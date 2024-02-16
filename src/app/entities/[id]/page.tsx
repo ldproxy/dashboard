@@ -1,5 +1,5 @@
 import { Button } from "@/components/shadcn-ui/button";
-import { entities } from "@/data/entities";
+import GetEntities from "@/lib/utils";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
 
@@ -8,6 +8,7 @@ import { healthChecks } from "@/data/health";
 import Summary from "@/components/dashboard/summary";
 
 export default function CustomerPage({ params }: { params: { id: string } }) {
+  const entities = GetEntities();
   const entity = entities.find((e) => (e.uid = params.id));
 
   if (!entity) {

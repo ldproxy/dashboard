@@ -12,9 +12,11 @@ import Link from "next/link";
 import { Tabs, TabsList, TabsTrigger } from "@/components/shadcn-ui/tabs";
 import { Badge } from "@/components/shadcn-ui/badge";
 import { healthChecks } from "@/data/health";
-import { entities } from "@/data/entities";
+import GetEntities from "@/lib/utils";
 
 export default function EntitiesPage() {
+  const entities = GetEntities();
+  console.log("entities", entities);
   //TODO: fetch, pass to [id]?
   const customers = [
     { id: 1, name: "IT.NRW", issues: 3, duration: "3 years" },

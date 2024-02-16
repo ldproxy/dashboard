@@ -10,8 +10,7 @@ export interface Entity {
   status: string;
 }
 
-// TODO: fetch from api route
-const fetchedEntities: { [key: string]: InputEntity[] } = {
+export const fetchedEntities: { [key: string]: InputEntity[] } = {
   providers: [
     {
       id: "bergbau",
@@ -33,11 +32,3 @@ const fetchedEntities: { [key: string]: InputEntity[] } = {
     },
   ],
 };
-
-export const entities: Entity[] = Object.keys(fetchedEntities).flatMap((type) =>
-  fetchedEntities[type].map((entity) => ({
-    type,
-    uid: `${type}_${entity.id}`,
-    ...entity,
-  }))
-);
