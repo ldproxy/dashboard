@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -13,15 +15,14 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/shadcn-ui/tabs";
 import { Badge } from "@/components/shadcn-ui/badge";
 import { healthChecks } from "@/data/health";
 import GetEntities from "@/lib/utils";
+import { useEffect } from "react";
 
 export default function EntitiesPage() {
   const entities = GetEntities();
-  console.log("entities", entities);
-  //TODO: fetch, pass to [id]?
-  const customers = [
-    { id: 1, name: "IT.NRW", issues: 3, duration: "3 years" },
-    { id: 2, name: "Hamburg", issues: 1, duration: "1 month" },
-  ];
+
+  useEffect(() => {
+    console.log("entities", entities);
+  }, [entities]);
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
