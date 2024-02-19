@@ -17,10 +17,11 @@ import {
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
 import { Badge } from "@/components/shadcn-ui/badge";
-import { healthChecks } from "@/data/health";
+import { GetHealthChecks } from "@/lib/utils";
 import { useState } from "react";
 
 export default function DeploymentPage() {
+  const healthChecks = GetHealthChecks();
   const [tab, setTab] = useState("health");
 
   const onTabChange = (tab: string) => {

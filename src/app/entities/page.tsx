@@ -19,7 +19,7 @@ import {
 } from "@/components/shadcn-ui/tabs";
 import { Badge } from "@/components/shadcn-ui/badge";
 import { healthChecks } from "@/data/health";
-import GetEntities from "@/lib/utils";
+import { GetEntities } from "@/lib/utils";
 import { FormEventHandler, useEffect, useState } from "react";
 
 export default function EntitiesPage() {

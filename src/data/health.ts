@@ -11,7 +11,7 @@ export interface Check {
   timestamp: string;
 }
 
-const fetchedHealthChecks: { [key: string]: InputCheck } = {
+export const fetchedHealthChecks: { [key: string]: InputCheck } = {
   "db.bergbau.pool.ConnectivityCheck": {
     healthy: true,
     duration: 0,
@@ -33,10 +33,3 @@ const fetchedHealthChecks: { [key: string]: InputCheck } = {
     timestamp: "2024-02-15T17:56:36.687+01:00",
   },
 };
-
-export const healthChecks: Check[] = Object.keys(fetchedHealthChecks).map(
-  (name) => ({
-    name,
-    ...fetchedHealthChecks[name],
-  })
-);

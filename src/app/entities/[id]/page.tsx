@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/shadcn-ui/button";
-import GetEntities from "@/lib/utils";
+import { GetEntities } from "@/lib/utils";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
 
