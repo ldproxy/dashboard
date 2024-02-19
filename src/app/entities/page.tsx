@@ -11,18 +11,28 @@ import Summary from "@/components/dashboard/summary";
 import { Button } from "@/components/shadcn-ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-import { Tabs, TabsList, TabsTrigger } from "@/components/shadcn-ui/tabs";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/shadcn-ui/tabs";
 import { Badge } from "@/components/shadcn-ui/badge";
 import { healthChecks } from "@/data/health";
 import GetEntities from "@/lib/utils";
-import { useEffect } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 
 export default function EntitiesPage() {
   const entities = GetEntities();
+  const [tab, setTab] = useState("health");
 
   useEffect(() => {
     console.log("entities", entities);
   }, [entities]);
+
+  const onTabChange = (tab: string) => {
+    setTab(tab);
+  };
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
@@ -35,7 +45,12 @@ export default function EntitiesPage() {
           </Button>
         </div>
       </div>
-      <Tabs defaultValue="health" className="h-full space-y-6">
+
+      <Tabs
+        value={tab}
+        onValueChange={onTabChange}
+        className="h-full space-y-6"
+      >
         <div className="space-between flex items-center">
           <TabsList>
             <TabsTrigger value="health">
@@ -49,18 +64,27 @@ export default function EntitiesPage() {
             </TabsTrigger>
           </TabsList>
         </div>
+
+        <TabsContent value="health">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {entities.map((entity) => (
+              <Summary
+                key={entity.uid}
+                header={`${entity.status}`}
+                main={entity.id}
+                footer={`${entity.type}`}
+                route={`/entities/${entity.uid}`}
+              />
+            ))}
+          </div>
+        </TabsContent>
+        <TabsContent value="store">
+          <div>Store content goes here</div>
+        </TabsContent>
+        <TabsContent value="cfg">
+          <div>Configuration content goes here</div>
+        </TabsContent>
       </Tabs>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {entities.map((entity) => (
-          <Summary
-            key={entity.uid}
-            header={`${entity.status}`}
-            main={entity.id}
-            footer={`${entity.type}`}
-            route={`/entities/${entity.uid}`}
-          />
-        ))}
-      </div>
     </div>
   );
 }
