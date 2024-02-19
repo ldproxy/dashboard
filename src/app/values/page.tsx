@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/shadcn-ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
 

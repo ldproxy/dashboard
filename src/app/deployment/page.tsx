@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardContent,
@@ -9,11 +10,23 @@ import Summary from "@/components/dashboard/summary";
 import { Button } from "@/components/shadcn-ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-import { Tabs, TabsList, TabsTrigger } from "@/components/shadcn-ui/tabs";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/shadcn-ui/tabs";
 import { Badge } from "@/components/shadcn-ui/badge";
 import { healthChecks } from "@/data/health";
+import { useState } from "react";
 
 export default function DeploymentPage() {
+  const [tab, setTab] = useState("health");
+
+  const onTabChange = (tab: string) => {
+    setTab(tab);
+  };
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between space-y-2">
@@ -25,7 +38,11 @@ export default function DeploymentPage() {
           </Button>
         </div>
       </div>
-      <Tabs defaultValue="health" className="h-full space-y-6">
+      <Tabs
+        value={tab}
+        onValueChange={onTabChange}
+        className="h-full space-y-6"
+      >
         <div className="space-between flex items-center">
           <TabsList>
             <TabsTrigger value="health">
@@ -39,19 +56,28 @@ export default function DeploymentPage() {
             </TabsTrigger>
           </TabsList>
         </div>
+
+        <TabsContent value="health">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {healthChecks
+              .filter((check) => !check.name.startsWith("db"))
+              .map((check) => (
+                <Summary
+                  key={check.name}
+                  header={`${check.healthy}`}
+                  main={check.name}
+                  footer={`${check.timestamp}`}
+                />
+              ))}
+          </div>
+        </TabsContent>
+        <TabsContent value="store">
+          <div>Store content goes here</div>
+        </TabsContent>
+        <TabsContent value="cfg">
+          <div>Configuration content goes here</div>
+        </TabsContent>
       </Tabs>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {healthChecks
-          .filter((check) => !check.name.startsWith("db"))
-          .map((check) => (
-            <Summary
-              key={check.name}
-              header={`${check.healthy}`}
-              main={check.name}
-              footer={`${check.timestamp}`}
-            />
-          ))}
-      </div>
     </div>
   );
 }
