@@ -18,17 +18,26 @@ import {
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
 import { Badge } from "@/components/shadcn-ui/badge";
-import { healthChecks } from "@/data/health";
 import { GetEntities } from "@/lib/utils";
-import { FormEventHandler, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Entity } from "@/data/entities";
 
 export default function EntitiesPage() {
-  const entities = GetEntities();
+  const [entities, setEntities] = useState<Entity[]>([]);
   const [tab, setTab] = useState("health");
 
+  const loadEntities = async () => {
+    try {
+      const newEntities = await GetEntities();
+      setEntities(newEntities);
+    } catch (error) {
+      console.error("Error loading entities:", error);
+    }
+  };
+
   useEffect(() => {
-    console.log("entities", entities);
-  }, [entities]);
+    loadEntities();
+  }, []);
 
   const onTabChange = (tab: string) => {
     setTab(tab);
@@ -39,7 +48,7 @@ export default function EntitiesPage() {
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Entities</h2>
         <div className="flex items-center space-x-2">
-          <Button>
+          <Button onClick={loadEntities}>
             <ReloadIcon className="mr-2 h-4 w-4" />
             Reload all
           </Button>

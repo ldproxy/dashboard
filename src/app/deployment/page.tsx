@@ -17,12 +17,26 @@ import {
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
 import { Badge } from "@/components/shadcn-ui/badge";
-import { GetHealthChecks } from "@/lib/utils";
-import { useState } from "react";
+import { getHealthChecks } from "@/lib/utils";
+import { useState, useEffect } from "react";
+import { Check } from "@/data/health";
 
 export default function DeploymentPage() {
-  const healthChecks = GetHealthChecks();
+  const [healthChecks, setHealthChecks] = useState<Check[]>([]);
   const [tab, setTab] = useState("health");
+
+  const loadHealthChecks = async () => {
+    try {
+      const newHealthChecks = await getHealthChecks();
+      setHealthChecks(newHealthChecks);
+    } catch (error) {
+      console.error("Error loading health checks:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadHealthChecks();
+  }, []);
 
   const onTabChange = (tab: string) => {
     setTab(tab);
@@ -33,7 +47,7 @@ export default function DeploymentPage() {
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Deployment</h2>
         <div className="flex items-center space-x-2">
-          <Button>
+          <Button onClick={loadHealthChecks}>
             <ReloadIcon className="mr-2 h-4 w-4" />
             Reload
           </Button>
