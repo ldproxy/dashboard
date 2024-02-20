@@ -14,24 +14,13 @@ import Summary from "@/components/dashboard/summary";
 import { useState, useEffect } from "react";
 import { Entity } from "@/data/entities";
 import { Check } from "@/data/health";
-import { GetServerSideProps } from "next";
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { id }: any = context.params;
-
-  return {
-    props: {
-      params: {
-        id: id,
-      },
-    },
-  };
-};
 
 export default function CustomerPage({ params }: { params: { id: string } }) {
   const [entities, setEntities] = useState<Entity[]>([]);
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
   const [tab, setTab] = useState("health");
+
+  console.log("params", params);
 
   const loadHealthChecks = async () => {
     try {
@@ -68,13 +57,14 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">{entity.id}</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">{entity.id}</h2>
         <div className="flex items-center space-x-2">
           <Button
             onClick={() => {
               loadEntities();
               loadHealthChecks();
             }}
+            className="font-bold"
           >
             <ReloadIcon className="mr-2 h-4 w-4" />
             Reload

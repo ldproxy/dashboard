@@ -25,13 +25,21 @@ export default function CustomersPage({
   Icon,
 }: SummaryProps) {
   return (
-    <Card>
+    <Card className="shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{header}</CardTitle>
+        <CardTitle
+          className={`text-sm font-semibold ${
+            header === "ACTIVE"
+              ? "text-blue-700 hover:text-blue-500"
+              : "text-red-700 hover:text-red-500"
+          }`}
+        >
+          {header}
+        </CardTitle>
         {Icon ? <Icon className="h-4 w-4 text-muted-foreground" /> : null}
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">
+        <div className="text-2xl font-bold ">
           {route ? <Link href={route}>{main}</Link> : main}
         </div>
         <p className="text-xs text-muted-foreground">{footer}</p>
