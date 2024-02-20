@@ -30,7 +30,7 @@ export default function CustomersPage({
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle
             className={`text-sm font-semibold ${
-              header === "ACTIVE"
+              header === "ACTIVE" || header === "true"
                 ? "text-blue-700 hover:text-blue-500"
                 : "text-red-700 hover:text-red-500"
             }`}
