@@ -17,8 +17,10 @@ import { Check } from "@/data/health";
 
 export default function CustomerPage({ params }: { params: { id: string } }) {
   const [entities, setEntities] = useState<Entity[]>([]);
+  const [entity, setEntity] = useState<Entity | null>(null); // entities[params.id]);
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
   const [tab, setTab] = useState("health");
+  const [isLoading, setIsLoading] = useState(true);
 
   console.log("params", params);
 
@@ -38,24 +40,37 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
         return notFound();
       }
       setEntities(newEntities);
+
+      const myEntity = newEntities.find((e) => e.uid === params.id);
+      setEntity(myEntity);
       console.log("newEntities", newEntities);
+      console.log("myEntity", myEntity);
     } catch (error) {
       console.error("Error loading entities:", error);
     }
   };
 
-  console.log("entities[id]", entities);
-
   useEffect(() => {
-    loadEntities();
-    loadHealthChecks();
+    const loadData = async () => {
+      await loadEntities();
+      await loadHealthChecks();
+      setIsLoading(false);
+      console.log("entities[id]", entities);
+      console.log("entity[id]", entity);
+    };
+
+    loadData();
   }, []);
 
   const onTabChange = (tab: string) => {
     setTab(tab);
   };
-  const entity = entities ? entities.find((e) => (e.uid = params.id)) : null;
 
+  //const entity = entities ? entities.find((e) => (e.uid = params.id)) : null; Diese Funktion hat UIDs in entities verändert.
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">

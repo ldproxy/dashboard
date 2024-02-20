@@ -42,15 +42,15 @@ export default function CustomersPage({
         <CardContent className="overflow-hidden">
           {main.toString().includes("ConnectivityCheck") ? (
             <>
-              <div className="text-1xl font-bold break-words">
+              <div className="text-1xl font-bold break-normal">
                 {main.toString().split("ConnectivityCheck")[0]}
               </div>
-              <div className="text-1xl font-bold break-words">
+              <div className="text-1xl font-bold break-normal">
                 ConnectivityCheck
               </div>
             </>
           ) : (
-            <div className="text-2xl font-bold break-words">{main}</div>
+            <div className="text-2xl font-bold break-normal">{main}</div>
           )}
           <p className="text-xs text-muted-foreground">{footer}</p>
         </CardContent>
