@@ -34,11 +34,17 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const loadEntities = async () => {
     try {
       const newEntities = await GetEntities();
+      if (!newEntities) {
+        return notFound();
+      }
       setEntities(newEntities);
+      console.log("newEntities", newEntities);
     } catch (error) {
       console.error("Error loading entities:", error);
     }
   };
+
+  console.log("entities[id]", entities);
 
   useEffect(() => {
     loadEntities();
@@ -48,16 +54,14 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const onTabChange = (tab: string) => {
     setTab(tab);
   };
-  const entity = entities.find((e) => (e.uid = params.id));
-
-  if (!entity) {
-    return notFound();
-  }
+  const entity = entities ? entities.find((e) => (e.uid = params.id)) : null;
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-2xl font-semibold tracking-tight">{entity.id}</h2>
+        <h2 className="text-2xl font-semibold tracking-tight">
+          {entity ? entity.id : "Not Found..."}
+        </h2>
         <div className="flex items-center space-x-2">
           <Button
             onClick={() => {
@@ -93,19 +97,22 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
 
         <TabsContent value="health">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {healthChecks
-              .filter(
-                (check) =>
-                  check.name.startsWith("db") && check.name.includes(entity.id)
-              )
-              .map((check) => (
-                <Summary
-                  key={check.name}
-                  header={`${check.healthy}`}
-                  main={check.name}
-                  footer={`${check.timestamp}`}
-                />
-              ))}
+            {healthChecks && entity
+              ? healthChecks
+                  .filter(
+                    (check) =>
+                      check.name.startsWith("db") &&
+                      check.name.includes(entity.id)
+                  )
+                  .map((check) => (
+                    <Summary
+                      key={check.name}
+                      header={`${check.healthy}`}
+                      main={check.name}
+                      footer={`${check.timestamp}`}
+                    />
+                  ))
+              : null}
           </div>
         </TabsContent>
         <TabsContent value="store">

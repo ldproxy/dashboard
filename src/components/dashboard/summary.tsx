@@ -31,16 +31,27 @@ export default function CustomersPage({
           <CardTitle
             className={`text-sm font-semibold ${
               header === "ACTIVE" || header === "true"
-                ? "text-blue-700 hover:text-blue-500"
-                : "text-red-700 hover:text-red-500"
+                ? "text-blue-700"
+                : "text-red-700"
             }`}
           >
             {header}
           </CardTitle>
           {Icon ? <Icon className="h-4 w-4 text-muted-foreground" /> : null}
         </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold ">{main}</div>
+        <CardContent className="overflow-hidden">
+          {main.toString().includes("ConnectivityCheck") ? (
+            <>
+              <div className="text-1xl font-bold break-words">
+                {main.toString().split("ConnectivityCheck")[0]}
+              </div>
+              <div className="text-1xl font-bold break-words">
+                ConnectivityCheck
+              </div>
+            </>
+          ) : (
+            <div className="text-2xl font-bold break-words">{main}</div>
+          )}
           <p className="text-xs text-muted-foreground">{footer}</p>
         </CardContent>
       </Card>
