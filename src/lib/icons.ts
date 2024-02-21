@@ -3,6 +3,7 @@ import {
   DashboardIcon,
   CodeIcon,
   IdCardIcon,
+  ListBulletIcon,
 } from "@radix-ui/react-icons";
 import { IconProps } from "@radix-ui/react-icons/dist/types";
 
@@ -10,6 +11,7 @@ export const icons = {
   Play: "Play",
   Id: "Id",
   Code: "Code",
+  ListBullet: "ListBullet",
 };
 
 export const getIcon = (
@@ -22,6 +24,8 @@ export const getIcon = (
       return IdCardIcon;
     case icons.Code:
       return CodeIcon;
+    case icons.ListBullet:
+      return ListBulletIcon;
     default:
       return undefined;
   }

@@ -122,6 +122,13 @@ export default function DeploymentPage() {
               footer="Go to Values..."
               Icon={getIcon("Code")}
             />
+            <Summary
+              key="Sources"
+              main="Sources"
+              footer="Go to Store..."
+              Icon={getIcon("ListBullet")}
+              onClick={() => setTab("store")}
+            />
           </div>
         </TabsContent>
         <TabsContent value="store">

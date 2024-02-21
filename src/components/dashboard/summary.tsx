@@ -25,10 +25,14 @@ export default function CustomersPage({
   footer,
   route,
   Icon,
+  ...props
 }: SummaryProps) {
   return (
     <Link href={route || "#"}>
-      <Card className="shadow-lg hover:bg-gray-100 transition-colors duration-200">
+      <Card
+        className="shadow-lg hover:bg-gray-100 transition-colors duration-200"
+        {...props}
+      >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle
             className={`text-sm font-semibold ${
