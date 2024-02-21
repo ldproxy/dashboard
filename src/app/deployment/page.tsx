@@ -115,6 +115,13 @@ export default function DeploymentPage() {
               footer={actualEntitiesFooter}
               Icon={getIcon("Id")}
             />
+            <Summary
+              key="Values"
+              main="Values"
+              route="/values"
+              footer="Go to Values..."
+              Icon={getIcon("Code")}
+            />
           </div>
         </TabsContent>
         <TabsContent value="store">
