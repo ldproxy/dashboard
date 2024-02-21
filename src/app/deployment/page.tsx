@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/shadcn-ui/card";
 import Summary from "@/components/dashboard/summary";
+import Info from "@/components/dashboard/info";
 import { Button } from "@/components/shadcn-ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
@@ -17,16 +18,42 @@ import {
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
 import { Badge } from "@/components/shadcn-ui/badge";
-import { GetEntities, getHealthChecks } from "@/lib/utils";
+import { GetEntities, getHealthChecks, getInfo, getMetrics } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Check } from "@/data/health";
 import { getIcon } from "@/lib/icons";
 import { Entity } from "@/data/entities";
+import { InputInfo } from "@/data/info";
+import { Metrics } from "@/data/metrics";
 
 export default function DeploymentPage() {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
   const [tab, setTab] = useState("overview");
   const [entities, setEntities] = useState<Entity[]>([]);
+  const [metrics, setMetrics] = useState<Metrics>({ uptime: 0, memory: 0 });
+  const [info, setInfo] = useState<InputInfo>({
+    name: "",
+    version: "",
+    status: "",
+  });
+
+  const loadInfo = async () => {
+    try {
+      const newInfo = await getInfo();
+      setInfo(newInfo);
+    } catch (error) {
+      console.error("Error loading info:", error);
+    }
+  };
+
+  const loadMetrics = async () => {
+    try {
+      const newMetrics = await getMetrics();
+      setMetrics(newMetrics);
+    } catch (error) {
+      console.error("Error loading metrics:", error);
+    }
+  };
 
   const loadEntities = async () => {
     try {
@@ -49,6 +76,8 @@ export default function DeploymentPage() {
   useEffect(() => {
     loadHealthChecks();
     loadEntities();
+    loadInfo();
+    loadMetrics();
   }, []);
 
   const onTabChange = (tab: string) => {
@@ -107,6 +136,19 @@ export default function DeploymentPage() {
         </div>
 
         <TabsContent value="overview">
+          <div
+            className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
+            style={{ marginBottom: "10px" }}
+          >
+            <Info
+              key="Entities"
+              name={info.name}
+              version={info.version}
+              uptime={metrics.uptime}
+              memory={metrics.memory}
+              health={info.status}
+            />
+          </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Summary
               key="Entities"

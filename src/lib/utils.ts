@@ -38,3 +38,28 @@ export const getHealthChecks = async () => {
     throw error;
   }
 };
+
+export const getInfo = async () => {
+  try {
+    const response = await fetch("http://localhost:3000/api/info");
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
+export const getMetrics = async () => {
+  try {
+    const response = await fetch("http://localhost:3000/api/metrics");
+    const data = await response.json();
+    return {
+      uptime: data.gauges["jvm.attribute.uptime"].value,
+      memory: data.gauges["jvm.memory.total.used"].value,
+    };
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
