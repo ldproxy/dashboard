@@ -20,6 +20,10 @@ export const fetchedEntities: { [key: string]: InputEntity[] } = {
       id: "krankenhaus",
       status: "ACTIVE",
     },
+    {
+      id: "test",
+      status: "INACTIVE",
+    },
   ],
   services: [
     {

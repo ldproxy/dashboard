@@ -7,10 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/shadcn-ui/card";
-import React from "react";
+import React, { ReactNode } from "react";
+import { getIcon } from "@/lib/icons";
+import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons";
 
 interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
-  header: string;
+  header?: string;
   main: string | React.ReactElement;
   footer: string;
   route?: string;
@@ -35,9 +37,15 @@ export default function CustomersPage({
                 : "text-red-700"
             }`}
           >
-            {header}
+            {header ? (
+              header
+            ) : Icon ? (
+              <Icon className="h-4 w-4 text-muted-foreground" />
+            ) : null}
           </CardTitle>
-          {Icon ? <Icon className="h-4 w-4 text-muted-foreground" /> : null}
+          {Icon && header ? (
+            <Icon className="h-4 w-4 text-muted-foreground" />
+          ) : null}
         </CardHeader>
         <CardContent className="overflow-hidden">
           {main.toString().includes("ConnectivityCheck") ? (
@@ -52,7 +60,60 @@ export default function CustomersPage({
           ) : (
             <div className="text-2xl font-bold break-normal">{main}</div>
           )}
-          <p className="text-xs text-muted-foreground">{footer}</p>
+          <p className="text-xs text-muted-foreground">
+            {footer.split(" ").map((word, index, words) => {
+              if (word === "active" && !isNaN(Number(words[index - 1]))) {
+                return [
+                  <span
+                    key={index}
+                    className="text-green-500"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: "3px",
+                    }}
+                  >
+                    <CheckCircledIcon
+                      className="text-green-500"
+                      key="CheckCircledIcon"
+                      style={{
+                        marginRight: "3px",
+                      }}
+                    />
+                    {words[index - 1]} {word}
+                  </span>,
+                ];
+              } else if (
+                word === "inactive" &&
+                !isNaN(Number(words[index - 1]))
+              ) {
+                return [
+                  <span
+                    key={index}
+                    className="text-red-500"
+                    style={{ display: "flex", alignItems: "center" }}
+                  >
+                    <CrossCircledIcon
+                      className="text-red-500"
+                      key="CheckCircledIcon"
+                      style={{
+                        marginRight: "3px",
+                      }}
+                    />
+                    {words[index - 1]} {word}
+                  </span>,
+                ];
+              } else if (
+                !isNaN(Number(word)) &&
+                (words[index + 1] === "active" ||
+                  words[index + 1] === "inactive")
+              ) {
+                return null;
+              } else {
+                return word;
+              }
+            })}
+          </p>
         </CardContent>
       </Card>
     </Link>

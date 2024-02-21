@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export const GetEntities = async () => {
   try {
-    const response = await fetch("http://localhost:3000/api/api?type=entities");
+    const response = await fetch("http://localhost:3000/api/entities");
     const data = await response.json();
     const newMappedEntities = Object.keys(data).flatMap((type) =>
       data[type].map((entity: any) => ({
@@ -26,9 +26,7 @@ export const GetEntities = async () => {
 
 export const getHealthChecks = async () => {
   try {
-    const response = await fetch(
-      "http://localhost:3000/api/api?type=healthchecks"
-    );
+    const response = await fetch("http://localhost:3000/api/health");
     const data = await response.json();
     const mappedHealthChecks = Object.keys(data).map((name) => ({
       name,

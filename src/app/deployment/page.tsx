@@ -17,13 +17,25 @@ import {
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
 import { Badge } from "@/components/shadcn-ui/badge";
-import { getHealthChecks } from "@/lib/utils";
+import { GetEntities, getHealthChecks } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Check } from "@/data/health";
+import { getIcon } from "@/lib/icons";
+import { Entity } from "@/data/entities";
 
 export default function DeploymentPage() {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
-  const [tab, setTab] = useState("health");
+  const [tab, setTab] = useState("overview");
+  const [entities, setEntities] = useState<Entity[]>([]);
+
+  const loadEntities = async () => {
+    try {
+      const newEntities = await GetEntities();
+      setEntities(newEntities);
+    } catch (error) {
+      console.error("Error loading entities:", error);
+    }
+  };
 
   const loadHealthChecks = async () => {
     try {
@@ -36,11 +48,33 @@ export default function DeploymentPage() {
 
   useEffect(() => {
     loadHealthChecks();
+    loadEntities();
   }, []);
 
   const onTabChange = (tab: string) => {
     setTab(tab);
   };
+
+  // Following variables are only used for the footer of the entities summary
+  const totalEntities = entities.length;
+  const activeEntities = entities.filter(
+    (entity) => entity.status === "ACTIVE"
+  ).length;
+
+  const entitiesFooterCaseActive = `${activeEntities} active`;
+  const entitiesFooterCaseInactive =
+    totalEntities !== activeEntities
+      ? `${totalEntities - activeEntities} inactive`
+      : "";
+
+  const actualEntitiesFooter =
+    entitiesFooterCaseInactive && entitiesFooterCaseActive
+      ? entitiesFooterCaseActive + " " + entitiesFooterCaseInactive
+      : entitiesFooterCaseActive
+      ? entitiesFooterCaseActive
+      : entitiesFooterCaseInactive
+      ? entitiesFooterCaseInactive
+      : "No entities found";
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
@@ -60,8 +94,8 @@ export default function DeploymentPage() {
       >
         <div className="space-between flex items-center">
           <TabsList>
-            <TabsTrigger value="health">
-              <span>Health</span>
+            <TabsTrigger value="overview">
+              <span>Overview</span>
             </TabsTrigger>
             <TabsTrigger value="store">
               <span>Store</span>
@@ -72,18 +106,15 @@ export default function DeploymentPage() {
           </TabsList>
         </div>
 
-        <TabsContent value="health">
+        <TabsContent value="overview">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {healthChecks
-              .filter((check) => !check.name.startsWith("db"))
-              .map((check) => (
-                <Summary
-                  key={check.name}
-                  header={`${check.healthy}`}
-                  main={check.name}
-                  footer={`${check.timestamp}`}
-                />
-              ))}
+            <Summary
+              key="Entities"
+              main="Entities"
+              route="/entities"
+              footer={actualEntitiesFooter}
+              Icon={getIcon("Id")}
+            />
           </div>
         </TabsContent>
         <TabsContent value="store">

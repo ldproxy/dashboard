@@ -14,6 +14,7 @@ import Summary from "@/components/dashboard/summary";
 import { useState, useEffect } from "react";
 import { Entity } from "@/data/entities";
 import { Check } from "@/data/health";
+import { DevEntities } from "@/data/constants";
 
 export default function CustomerPage({ params }: { params: { id: string } }) {
   const [entities, setEntities] = useState<Entity[]>([]);
@@ -21,8 +22,6 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
   const [tab, setTab] = useState("health");
   const [isLoading, setIsLoading] = useState(true);
-
-  console.log("params", params);
 
   const loadHealthChecks = async () => {
     try {
@@ -43,8 +42,12 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
 
       const myEntity = newEntities.find((e) => e.uid === params.id);
       setEntity(myEntity);
-      console.log("newEntities", newEntities);
-      console.log("myEntity", myEntity);
+
+      if (DevEntities) {
+        console.log("params", params);
+        console.log("newEntities", newEntities);
+        console.log("myEntity", myEntity);
+      }
     } catch (error) {
       console.error("Error loading entities:", error);
     }
@@ -55,8 +58,10 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
       await loadEntities();
       await loadHealthChecks();
       setIsLoading(false);
-      console.log("entities[id]", entities);
-      console.log("entity[id]", entity);
+      if (DevEntities) {
+        console.log("entities[id]", entities);
+        console.log("entity[id]", entity);
+      }
     };
 
     loadData();

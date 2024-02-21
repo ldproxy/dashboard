@@ -3,7 +3,6 @@ import {
   DashboardIcon,
   CodeIcon,
   IdCardIcon,
-  MixIcon,
 } from "@radix-ui/react-icons";
 import { IconProps } from "@radix-ui/react-icons/dist/types";
 
