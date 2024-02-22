@@ -1,8 +1,9 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/shadcn-ui/button";
+import { Badge } from "@/components/shadcn-ui/badge";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -13,6 +14,8 @@ export type Payment =
       checked: string;
     }
   | unknown;
+
+type PaymentRow = any;
 
 export const columns: ColumnDef<Payment>[] = [
   {
@@ -27,6 +30,14 @@ export const columns: ColumnDef<Payment>[] = [
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
+    },
+    cell: ({ row }: { row: PaymentRow }) => {
+      if (row.original) {
+        const badgeColor =
+          row.original.status === "HEALTHY" ? "default" : "destructive";
+        return <Badge variant={badgeColor}>{row.original.status}</Badge>;
+      }
+      return null;
     },
   },
   {

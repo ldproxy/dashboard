@@ -33,13 +33,15 @@ export default function DeploymentPage() {
     status: "",
   });
   const [tableData, setTableData] = useState([] as any[]);
+  const [storeState, setStoreState] = useState(true);
 
   useEffect(() => {
     const storeCheck = healthChecks.find((check) => check.name === "store");
     if (DevDeployment) {
       console.log("storeCheck data:", storeCheck);
     }
-    if (storeCheck && storeCheck.sources) {
+    if (storeCheck && storeCheck.sources && storeCheck.healthy) {
+      setStoreState(storeCheck.healthy);
       setTableData(
         storeCheck.sources.map((source) => ({
           label: source.label,
@@ -185,7 +187,7 @@ export default function DeploymentPage() {
             <Summary
               key="Sources"
               main="Sources"
-              footer="Go to Store..."
+              footer={storeState ? "true" : "false"}
               Icon={getIcon("ListBullet")}
               onClick={() => setTab("store")}
             />
