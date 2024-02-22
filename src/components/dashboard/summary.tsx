@@ -71,8 +71,11 @@ export default function CustomersPage({
               {main}
             </div>
           )}
-          <p className="text-xs text-muted-foreground">
-            <div style={{ display: "flex", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", flexWrap: "wrap" }}>
+            <p
+              className="text-xs text-muted-foreground"
+              style={{ display: "flex", flexDirection: "row" }}
+            >
               {footer
                 ? footer.split(" ").map((word, index, words) => {
                     if (word === "active" && !isNaN(Number(words[index - 1]))) {
@@ -127,8 +130,8 @@ export default function CustomersPage({
                     }
                   })
                 : null}
-            </div>
-          </p>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </Link>

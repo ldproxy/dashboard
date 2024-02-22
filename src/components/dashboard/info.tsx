@@ -54,7 +54,7 @@ export default function CustomersPage({
             className="text-xs text-muted-foreground"
             style={{ marginTop: "10px" }}
           >
-            <div>{version}</div>
+            {version}
           </p>
         </div>
         <div style={{ marginRight: "250px", marginBottom: "-10px" }}>
