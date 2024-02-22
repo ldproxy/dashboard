@@ -147,6 +147,8 @@ export default function DeploymentPage() {
               uptime={metrics.uptime}
               memory={metrics.memory}
               health={info.status}
+              IconFooter1={getIcon("Clock")}
+              IconFooter2={getIcon("Upload")}
             />
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

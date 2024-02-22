@@ -18,6 +18,8 @@ interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   memory: number;
   health: string;
   Icon?: React.FunctionComponent<IconProps>;
+  IconFooter1?: React.FunctionComponent<IconProps>;
+  IconFooter2?: React.FunctionComponent<IconProps>;
 }
 
 export default function CustomersPage({
@@ -27,6 +29,8 @@ export default function CustomersPage({
   memory,
   health,
   Icon,
+  IconFooter1,
+  IconFooter2,
 }: SummaryProps) {
   return (
     <Card>
@@ -57,11 +61,39 @@ export default function CustomersPage({
             {version}
           </p>
         </div>
-        <div style={{ marginRight: "250px", marginBottom: "-10px" }}>
-          <p style={{ fontSize: "14px", fontWeight: "bold" }}>
+        <div style={{ marginRight: "230px", marginBottom: "-10px" }}>
+          <p
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              fontSize: "14px",
+              fontWeight: "bold",
+              color: "dimgray",
+            }}
+          >
+            {IconFooter1 ? (
+              <IconFooter1
+                className="h-4 w-4 text-muted-foreground"
+                style={{ marginRight: "5px", marginTop: "2px" }}
+              />
+            ) : null}
             Uptime: {uptime}
           </p>
-          <p style={{ fontSize: "14px", fontWeight: "bold" }}>
+          <p
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              fontSize: "14px",
+              fontWeight: "bold",
+              color: "dimgray",
+            }}
+          >
+            {IconFooter2 ? (
+              <IconFooter2
+                className="h-4 w-4 text-muted-foreground"
+                style={{ marginRight: "5px", marginTop: "2px" }}
+              />
+            ) : null}
             Memory: {memory}
           </p>
         </div>

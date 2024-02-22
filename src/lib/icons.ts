@@ -4,6 +4,8 @@ import {
   CodeIcon,
   IdCardIcon,
   ListBulletIcon,
+  UploadIcon,
+  ClockIcon,
 } from "@radix-ui/react-icons";
 import { IconProps } from "@radix-ui/react-icons/dist/types";
 
@@ -12,6 +14,8 @@ export const icons = {
   Id: "Id",
   Code: "Code",
   ListBullet: "ListBullet",
+  Upload: "Upload",
+  Clock: "Clock",
 };
 
 export const getIcon = (
@@ -26,6 +30,10 @@ export const getIcon = (
       return CodeIcon;
     case icons.ListBullet:
       return ListBulletIcon;
+    case icons.Upload:
+      return UploadIcon;
+    case icons.Clock:
+      return ClockIcon;
     default:
       return undefined;
   }
