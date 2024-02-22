@@ -81,7 +81,7 @@ export default function EntitiesPage() {
                 key={entity.uid}
                 header={`${entity.status}`}
                 main={entity.id}
-                footer={`${entity.type}`}
+                footer={`${entity.type} (${entity.subType})`}
                 route={`/entities/${entity.uid}`}
               />
             ))}

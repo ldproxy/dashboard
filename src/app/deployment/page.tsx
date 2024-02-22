@@ -105,7 +105,7 @@ export default function DeploymentPage() {
   // Following variables are only used for the footer of the entities summary
   const totalEntities = entities.length;
   const activeEntities = entities.filter(
-    (entity) => entity.status === "ACTIVE"
+    (entity) => entity.status === "ACTIVE" || entity.status === "HEALTHY"
   ).length;
 
   const entitiesFooterCaseActive = `${activeEntities} active`;

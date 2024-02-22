@@ -36,7 +36,7 @@ export default function CustomersPage({
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle
             className={`text-sm font-semibold ${
-              header === "ACTIVE" || header === "true"
+              header === "ACTIVE" || header === "true" || header === "HEALTHY"
                 ? "text-blue-700"
                 : "text-red-700"
             }`}
