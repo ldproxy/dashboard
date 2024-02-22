@@ -1,11 +1,5 @@
 "use client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/shadcn-ui/card";
+import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import Summary from "@/components/dashboard/summary";
 import Info from "@/components/dashboard/info";
 import { Button } from "@/components/shadcn-ui/button";
@@ -25,6 +19,8 @@ import { getIcon } from "@/lib/icons";
 import { Entity } from "@/data/entities";
 import { InputInfo } from "@/data/info";
 import { Metrics } from "@/data/metrics";
+import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
+import { DevDeployment } from "@/data/constants";
 
 export default function DeploymentPage() {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
@@ -36,6 +32,26 @@ export default function DeploymentPage() {
     version: "",
     status: "",
   });
+  const [tableData, setTableData] = useState([] as any[]);
+
+  useEffect(() => {
+    const storeCheck = healthChecks.find((check) => check.name === "store");
+    if (DevDeployment) {
+      console.log("storeCheck data:", storeCheck);
+    }
+    if (storeCheck && storeCheck.sources) {
+      setTableData(
+        storeCheck.sources.map((source) => ({
+          label: source.label,
+          status: source.status,
+          checked: storeCheck.timestamp,
+        }))
+      );
+    }
+    if (DevDeployment) {
+      console.log("Table data:", tableData);
+    }
+  }, [healthChecks]);
 
   const loadInfo = async () => {
     try {
@@ -176,7 +192,9 @@ export default function DeploymentPage() {
           </div>
         </TabsContent>
         <TabsContent value="store">
-          <div>Store content goes here</div>
+          <div className="container mx-auto py-10">
+            <DataTable columns={columns} data={tableData} />
+          </div>
         </TabsContent>
         <TabsContent value="cfg">
           <div>Configuration content goes here</div>

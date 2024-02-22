@@ -1,14 +1,16 @@
 export interface InputCheck {
   healthy: boolean;
-  duration: number;
   timestamp: string;
+  duration: number;
+  sources?: { label: string; status: string }[];
 }
 
 export interface Check {
   name: string;
   healthy: boolean;
-  duration: number;
   timestamp: string;
+  duration: number;
+  sources?: { label: string; status: string }[];
 }
 
 export const fetchedHealthChecks: { [key: string]: InputCheck } = {
@@ -31,5 +33,15 @@ export const fetchedHealthChecks: { [key: string]: InputCheck } = {
     healthy: true,
     duration: 0,
     timestamp: "2024-02-15T17:56:36.687+01:00",
+    sources: [
+      {
+        label: "FS[.]",
+        status: "HEALTHY",
+      },
+      {
+        label: "S3[s3.ldproxy.net/bplan]",
+        status: "DEFECTIVE",
+      },
+    ],
   },
 };
