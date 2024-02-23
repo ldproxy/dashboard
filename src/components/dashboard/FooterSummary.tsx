@@ -1,10 +1,18 @@
 import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons";
+import { Badge } from "@/components/shadcn-ui/badge";
 
 interface FooterSummaryProps {
   footer: string;
 }
 
 export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
+  const type = footer.includes("_")
+    ? footer.split("_")[1]
+    : footer.includes("/")
+    ? footer.split("/")[1]
+    : null;
+  console.log("footer: ", footer);
+  console.log("type1: ", type);
   return (
     <>
       {footer
@@ -92,6 +100,8 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                   Store is unhealthy
                 </span>,
               ];
+            } else if (type !== null) {
+              return <Badge key={type}>{type}</Badge>;
             } else if (
               !isNaN(Number(word)) &&
               (words[index + 1] === "active" ||

@@ -1,2 +1,2 @@
-export const DevEntities = false;
-export const DevDeployment = true;
+export const DevEntities = true;
+export const DevDeployment = false;

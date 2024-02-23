@@ -17,7 +17,7 @@ export const fetchedEntities: { [key: string]: InputEntity[] } = {
     {
       id: "bergbau",
       status: "ACTIVE",
-      subType: "features/sql",
+      subType: "features/features",
     },
     {
       id: "krankenhaus",

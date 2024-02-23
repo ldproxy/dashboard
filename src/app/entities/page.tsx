@@ -25,7 +25,7 @@ import { DevEntities } from "@/data/constants";
 
 export default function EntitiesPage() {
   const [entities, setEntities] = useState<Entity[]>([]);
-  const [tab, setTab] = useState("health");
+  const [tab, setTab] = useState("overview");
 
   const entityTypes = entities
     .map((entity) => entity.subType.split(/[ _/]/)[0])
@@ -71,7 +71,7 @@ export default function EntitiesPage() {
   };
 
   if (DevEntities) {
-    console.log("entityTypeStatusCounts:", entityTypeStatusCounts.ogc.active);
+    console.log("entityTypeStatusCounts:", entityTypeStatusCounts);
     console.log("Counts:", entityTypeCounts.ogc);
     console.log("entityTypes", entityTypes);
   }
@@ -94,19 +94,21 @@ export default function EntitiesPage() {
       >
         <div className="space-between flex items-center">
           <TabsList>
-            <TabsTrigger value="health">
-              <span>Health</span>
+            <TabsTrigger value="overview">
+              <span>Overview</span>
             </TabsTrigger>
-            <TabsTrigger value="store">
-              <span>Store</span>
-            </TabsTrigger>
+            {entityTypes.map((entityType) => (
+              <TabsTrigger key={entityType} value={entityType}>
+                <span>{entityType}</span>
+              </TabsTrigger>
+            ))}
             <TabsTrigger value="cfg">
               <span>Configuration</span>
             </TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="health">
+        <TabsContent value="overview">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {entityTypes.map((entity) => (
               <Summary
@@ -129,14 +131,30 @@ export default function EntitiesPage() {
                     : "No entities found"
                 }
                 total={entityTypeCounts[entity]}
-                route={`/entities/${entity}`}
+                onClick={() => setTab(entity)}
               />
             ))}
           </div>
         </TabsContent>
-        <TabsContent value="store">
-          <div>Store content goes here</div>
-        </TabsContent>
+        {entityTypes.map((entityType) => (
+          <TabsContent key={entityType} value={entityType}>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {entities
+                .filter(
+                  (entity) => entity.subType.split(/[ _/]/)[0] === entityType
+                )
+                .map((entity) => (
+                  <Summary
+                    key={entity.uid}
+                    header={entity.status}
+                    main={entity.id}
+                    footer={entity.subType}
+                    route={`/entities/${entity.uid}`}
+                  />
+                ))}
+            </div>
+          </TabsContent>
+        ))}
         <TabsContent value="cfg">
           <div>Configuration content goes here</div>
         </TabsContent>

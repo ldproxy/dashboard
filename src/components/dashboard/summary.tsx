@@ -14,7 +14,7 @@ import { FooterSummary } from "./FooterSummary";
 interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   header?: string;
   main: string | React.ReactElement;
-  total: number;
+  total?: number;
   footer?: string;
   route?: string;
   Icon?: React.FunctionComponent<IconProps>;
