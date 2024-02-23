@@ -22,6 +22,7 @@ import { GetEntities } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Entity } from "@/data/entities";
 import { DevEntities } from "@/data/constants";
+import { getIcon } from "@/lib/icons";
 
 export default function EntitiesPage() {
   const [entities, setEntities] = useState<Entity[]>([]);
@@ -132,6 +133,7 @@ export default function EntitiesPage() {
                 }
                 total={entityTypeCounts[entity]}
                 onClick={() => setTab(entity)}
+                Icon={getIcon("Id")}
               />
             ))}
           </div>
