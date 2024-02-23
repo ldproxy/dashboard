@@ -219,7 +219,7 @@ export default function DeploymentPage() {
           </div>
         </TabsContent>
         <TabsContent value="store">
-          <div className="container mx-auto py-10">
+          <div>
             <DataTable columns={columns} data={tableData} />
           </div>
         </TabsContent>

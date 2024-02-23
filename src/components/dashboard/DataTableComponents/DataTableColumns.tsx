@@ -19,6 +19,20 @@ type PaymentRow = any;
 
 export const columns: ColumnDef<Payment>[] = [
   {
+    accessorKey: "label",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Label
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+  },
+  {
     accessorKey: "status",
     header: ({ column }) => {
       return (
@@ -38,20 +52,6 @@ export const columns: ColumnDef<Payment>[] = [
         return <Badge variant={badgeColor}>{row.original.status}</Badge>;
       }
       return null;
-    },
-  },
-  {
-    accessorKey: "label",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Label
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
     },
   },
   {
