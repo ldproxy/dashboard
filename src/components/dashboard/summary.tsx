@@ -14,6 +14,7 @@ import { FooterSummary } from "./FooterSummary";
 interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   header?: string;
   main: string | React.ReactElement;
+  total: number;
   footer?: string;
   route?: string;
   Icon?: React.FunctionComponent<IconProps>;
@@ -24,6 +25,7 @@ export default function CustomersPage({
   main,
   footer,
   route,
+  total,
   Icon,
   ...props
 }: SummaryProps) {
@@ -33,23 +35,23 @@ export default function CustomersPage({
         className="shadow-lg hover:bg-gray-100 transition-colors duration-200"
         {...props}
       >
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
           <CardTitle
             className={`text-sm font-semibold ${
-              header === "ACTIVE" || header === "true" || header === "HEALTHY"
+              header === "ACTIVE" ||
+              header === "true" ||
+              header === "HEALTHY" ||
+              !isNaN(Number(total))
                 ? "text-blue-700"
                 : "text-red-700"
-            }`}
+            }${!header ? "text-2xl font-bold mb-1" : ""}`}
           >
             {header ? (
               header
-            ) : Icon ? (
-              <Icon className="h-4 w-4 text-muted-foreground" />
-            ) : null}
+            ) : (
+              <span className="text-2xl font-bold mb-1">{total}</span>
+            )}
           </CardTitle>
-          {Icon && header ? (
-            <Icon className="h-4 w-4 text-muted-foreground" />
-          ) : null}
         </CardHeader>
         <CardContent className="overflow-hidden">
           {main.toString().includes("ConnectivityCheck") ? (
@@ -65,9 +67,15 @@ export default function CustomersPage({
             <div
               className="text-2xl font-bold break-normal"
               style={{
+                display: "flex",
+                flexDirection: "row",
                 marginBottom: "5px",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                gap: "10px",
               }}
             >
+              {Icon ? <Icon className="h-6 w-6 text-muted-foreground" /> : null}
               {main}
             </div>
           )}

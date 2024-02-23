@@ -12,7 +12,13 @@ import {
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
 import { Badge } from "@/components/shadcn-ui/badge";
-import { GetEntities, getHealthChecks, getInfo, getMetrics } from "@/lib/utils";
+import {
+  GetEntities,
+  getHealthChecks,
+  getInfo,
+  getMetrics,
+  getValues,
+} from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Check } from "@/data/health";
 import { getIcon } from "@/lib/icons";
@@ -32,6 +38,7 @@ export default function DeploymentPage() {
     version: "",
     status: "",
   });
+  const [values, setValues] = useState([] as any[]);
   const [tableData, setTableData] = useState([] as any[]);
   const [storeState, setStoreState] = useState(true);
 
@@ -91,17 +98,31 @@ export default function DeploymentPage() {
     }
   };
 
+  const loadValues = async () => {
+    try {
+      const newValues = await getValues();
+      setValues(newValues);
+    } catch (error) {
+      console.error("Error loading health values:", error);
+    }
+  };
+
   useEffect(() => {
     loadHealthChecks();
     loadEntities();
     loadInfo();
     loadMetrics();
+    loadValues();
   }, []);
 
   const onTabChange = (tab: string) => {
     setTab(tab);
   };
 
+  const totalSources = tableData.length;
+  const totalValues = values.length;
+  console.log("Values:", totalValues);
+  console.log("totalSources:", totalSources);
   // Following variables are only used for the footer of the entities summary
   const totalEntities = entities.length;
   const activeEntities = entities.filter(
@@ -176,21 +197,24 @@ export default function DeploymentPage() {
               main="Entities"
               route="/entities"
               footer={actualEntitiesFooter}
+              total={totalEntities}
               Icon={getIcon("Id")}
-            />
-            <Summary
-              key="Values"
-              main="Values"
-              route="/values"
-              footer="Go to Values..."
-              Icon={getIcon("Code")}
             />
             <Summary
               key="Sources"
               main="Sources"
               footer={storeState ? "true" : "false"}
               Icon={getIcon("ListBullet")}
+              total={totalSources}
               onClick={() => setTab("store")}
+            />
+            <Summary
+              key="Values"
+              main="Values"
+              route="/values"
+              footer="Go to Values..."
+              total={totalValues}
+              Icon={getIcon("Code")}
             />
           </div>
         </TabsContent>

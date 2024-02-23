@@ -63,3 +63,14 @@ export const getMetrics = async () => {
     throw error;
   }
 };
+
+export const getValues = async () => {
+  try {
+    const response = await fetch("http://localhost:3000/api/values");
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
