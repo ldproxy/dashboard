@@ -17,7 +17,7 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    marginRight: "20px",
+                    marginRight: "15px",
                   }}
                 >
                   <CheckCircledIcon
@@ -31,7 +31,7 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                 </span>,
               ];
             } else if (
-              word === "inactive" &&
+              word === "defective" &&
               !isNaN(Number(words[index - 1]))
             ) {
               return [
@@ -94,7 +94,8 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
               ];
             } else if (
               !isNaN(Number(word)) &&
-              (words[index + 1] === "active" || words[index + 1] === "inactive")
+              (words[index + 1] === "active" ||
+                words[index + 1] === "defective")
             ) {
               return null;
             } else {

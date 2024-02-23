@@ -21,10 +21,37 @@ import { Badge } from "@/components/shadcn-ui/badge";
 import { GetEntities } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Entity } from "@/data/entities";
+import { DevEntities } from "@/data/constants";
 
 export default function EntitiesPage() {
   const [entities, setEntities] = useState<Entity[]>([]);
   const [tab, setTab] = useState("health");
+
+  const entityTypes = entities
+    .map((entity) => entity.subType.split(/[ _/]/)[0])
+    .filter((value, index, self) => self.indexOf(value) === index);
+
+  const entityTypeCounts = entities.reduce((counts, entity) => {
+    const entityType = entity.subType.split(/[ _/]/)[0];
+    if (!counts[entityType]) {
+      counts[entityType] = 0;
+    }
+    counts[entityType]++;
+    return counts;
+  }, {} as { [key: string]: number });
+
+  const entityTypeStatusCounts = entities.reduce((counts, entity) => {
+    const entityType = entity.subType.split(/[ _/]/)[0];
+    if (!counts[entityType]) {
+      counts[entityType] = { active: 0, defective: 0 };
+    }
+    if (entity.status === "ACTIVE") {
+      counts[entityType].active++;
+    } else if (entity.status === "DEFECTIVE") {
+      counts[entityType].defective++;
+    }
+    return counts;
+  }, {} as { [key: string]: { active: number; defective: number } });
 
   const loadEntities = async () => {
     try {
@@ -43,6 +70,11 @@ export default function EntitiesPage() {
     setTab(tab);
   };
 
+  if (DevEntities) {
+    console.log("entityTypeStatusCounts:", entityTypeStatusCounts.ogc.active);
+    console.log("Counts:", entityTypeCounts.ogc);
+    console.log("entityTypes", entityTypes);
+  }
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between space-y-2">
@@ -76,13 +108,28 @@ export default function EntitiesPage() {
 
         <TabsContent value="health">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {entities.map((entity) => (
+            {entityTypes.map((entity) => (
               <Summary
-                key={entity.uid}
-                header={`${entity.status}`}
-                main={entity.id}
-                footer={`${entity.type} (${entity.subType})`}
-                route={`/entities/${entity.uid}`}
+                key={entity}
+                main={entity}
+                footer={
+                  entityTypeStatusCounts &&
+                  entityTypeStatusCounts[entity] &&
+                  entityTypeStatusCounts[entity].active &&
+                  entityTypeStatusCounts[entity].defective
+                    ? `${entityTypeStatusCounts[entity].active} active ${entityTypeStatusCounts[entity].defective} defective`
+                    : entityTypeStatusCounts &&
+                      entityTypeStatusCounts[entity] &&
+                      entityTypeStatusCounts[entity].active
+                    ? `${entityTypeStatusCounts[entity].active} active`
+                    : entityTypeStatusCounts &&
+                      entityTypeStatusCounts[entity] &&
+                      entityTypeStatusCounts[entity].defective
+                    ? `${entityTypeStatusCounts[entity].defective} defective`
+                    : "No entities found"
+                }
+                total={entityTypeCounts[entity]}
+                route={`/entities/${entity}`}
               />
             ))}
           </div>

@@ -26,7 +26,7 @@ export const fetchedEntities: { [key: string]: InputEntity[] } = {
     },
     {
       id: "test",
-      status: "INACTIVE",
+      status: "DEFECTIVE",
       subType: "ogc_api",
     },
   ],

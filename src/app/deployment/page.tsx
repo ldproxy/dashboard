@@ -132,7 +132,7 @@ export default function DeploymentPage() {
   const entitiesFooterCaseActive = `${activeEntities} active`;
   const entitiesFooterCaseInactive =
     totalEntities !== activeEntities
-      ? `${totalEntities - activeEntities} inactive`
+      ? `${totalEntities - activeEntities} defective`
       : "";
 
   const actualEntitiesFooter =
