@@ -167,6 +167,7 @@ export default function DeploymentPage() {
               health={info.status}
               IconFooter1={getIcon("Clock")}
               IconFooter2={getIcon("Upload")}
+              IconFooter3={getIcon("Desktop")}
             />
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
