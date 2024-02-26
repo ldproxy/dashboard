@@ -42,3 +42,12 @@ export const services_krankenhaus: InputCfg = {
   test2: null,
   label: "Services",
 };
+
+export const appCfg: InputCfg = {
+  id: "appCfg",
+  serviceType: "OGC_API",
+  enabled: true,
+  test: 12,
+  test2: null,
+  label: "Services",
+};

@@ -18,6 +18,7 @@ import {
   getInfo,
   getMetrics,
   getValues,
+  getDeploymentCfg,
 } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Check } from "@/data/health";
@@ -27,6 +28,9 @@ import { InputInfo } from "@/data/info";
 import { Metrics } from "@/data/metrics";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { DevDeployment } from "@/data/constants";
+import Prism from "prismjs";
+import "prismjs/components/prism-json";
+import "prismjs/themes/prism.css";
 
 export default function DeploymentPage() {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
@@ -41,6 +45,7 @@ export default function DeploymentPage() {
   const [values, setValues] = useState([] as any[]);
   const [tableData, setTableData] = useState([] as any[]);
   const [storeState, setStoreState] = useState(true);
+  const [cfg, setCfg] = useState<{}>({});
 
   useEffect(() => {
     const storeCheck = healthChecks.find((check) => check.name === "store");
@@ -68,6 +73,15 @@ export default function DeploymentPage() {
       setInfo(newInfo);
     } catch (error) {
       console.error("Error loading info:", error);
+    }
+  };
+
+  const loadCfg = async () => {
+    try {
+      const newCfg = await getDeploymentCfg();
+      setCfg(newCfg);
+    } catch (error) {
+      console.error("Error loading cfg:", error);
     }
   };
 
@@ -113,6 +127,7 @@ export default function DeploymentPage() {
     loadInfo();
     loadMetrics();
     loadValues();
+    loadCfg();
   }, []);
 
   const onTabChange = (tab: string) => {
@@ -224,7 +239,34 @@ export default function DeploymentPage() {
           </div>
         </TabsContent>
         <TabsContent value="cfg">
-          <div>Configuration content goes here</div>
+          <div
+            style={{
+              backgroundColor: "#f5f5f5",
+              borderRadius: "8px",
+              padding: "16px",
+              border: "1px solid lightgray",
+            }}
+          >
+            {Object.entries(cfg).map(([key, value]) => {
+              const strValue = JSON.stringify(value, null, 2);
+
+              const highlightedValue = Prism.highlight(
+                strValue,
+                Prism.languages.json,
+                "json"
+              );
+
+              return (
+                <div key={key} style={{ display: "flex" }}>
+                  <span>{key}:</span>
+                  <pre
+                    dangerouslySetInnerHTML={{ __html: highlightedValue }}
+                    style={{ margin: "0 0 0 10px" }}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

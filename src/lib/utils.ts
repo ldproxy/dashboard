@@ -89,3 +89,16 @@ export const getCfg = async (param: string) => {
     throw error;
   }
 };
+
+export const getDeploymentCfg = async () => {
+  try {
+    const response = await fetch(
+      "http://localhost:3000/api/cfg/global/deployment"
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
