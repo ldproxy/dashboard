@@ -74,3 +74,18 @@ export const getValues = async () => {
     throw error;
   }
 };
+
+export const getCfg = async (param: string) => {
+  try {
+    const formattedParam = param.replace(/_/g, "/");
+
+    const response = await fetch(
+      `http://localhost:3000/api/cfg/entities/${formattedParam}`
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};

@@ -103,9 +103,6 @@ export default function EntitiesPage() {
                 <span>{entityType}</span>
               </TabsTrigger>
             ))}
-            <TabsTrigger value="cfg">
-              <span>Configuration</span>
-            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -157,9 +154,6 @@ export default function EntitiesPage() {
             </div>
           </TabsContent>
         ))}
-        <TabsContent value="cfg">
-          <div>Configuration content goes here</div>
-        </TabsContent>
       </Tabs>
     </div>
   );
