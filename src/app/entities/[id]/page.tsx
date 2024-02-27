@@ -9,7 +9,8 @@ import { Check } from "@/data/health";
 import { DevEntities } from "@/data/constants";
 import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+
 import {
   Tabs,
   TabsList,
@@ -21,6 +22,7 @@ import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 
 export default function CustomerPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const [entities, setEntities] = useState<Entity[]>([]);
   const [entity, setEntity] = useState<Entity | null>(null); // entities[params.id]);
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
@@ -117,7 +119,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
       <div className="flex-1 space-y-4 p-8 pt-6">
         <div className="flex items-center justify-between space-y-2">
           <a
-            onClick={() => window.history.back()}
+            onClick={() => router.back()}
             className="font-bold flex items-center cursor-pointer text-blue-500 hover:text-blue-400"
           >
             <ChevronLeftIcon className="mr-[-1px] h-6 w-6" />

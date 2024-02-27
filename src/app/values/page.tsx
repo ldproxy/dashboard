@@ -15,6 +15,8 @@ import { InputValue } from "@/data/values";
 import { getIcon } from "@/lib/icons";
 import { columns } from "@/components/dashboard/DataTableComponents/ColumnsValues";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 interface TableDataItem {
   label: string;
@@ -25,6 +27,8 @@ export default function EntitiesPage() {
   const [values, setValues] = useState<any[]>([]);
   const [tab, setTab] = useState("overview");
   const [tableData, setTableData] = useState<TableDataItem[]>([]);
+  const router = useRouter();
+  let pathname = usePathname();
 
   const loadValues = async () => {
     try {
@@ -42,10 +46,14 @@ export default function EntitiesPage() {
 
   useEffect(() => {
     loadValues();
+    if (pathname) {
+      setTab(window.location.hash.slice(1) || "overview");
+    }
   }, []);
 
   const onTabChange = (tab: string) => {
     setTab(tab);
+    router.push(`${pathname}#${tab}`);
   };
 
   const valueTypes = values
@@ -98,8 +106,11 @@ export default function EntitiesPage() {
                 key={value.id ? value.id : value.path ? value.path : "No Id"}
                 main={value.type}
                 total={valueTypeCounts[value.type]}
-                onClick={() => setTab(value.type)}
+                onClick={() => {
+                  setTab(value.type);
+                }}
                 Icon={getIcon("Code")}
+                route={`${pathname}#${value.type}`}
               />
             ))}
           </div>

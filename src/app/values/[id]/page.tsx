@@ -3,6 +3,7 @@ import { Button } from "@/components/shadcn-ui/button";
 import { GetEntities, getValuesCfg, getHealthChecks } from "@/lib/utils";
 import { ReloadIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import Prism from "prismjs";
 import "prismjs/components/prism-json";
@@ -10,6 +11,7 @@ import "prismjs/themes/prism.css";
 
 export default function CustomerPage({ params }: { params: { id: string } }) {
   const [cfg, setCfg] = useState<{}>({});
+  const router = useRouter();
 
   const loadCfg = async () => {
     try {
@@ -29,7 +31,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
       <div className="flex-1 space-y-4 p-8 pt-6">
         <div className="flex items-center justify-between space-y-2">
           <a
-            onClick={() => window.history.back()}
+            onClick={() => router.back()}
             className="font-bold flex items-center cursor-pointer text-blue-500 hover:text-blue-400"
           >
             <ChevronLeftIcon className="mr-[-1px] h-6 w-6" />

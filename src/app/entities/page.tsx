@@ -17,7 +17,8 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
-import { Badge } from "@/components/shadcn-ui/badge";
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { GetEntities } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Entity } from "@/data/entities";
@@ -27,6 +28,8 @@ import { getIcon } from "@/lib/icons";
 export default function EntitiesPage() {
   const [entities, setEntities] = useState<Entity[]>([]);
   const [tab, setTab] = useState("overview");
+  const router = useRouter();
+  let pathname = usePathname();
 
   const entityTypes = entities
     .map((entity) => entity.subType.split(/[ _/]/)[0])
@@ -65,10 +68,14 @@ export default function EntitiesPage() {
 
   useEffect(() => {
     loadEntities();
+    if (pathname) {
+      setTab(window.location.hash.slice(1) || "overview");
+    }
   }, []);
 
   const onTabChange = (tab: string) => {
     setTab(tab);
+    router.push(`${pathname}#${tab}`);
   };
 
   if (DevEntities) {
@@ -130,6 +137,7 @@ export default function EntitiesPage() {
                 }
                 total={entityTypeCounts[entity]}
                 onClick={() => setTab(entity)}
+                route={`${pathname}#${entity}`}
                 Icon={getIcon("Id")}
               />
             ))}

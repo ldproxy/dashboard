@@ -31,6 +31,8 @@ import { DevDeployment } from "@/data/constants";
 import Prism from "prismjs";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 export default function DeploymentPage() {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
@@ -46,6 +48,8 @@ export default function DeploymentPage() {
   const [tableData, setTableData] = useState([] as any[]);
   const [storeState, setStoreState] = useState(true);
   const [cfg, setCfg] = useState<{}>({});
+  const router = useRouter();
+  let pathname = usePathname();
 
   useEffect(() => {
     const storeCheck = healthChecks.find((check) => check.name === "store");
@@ -122,6 +126,9 @@ export default function DeploymentPage() {
   };
 
   useEffect(() => {
+    if (pathname) {
+      setTab(window.location.hash.slice(1) || "overview");
+    }
     loadHealthChecks();
     loadEntities();
     loadInfo();
@@ -132,6 +139,7 @@ export default function DeploymentPage() {
 
   const onTabChange = (tab: string) => {
     setTab(tab);
+    router.push(`${pathname}#${tab}`);
   };
 
   const totalSources = tableData.length;
