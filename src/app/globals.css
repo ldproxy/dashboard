@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .token.number {
-  color: rgb(225, 13, 13) !important;
+  color: rgb(190, 12, 12) !important;
 }
 
 .token.boolean {
@@ -11,7 +11,7 @@
 }
 
 .token.string {
-  color: rgb(14, 168, 14) !important;
+  color: rgb(12, 155, 12) !important;
 }
 
 .token.null {

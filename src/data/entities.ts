@@ -17,12 +17,17 @@ export const fetchedEntities: { [key: string]: InputEntity[] } = {
     {
       id: "bergbau",
       status: "ACTIVE",
-      subType: "features/features",
+      subType: "features/wfs",
     },
     {
       id: "krankenhaus",
       status: "ACTIVE",
       subType: "features/sql",
+    },
+    {
+      id: "krankenhaus-tiles",
+      status: "ACTIVE",
+      subType: "tiles/mbtiles",
     },
     {
       id: "test",
@@ -34,7 +39,7 @@ export const fetchedEntities: { [key: string]: InputEntity[] } = {
     {
       id: "bergbau",
       status: "ACTIVE",
-      subType: "features/sql",
+      subType: "ogc_api",
     },
     {
       id: "krankenhaus",

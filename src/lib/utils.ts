@@ -102,3 +102,18 @@ export const getDeploymentCfg = async () => {
     throw error;
   }
 };
+
+export const getValuesCfg = async (param: string) => {
+  try {
+    const formattedParam = param.replace(/_/g, "/");
+
+    const response = await fetch(
+      `http://localhost:3000/api/cfg/values/${formattedParam}`
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
