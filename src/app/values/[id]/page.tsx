@@ -28,30 +28,31 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
 
   return (
     <>
-      <div className="flex-1 space-y-4 p-8 pt-6">
-        <div className="flex items-center justify-between space-y-2">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
           <a
             onClick={() => router.back()}
             className="font-bold flex items-center cursor-pointer text-blue-500 hover:text-blue-400"
           >
             <ChevronLeftIcon className="mr-[-1px] h-6 w-6" />
-            Back
           </a>
-          <div className="flex items-center space-x-2">
-            <Button
-              onClick={() => {
-                loadCfg();
-              }}
-              className="font-bold"
-            >
-              <ReloadIcon className="mr-2 h-4 w-4" />
-              Reload
-            </Button>
-          </div>
+          <h2 className="text-2xl font-semibold tracking-tight ml-2">
+            {params.id ? params.id.split("_")[1] : "Not Found..."}
+          </h2>
         </div>
-        <h2 className="text-2xl font-semibold tracking-tight">
-          {params.id ? params.id.split("_")[1] : "Not Found..."}
-        </h2>
+        <div className="p-8 pt-6">
+          <Button
+            onClick={() => {
+              loadCfg();
+            }}
+            className="font-bold"
+          >
+            <ReloadIcon className="mr-2 h-4 w-4" />
+            Reload
+          </Button>
+        </div>
+      </div>
+      <div className="p-8 pt-6">
         <div
           style={{
             backgroundColor: "#f5f5f5",
