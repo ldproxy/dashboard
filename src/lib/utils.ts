@@ -82,6 +82,9 @@ export const getCfg = async (param: string) => {
     const response = await fetch(
       `http://localhost:3000/api/cfg/entities/${formattedParam}`
     );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const data = await response.json();
     return data;
   } catch (error) {
@@ -95,6 +98,9 @@ export const getDeploymentCfg = async () => {
     const response = await fetch(
       "http://localhost:3000/api/cfg/global/deployment"
     );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const data = await response.json();
     return data;
   } catch (error) {
@@ -110,6 +116,9 @@ export const getValuesCfg = async (param: string) => {
     const response = await fetch(
       `http://localhost:3000/api/cfg/values/${formattedParam}`
     );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const data = await response.json();
     return data;
   } catch (error) {

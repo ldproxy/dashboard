@@ -48,6 +48,7 @@ export default function DeploymentPage() {
   const [tableData, setTableData] = useState([] as any[]);
   const [storeState, setStoreState] = useState(true);
   const [cfg, setCfg] = useState<{}>({});
+  const [hasError, setHasError] = useState(false);
   const router = useRouter();
   let pathname = usePathname();
 
@@ -83,8 +84,14 @@ export default function DeploymentPage() {
   const loadCfg = async () => {
     try {
       const newCfg = await getDeploymentCfg();
-      setCfg(newCfg);
+      if (newCfg.message === "Method not allowed") {
+        setHasError(true);
+      } else {
+        setCfg(newCfg);
+      }
     } catch (error) {
+      setHasError(true);
+
       console.error("Error loading cfg:", error);
     }
   };
@@ -255,25 +262,29 @@ export default function DeploymentPage() {
               border: "1px solid lightgray",
             }}
           >
-            {Object.entries(cfg).map(([key, value]) => {
-              const strValue = JSON.stringify(value, null, 2);
+            {hasError
+              ? "No results."
+              : Object.keys(cfg).length === 0
+              ? "Loading..."
+              : Object.entries(cfg).map(([key, value]) => {
+                  const strValue = JSON.stringify(value, null, 2);
 
-              const highlightedValue = Prism.highlight(
-                strValue,
-                Prism.languages.json,
-                "json"
-              );
+                  const highlightedValue = Prism.highlight(
+                    strValue,
+                    Prism.languages.json,
+                    "json"
+                  );
 
-              return (
-                <div key={key} style={{ display: "flex" }}>
-                  <span>{key}:</span>
-                  <pre
-                    dangerouslySetInnerHTML={{ __html: highlightedValue }}
-                    style={{ margin: "0 0 0 10px" }}
-                  />
-                </div>
-              );
-            })}
+                  return (
+                    <div key={key} style={{ display: "flex" }}>
+                      <span>{key}:</span>
+                      <pre
+                        dangerouslySetInnerHTML={{ __html: highlightedValue }}
+                        style={{ margin: "0 0 0 10px" }}
+                      />
+                    </div>
+                  );
+                })}
           </div>
         </TabsContent>
       </Tabs>

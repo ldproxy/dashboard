@@ -30,6 +30,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const [isLoading, setIsLoading] = useState(true);
   const [tableData, setTableData] = useState([] as any[]);
   const [tab, setTab] = useState("overview");
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     if (healthChecks && entity) {
@@ -62,9 +63,14 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const loadCfg = async () => {
     try {
       const newCfg = await getCfg(params.id);
-      setCfg(newCfg);
+      if (newCfg.message === "Method not allowed") {
+        setHasError(true);
+      } else {
+        setCfg(newCfg);
+      }
     } catch (error) {
       console.error("Error loading cfg:", error);
+      setHasError(true);
     }
   };
 
@@ -172,25 +178,29 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                 border: "1px solid lightgray",
               }}
             >
-              {Object.entries(cfg).map(([key, value]) => {
-                const strValue = JSON.stringify(value, null, 2);
+              {hasError
+                ? "No results."
+                : Object.keys(cfg).length === 0
+                ? "Loading..."
+                : Object.entries(cfg).map(([key, value]) => {
+                    const strValue = JSON.stringify(value, null, 2);
 
-                const highlightedValue = Prism.highlight(
-                  strValue,
-                  Prism.languages.json,
-                  "json"
-                );
+                    const highlightedValue = Prism.highlight(
+                      strValue,
+                      Prism.languages.json,
+                      "json"
+                    );
 
-                return (
-                  <div key={key} style={{ display: "flex" }}>
-                    <span>{key}:</span>
-                    <pre
-                      dangerouslySetInnerHTML={{ __html: highlightedValue }}
-                      style={{ margin: "0 0 0 10px" }}
-                    />
-                  </div>
-                );
-              })}
+                    return (
+                      <div key={key} style={{ display: "flex" }}>
+                        <span>{key}:</span>
+                        <pre
+                          dangerouslySetInnerHTML={{ __html: highlightedValue }}
+                          style={{ margin: "0 0 0 10px" }}
+                        />
+                      </div>
+                    );
+                  })}
             </div>
           </TabsContent>
         </Tabs>

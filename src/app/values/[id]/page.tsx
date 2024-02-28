@@ -11,13 +11,19 @@ import "prismjs/themes/prism.css";
 
 export default function CustomerPage({ params }: { params: { id: string } }) {
   const [cfg, setCfg] = useState<{}>({});
+  const [hasError, setHasError] = useState(false);
   const router = useRouter();
 
   const loadCfg = async () => {
     try {
       const newCfg = await getValuesCfg(params.id);
-      setCfg(newCfg);
+      if (newCfg.message === "Method not allowed") {
+        setHasError(true);
+      } else {
+        setCfg(newCfg);
+      }
     } catch (error) {
+      setHasError(true);
       console.error("Error loading cfg:", error);
     }
   };
@@ -61,25 +67,29 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
             border: "1px solid lightgray",
           }}
         >
-          {Object.entries(cfg).map(([key, value]) => {
-            const strValue = JSON.stringify(value, null, 2);
+          {hasError
+            ? "No results."
+            : Object.keys(cfg).length === 0
+            ? "Loading..."
+            : Object.entries(cfg).map(([key, value]) => {
+                const strValue = JSON.stringify(value, null, 2);
 
-            const highlightedValue = Prism.highlight(
-              strValue,
-              Prism.languages.json,
-              "json"
-            );
+                const highlightedValue = Prism.highlight(
+                  strValue,
+                  Prism.languages.json,
+                  "json"
+                );
 
-            return (
-              <div key={key} style={{ display: "flex" }}>
-                <span>{key}:</span>
-                <pre
-                  dangerouslySetInnerHTML={{ __html: highlightedValue }}
-                  style={{ margin: "0 0 0 10px" }}
-                />
-              </div>
-            );
-          })}
+                return (
+                  <div key={key} style={{ display: "flex" }}>
+                    <span>{key}:</span>
+                    <pre
+                      dangerouslySetInnerHTML={{ __html: highlightedValue }}
+                      style={{ margin: "0 0 0 10px" }}
+                    />
+                  </div>
+                );
+              })}
         </div>
       </div>
     </>
