@@ -29,11 +29,6 @@ export const fetchedEntities: { [key: string]: InputEntity[] } = {
       status: "ACTIVE",
       subType: "tiles/mbtiles",
     },
-    {
-      id: "test",
-      status: "DEFECTIVE",
-      subType: "ogc_api",
-    },
   ],
   services: [
     {
@@ -44,6 +39,11 @@ export const fetchedEntities: { [key: string]: InputEntity[] } = {
     {
       id: "krankenhaus",
       status: "ACTIVE",
+      subType: "ogc_api",
+    },
+    {
+      id: "test",
+      status: "DEFECTIVE",
       subType: "ogc_api",
     },
   ],

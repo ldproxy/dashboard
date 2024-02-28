@@ -1,12 +1,5 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/shadcn-ui/card";
 import Summary from "@/components/dashboard/summary";
 import { Button } from "@/components/shadcn-ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
@@ -32,10 +25,27 @@ export default function EntitiesPage() {
   let pathname = usePathname();
 
   const entityTypes = entities
+    .filter((entity) => {
+      const entityType = entity.subType.split(/[ _/]/)[0];
+      return (
+        !(entityType === "features" && entity.type !== "providers") &&
+        !(entityType === "ogc" && entity.type !== "services") &&
+        !(entityType === "tiles" && entity.type !== "providers")
+      );
+    })
     .map((entity) => entity.subType.split(/[ _/]/)[0])
     .filter((value, index, self) => self.indexOf(value) === index);
 
-  const entityTypeCounts = entities.reduce((counts, entity) => {
+  const filteredEntities = entities.filter((entity) => {
+    const entityType = entity.subType.split(/[ _/]/)[0];
+    return (
+      !(entityType === "features" && entity.type !== "providers") &&
+      !(entityType === "ogc" && entity.type !== "services") &&
+      !(entityType === "tiles" && entity.type !== "providers")
+    );
+  });
+
+  const entityTypeCounts = filteredEntities.reduce((counts, entity) => {
     const entityType = entity.subType.split(/[ _/]/)[0];
     if (!counts[entityType]) {
       counts[entityType] = 0;
@@ -44,7 +54,7 @@ export default function EntitiesPage() {
     return counts;
   }, {} as { [key: string]: number });
 
-  const entityTypeStatusCounts = entities.reduce((counts, entity) => {
+  const entityTypeStatusCounts = filteredEntities.reduce((counts, entity) => {
     const entityType = entity.subType.split(/[ _/]/)[0];
     if (!counts[entityType]) {
       counts[entityType] = { active: 0, defective: 0 };
@@ -80,6 +90,7 @@ export default function EntitiesPage() {
 
   if (DevEntities) {
     console.log("entityTypeStatusCounts:", entityTypeStatusCounts);
+    console.log("entities", entities);
     console.log("Counts:", entityTypeCounts.ogc);
     console.log("entityTypes", entityTypes);
   }
@@ -146,7 +157,7 @@ export default function EntitiesPage() {
         {entityTypes.map((entityType) => (
           <TabsContent key={entityType} value={entityType}>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {entities
+              {filteredEntities
                 .filter(
                   (entity) => entity.subType.split(/[ _/]/)[0] === entityType
                 )
