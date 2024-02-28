@@ -33,6 +33,7 @@ import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { ClipLoader } from "react-spinners";
 
 export default function DeploymentPage() {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
@@ -262,29 +263,34 @@ export default function DeploymentPage() {
               border: "1px solid lightgray",
             }}
           >
-            {hasError
-              ? "No results."
-              : Object.keys(cfg).length === 0
-              ? "Loading..."
-              : Object.entries(cfg).map(([key, value]) => {
-                  const strValue = JSON.stringify(value, null, 2);
+            {hasError ? (
+              "No results."
+            ) : Object.keys(cfg).length === 0 ? (
+              <div className="flex items-center">
+                <ClipLoader color={"#123abc"} loading={true} size={20} />
+                <span style={{ marginLeft: "5px" }}>Loading...</span>
+              </div>
+            ) : (
+              Object.entries(cfg).map(([key, value]) => {
+                const strValue = JSON.stringify(value, null, 2);
 
-                  const highlightedValue = Prism.highlight(
-                    strValue,
-                    Prism.languages.json,
-                    "json"
-                  );
+                const highlightedValue = Prism.highlight(
+                  strValue,
+                  Prism.languages.json,
+                  "json"
+                );
 
-                  return (
-                    <div key={key} style={{ display: "flex" }}>
-                      <span>{key}:</span>
-                      <pre
-                        dangerouslySetInnerHTML={{ __html: highlightedValue }}
-                        style={{ margin: "0 0 0 10px" }}
-                      />
-                    </div>
-                  );
-                })}
+                return (
+                  <div key={key} style={{ display: "flex" }}>
+                    <span>{key}:</span>
+                    <pre
+                      dangerouslySetInnerHTML={{ __html: highlightedValue }}
+                      style={{ margin: "0 0 0 10px" }}
+                    />
+                  </div>
+                );
+              })
+            )}
           </div>
         </TabsContent>
       </Tabs>

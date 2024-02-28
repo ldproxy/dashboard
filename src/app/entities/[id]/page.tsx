@@ -10,6 +10,7 @@ import { DevEntities } from "@/data/constants";
 import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { useRouter } from "next/navigation";
+import { ClipLoader } from "react-spinners";
 
 import {
   Tabs,
@@ -118,7 +119,12 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   //const entity = entities ? entities.find((e) => (e.uid = params.id)) : null; Diese Funktion hat UIDs in entities verändert.
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center">
+        <ClipLoader color={"#123abc"} loading={true} size={20} />
+        <span style={{ marginLeft: "10px" }}>Loading...</span>
+      </div>
+    );
   }
   return (
     <>
@@ -178,29 +184,34 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
                 border: "1px solid lightgray",
               }}
             >
-              {hasError
-                ? "No results."
-                : Object.keys(cfg).length === 0
-                ? "Loading..."
-                : Object.entries(cfg).map(([key, value]) => {
-                    const strValue = JSON.stringify(value, null, 2);
+              {hasError ? (
+                "No results."
+              ) : Object.keys(cfg).length === 0 ? (
+                <div className="flex items-center">
+                  <ClipLoader color={"#123abc"} loading={true} size={20} />
+                  <span style={{ marginLeft: "5px" }}>Loading...</span>
+                </div>
+              ) : (
+                Object.entries(cfg).map(([key, value]) => {
+                  const strValue = JSON.stringify(value, null, 2);
 
-                    const highlightedValue = Prism.highlight(
-                      strValue,
-                      Prism.languages.json,
-                      "json"
-                    );
+                  const highlightedValue = Prism.highlight(
+                    strValue,
+                    Prism.languages.json,
+                    "json"
+                  );
 
-                    return (
-                      <div key={key} style={{ display: "flex" }}>
-                        <span>{key}:</span>
-                        <pre
-                          dangerouslySetInnerHTML={{ __html: highlightedValue }}
-                          style={{ margin: "0 0 0 10px" }}
-                        />
-                      </div>
-                    );
-                  })}
+                  return (
+                    <div key={key} style={{ display: "flex" }}>
+                      <span>{key}:</span>
+                      <pre
+                        dangerouslySetInnerHTML={{ __html: highlightedValue }}
+                        style={{ margin: "0 0 0 10px" }}
+                      />
+                    </div>
+                  );
+                })
+              )}
             </div>
           </TabsContent>
         </Tabs>
