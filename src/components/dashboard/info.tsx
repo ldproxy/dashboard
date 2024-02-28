@@ -34,7 +34,7 @@ export default function CustomersPage({
   IconFooter3,
 }: SummaryProps) {
   const formattedMemory = filesize(memory, { base: 10 });
-  const formattedUptime = moment.utc(uptime * 1000).format("HH:mm:ss");
+  const formattedUptime = moment.utc(uptime * 1000).format("HH[h] mm[m] ss[s]");
   return (
     <Card className="shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
