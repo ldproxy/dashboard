@@ -1,4 +1,3 @@
-"use client";
 import { Button } from "@/components/shadcn-ui/button";
 import { GetEntities, getCfg, getHealthChecks } from "@/lib/utils";
 import { ReloadIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
@@ -11,7 +10,6 @@ import { columns } from "@/components/dashboard/DataTableComponents/DataTableCol
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { useRouter } from "next/navigation";
 import { ClipLoader } from "react-spinners";
-
 import {
   Tabs,
   TabsList,
@@ -22,40 +20,58 @@ import Prism from "prismjs";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 
-export default function CustomerPage({ params }: { params: { id: string } }) {
-  const router = useRouter();
-  const [entities, setEntities] = useState<Entity[]>([]);
-  const [entity, setEntity] = useState<Entity | null>(null); // entities[params.id]);
-  const [healthChecks, setHealthChecks] = useState<Check[]>([]);
-  const [cfg, setCfg] = useState<{}>({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [tableData, setTableData] = useState([] as any[]);
-  const [tab, setTab] = useState("overview");
-  const [hasError, setHasError] = useState(false);
+export function generateStaticParams() {
+  return [
+    { id: "services_bergbau" },
+    { id: "providers_bergbau" },
+    { id: "services_krankenhaeuser" },
+  ];
+}
 
-  useEffect(() => {
+export default function CustomerPage({ params }: { params: { id: string } }) {
+  const { id } = params;
+  const router = useRouter();
+  let entities: Entity[] = [];
+  let entity: Entity | null = {
+    type: "providers",
+    uid: `providers_bergbau`,
+    id: "bergbau",
+    status: "ACTIVE",
+    subType: "features/wfs",
+  }; // entities[params.id]);
+  let healthChecks: Check[] = [];
+  let cfg = {};
+  let isLoading = true;
+  let tableData: { label: string; status: string; checked: string }[] = [];
+  let tab = "overview";
+  let hasError = false;
+
+  const table = () => {
     if (healthChecks && entity) {
       const myCheck = healthChecks
         .filter(
           (check) =>
-            check.name.startsWith("db") && check.name.includes(entity.id)
+            check.name.startsWith("db") &&
+            entity &&
+            check.name.includes(entity.id)
         )
         .map((check) => ({
           label: check.name,
           status: check.healthy ? "HEALTHY" : "UNHEALTHY",
           checked: check.timestamp,
         }));
-      setTableData(myCheck);
+      tableData = myCheck;
       if (DevEntities) {
         console.log("myCheck:", myCheck);
       }
     }
-  }, [healthChecks, entity]);
+  };
+  table();
 
   const loadHealthChecks = async () => {
     try {
       const newHealthChecks = await getHealthChecks();
-      setHealthChecks(newHealthChecks);
+      healthChecks = newHealthChecks;
     } catch (error) {
       console.error("Error loading health checks:", error);
     }
@@ -63,15 +79,15 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
 
   const loadCfg = async () => {
     try {
-      const newCfg = await getCfg(params.id);
+      const newCfg = await getCfg(id);
       if (newCfg.message === "Method not allowed") {
-        setHasError(true);
+        hasError = true;
       } else {
-        setCfg(newCfg);
+        cfg = newCfg;
       }
     } catch (error) {
       console.error("Error loading cfg:", error);
-      setHasError(true);
+      hasError = true;
     }
   };
 
@@ -81,10 +97,10 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
       if (!newEntities) {
         return notFound();
       }
-      setEntities(newEntities);
+      entities = newEntities;
 
-      const myEntity = newEntities.find((e) => e.uid === params.id);
-      setEntity(myEntity);
+      const myEntity = newEntities.find((e) => e.uid === id);
+      entity = myEntity;
 
       if (DevEntities) {
         console.log("params", params);
@@ -96,24 +112,22 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     }
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      await loadEntities();
-      await loadHealthChecks();
-      await loadCfg();
-      setIsLoading(false);
-      if (DevEntities) {
-        console.log("entities[id]", entities);
-        console.log("entity[id]", entity);
-        console.log("cfg", cfg);
-      }
-    };
+  const loadData = async () => {
+    await loadEntities();
+    await loadHealthChecks();
+    await loadCfg();
+    isLoading = false;
+    if (DevEntities) {
+      console.log("entities[id]", entities);
+      console.log("entity[id]", entity);
+      console.log("cfg", cfg);
+    }
+  };
 
-    loadData();
-  }, []);
+  loadData();
 
   const onTabChange = (tab: string) => {
-    setTab(tab);
+    tab = tab;
   };
 
   //const entity = entities ? entities.find((e) => (e.uid = params.id)) : null; Diese Funktion hat UIDs in entities verändert.
@@ -127,11 +141,11 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
     );
   }
   return (
-    <>
+    <div>
       <div className="flex justify-between items-center">
         <div className="flex items-center">
           <a
-            onClick={() => router.back()}
+            //      onClick={() => router.back()}
             className="font-bold flex items-center cursor-pointer text-blue-500 hover:text-blue-400"
           >
             <ChevronLeftIcon className="mr-[-1px] h-6 w-6" />
@@ -216,6 +230,6 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
           </TabsContent>
         </Tabs>
       </div>
-    </>
+    </div>
   );
 }
