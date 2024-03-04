@@ -1,52 +1,50 @@
+"use client";
 import { Button } from "@/components/shadcn-ui/button";
 import { GetEntities, getValuesCfg, getHealthChecks } from "@/lib/utils";
 import { ReloadIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+
 import Prism from "prismjs";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import { ClipLoader } from "react-spinners";
-import { flightRouterStateSchema } from "next/dist/server/app-render/types";
-
-export function generateStaticParams() {
-  return [{ id: "foo" }, { id: "bar" }];
-}
 
 export default function CustomerPage({ params }: { params: { id: string } }) {
-  const { id } = params;
-  let cfg = {};
-  let hasError = flightRouterStateSchema;
+  const [cfg, setCfg] = useState<{}>({});
+  const [hasError, setHasError] = useState(false);
   const router = useRouter();
 
   const loadCfg = async () => {
     try {
-      const newCfg = await getValuesCfg(id);
+      const newCfg = await getValuesCfg(params.id);
       if (newCfg.message === "Method not allowed") {
-        hasError = true;
+        setHasError(true);
       } else {
-        cfg = newCfg;
+        setCfg(newCfg);
       }
     } catch (error) {
-      hasError = true;
+      setHasError(true);
       console.error("Error loading cfg:", error);
     }
   };
 
-  loadCfg();
+  useEffect(() => {
+    loadCfg();
+  }, []);
 
   return (
-    <div>
+    <>
       <div className="flex justify-between items-center">
         <div className="flex items-center">
           <a
-            //    onClick={() => router.back()}
+            onClick={() => router.back()}
             className="font-bold flex items-center cursor-pointer text-blue-500 hover:text-blue-400"
           >
             <ChevronLeftIcon className="mr-[-1px] h-6 w-6" />
           </a>
           <h2 className="text-2xl font-semibold tracking-tight ml-2">
-            {id ? id.split("_")[1] : "Not Found..."}
+            {params.id ? params.id.split("_")[1] : "Not Found..."}
           </h2>
         </div>
         <div className="p-8 pt-6">
@@ -100,6 +98,6 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
