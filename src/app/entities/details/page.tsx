@@ -9,7 +9,7 @@ import { Check } from "@/data/health";
 import { DevEntities } from "@/data/constants";
 import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 
 import {
@@ -21,8 +21,17 @@ import {
 import Prism from "prismjs";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
+import { Suspense } from "react";
 
-export default function CustomerPage({ params }: { params: { id: string } }) {
+const SuspenseWrapper = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <CustomerPage />
+  </Suspense>
+);
+
+export default SuspenseWrapper;
+
+function CustomerPage() {
   const router = useRouter();
   const [entities, setEntities] = useState<Entity[]>([]);
   const [entity, setEntity] = useState<Entity | null>(null); // entities[params.id]);
@@ -32,6 +41,24 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
   const [tableData, setTableData] = useState([] as any[]);
   const [tab, setTab] = useState("overview");
   const [hasError, setHasError] = useState(false);
+
+  let id: string | null;
+  let searchParams = useSearchParams();
+
+  if (searchParams !== null) {
+    const urllId = searchParams.get("id");
+    id = urllId;
+  }
+
+  /* Vlt stattdessen mal das probieren:
+  import { useLocation } from 'react-router-dom';
+
+function MyComponent() {
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const id = query.get('id');
+}
+*/
 
   useEffect(() => {
     if (healthChecks && entity) {
@@ -63,11 +90,13 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
 
   const loadCfg = async () => {
     try {
-      const newCfg = await getCfg(params.id);
-      if (newCfg.message === "Method not allowed") {
-        setHasError(true);
-      } else {
-        setCfg(newCfg);
+      if (id !== null) {
+        const newCfg = await getCfg(id);
+        if (newCfg.message === "Method not allowed") {
+          setHasError(true);
+        } else {
+          setCfg(newCfg);
+        }
       }
     } catch (error) {
       console.error("Error loading cfg:", error);
@@ -83,11 +112,10 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
       }
       setEntities(newEntities);
 
-      const myEntity = newEntities.find((e) => e.uid === params.id);
+      const myEntity = newEntities.find((e) => e.uid === id);
       setEntity(myEntity);
 
       if (DevEntities) {
-        console.log("params", params);
         console.log("newEntities", newEntities);
         console.log("myEntity", myEntity);
       }
