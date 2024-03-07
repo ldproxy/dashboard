@@ -42,23 +42,13 @@ function CustomerPage() {
   const [tab, setTab] = useState("overview");
   const [hasError, setHasError] = useState(false);
 
-  let id: string | null;
+  let id: string | null = "providers_bergbau";
   let searchParams = useSearchParams();
 
   if (searchParams !== null) {
     const urllId = searchParams.get("id");
     id = urllId;
   }
-
-  /* Vlt stattdessen mal das probieren:
-  import { useLocation } from 'react-router-dom';
-
-function MyComponent() {
-  const location = useLocation();
-  const query = new URLSearchParams(location.search);
-  const id = query.get('id');
-}
-*/
 
   useEffect(() => {
     if (healthChecks && entity) {
