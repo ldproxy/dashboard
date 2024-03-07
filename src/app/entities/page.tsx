@@ -167,7 +167,7 @@ export default function EntitiesPage() {
                     header={entity.status}
                     main={entity.id}
                     footer={entity.subType}
-                    route={`/entities/${entity.uid}`}
+                    route={`/entities/details?id=${entity.uid}`}
                   />
                 ))}
             </div>
