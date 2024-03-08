@@ -30,7 +30,7 @@ export default function CustomersPage({
   ...props
 }: SummaryProps) {
   const cardStyle =
-    typeof main === "string" && main.length > 12 ? { width: "260px" } : {};
+    typeof main === "string" && main.length > 12 ? { width: "290px" } : {};
 
   return (
     <Link href={route || "#"}>
