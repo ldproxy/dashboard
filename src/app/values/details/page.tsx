@@ -3,26 +3,48 @@ import { Button } from "@/components/shadcn-ui/button";
 import { GetEntities, getValuesCfg, getHealthChecks } from "@/lib/utils";
 import { ReloadIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import Prism from "prismjs";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import { ClipLoader } from "react-spinners";
+import { Suspense } from "react";
 
-export default function CustomerPage({ params }: { params: { id: string } }) {
+
+const SuspenseWrapper = () => (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CustomerPage />
+    </Suspense>
+  );
+
+  export default SuspenseWrapper;
+
+
+  function CustomerPage() {
   const [cfg, setCfg] = useState<{}>({});
   const [hasError, setHasError] = useState(false);
   const router = useRouter();
 
+  let id: string | null = "";
+  let searchParams = useSearchParams();
+
+  if (searchParams !== null) {
+    const urllId = searchParams.get("id");
+    id = urllId;
+  }
+
   const loadCfg = async () => {
     try {
-      const newCfg = await getValuesCfg(params.id);
+        if (id !== null) {
+      const newCfg = await getValuesCfg(id);
       if (newCfg.message === "Method not allowed") {
         setHasError(true);
+      
       } else {
         setCfg(newCfg);
       }
+    }
     } catch (error) {
       setHasError(true);
       console.error("Error loading cfg:", error);
@@ -44,7 +66,7 @@ export default function CustomerPage({ params }: { params: { id: string } }) {
             <ChevronLeftIcon className="mr-[-1px] h-6 w-6" />
           </a>
           <h2 className="text-2xl font-semibold tracking-tight ml-2">
-            {params.id ? params.id.split("_")[1] : "Not Found..."}
+            {id ? id.split("_")[1] : "Not Found..."}
           </h2>
         </div>
         <div className="p-8 pt-6">

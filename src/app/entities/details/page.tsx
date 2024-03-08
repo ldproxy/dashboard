@@ -42,7 +42,7 @@ function CustomerPage() {
   const [tab, setTab] = useState("overview");
   const [hasError, setHasError] = useState(false);
 
-  let id: string | null = "providers_bergbau";
+  let id: string | null = "";
   let searchParams = useSearchParams();
 
   if (searchParams !== null) {

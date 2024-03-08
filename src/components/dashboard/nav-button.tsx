@@ -19,7 +19,7 @@ export function NavButton({ title, route, icon }: EntryProps) {
   return (
     <Button
       key={title}
-      variant={pathname.startsWith(route) ? "secondary" : "ghost"}
+      variant={pathname && pathname.startsWith(route) ? "secondary" : "ghost"}
       className="w-full justify-start"
       asChild
     >

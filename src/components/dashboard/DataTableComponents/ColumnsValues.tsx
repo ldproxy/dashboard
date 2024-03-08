@@ -28,7 +28,7 @@ export const columns: ColumnDef<Values>[] = [
       const typeWithoutHyphens = row.original.type.replace(/-/g, "");
       return (
         <div style={{ marginLeft: "10px", fontWeight: "bold" }}>
-          <Link href={`/values/${typeWithoutHyphens}_${row.original.label}`}>
+          <Link href={`values/details?id=${typeWithoutHyphens}_${row.original.label}`}>
             {row.original.label}
           </Link>{" "}
         </div>
