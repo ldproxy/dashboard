@@ -7,8 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/shadcn-ui/card";
-import React, { ReactNode } from "react";
-import { getIcon } from "@/lib/icons";
 import { FooterSummary } from "./FooterSummary";
 
 interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -29,14 +27,10 @@ export default function CustomersPage({
   Icon,
   ...props
 }: SummaryProps) {
-  const cardStyle =
-    typeof main === "string" && main.length > 12 ? { width: "290px" } : {};
-
   return (
     <Link href={route || "#"}>
       <Card
         className="shadow-lg hover:bg-gray-100 transition-colors duration-200"
-        style={cardStyle}
         {...props}
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
@@ -57,9 +51,9 @@ export default function CustomersPage({
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent className="overflow-hidden">
+        <CardContent>
           <div
-            className="text-2xl font-bold"
+            className="text-2xl font-bold overflow-ellipsis overflow-hidden whitespace-nowrap"
             style={{
               display: "flex",
               flexDirection: "row",
