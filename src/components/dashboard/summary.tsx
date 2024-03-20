@@ -53,7 +53,7 @@ export default function CustomersPage({
         </CardHeader>
         <CardContent>
           <div
-            className="text-2xl font-bold overflow-ellipsis overflow-hidden whitespace-nowrap"
+            className="text-2xl font-bold"
             style={{
               display: "flex",
               flexDirection: "row",
@@ -64,7 +64,16 @@ export default function CustomersPage({
             }}
           >
             {Icon ? <Icon className="h-6 w-6 text-muted-foreground" /> : null}
-            {main}
+            <span
+              style={{
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+              }}
+              title={typeof main === "string" ? main : ""}
+            >
+              {main}
+            </span>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap" }}>
             <p
