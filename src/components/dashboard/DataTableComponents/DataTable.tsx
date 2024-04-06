@@ -22,6 +22,8 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   useReactTable,
+  ExpandedState,
+  getExpandedRowModel,
 } from "@tanstack/react-table";
 
 import {
@@ -32,41 +34,48 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/shadcn-ui/table";
+import { HealthCheck } from "./DataTableColumns";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+interface DataTableProps<HealthCheck, TValue> {
+  columns: ColumnDef<HealthCheck, TValue>[];
+  data: HealthCheck[];
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<HealthCheck, TValue>({
   columns,
   data,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<HealthCheck, TValue>) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [expanded, setExpanded] = React.useState<ExpandedState>({});
   const table = useReactTable({
     data,
     columns,
-    getPaginationRowModel: getPaginationRowModel(),
+    //getPaginationRowModel: getPaginationRowModel(),
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    getExpandedRowModel: getExpandedRowModel(),
+    getSubRows: (row: any) => row.subRows,
+    onExpandedChange: setExpanded,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
+      expanded,
     },
   });
 
   return (
     <div>
+      <div>{JSON.stringify(expanded)}</div>
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter label..."
@@ -129,6 +138,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className={`${row.getCanExpand() ? "" : "bg-muted"}`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

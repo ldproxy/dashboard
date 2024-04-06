@@ -54,13 +54,33 @@ function CustomerPage() {
     if (healthChecks && entity) {
       const myCheck = healthChecks
         .filter(
-          (check) =>
-            check.name.startsWith("db") && check.name.includes(entity.id)
+          (check) => check.name === `entities/${entity.type}/${entity.id}`
+        )
+        .flatMap((check) =>
+          check.capabilities
+            ? check.capabilities.map((cap) => ({
+                ...cap,
+                components: check.components
+                  ? check.components
+                      .filter((comp) => comp.capabilities.includes(cap.name))
+                      .map((comp) => ({
+                        ...comp,
+                        capability: cap.name,
+                        component: true,
+                      }))
+                  : [],
+              }))
+            : []
         )
         .map((check) => ({
           label: check.name,
           status: check.healthy ? "HEALTHY" : "UNHEALTHY",
-          checked: check.timestamp,
+          checked: "",
+          subRows: check.components.map((comp) => ({
+            label: comp.name,
+            status: comp.healthy ? "HEALTHY" : "UNHEALTHY",
+            checked: "",
+          })),
         }));
       setTableData(myCheck);
       if (DevEntities) {
@@ -180,7 +200,7 @@ function CustomerPage() {
           <div className="space-between flex items-center">
             <TabsList>
               <TabsTrigger value="overview">
-                <span>Overview</span>
+                <span>Health</span>
               </TabsTrigger>
               <TabsTrigger value="cfg">
                 <span>Configuration</span>

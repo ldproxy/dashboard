@@ -11,6 +11,13 @@ export interface Check {
   timestamp: string;
   duration: number;
   sources?: { label: string; status: string }[];
+  capabilities?: { name: string; healthy: boolean; state: string }[];
+  components?: {
+    name: string;
+    healthy: boolean;
+    state: string;
+    capabilities: string[];
+  }[];
 }
 
 export const fetchedHealthChecks: { [key: string]: InputCheck } = {

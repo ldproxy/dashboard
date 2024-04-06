@@ -6,9 +6,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const API_URL = "/api";//"http://localhost:7081/api";
+const API_URL2 = "/api";
+
 export const GetEntities = async () => {
   try {
-    const response = await fetch("http://localhost:3000/api/entities");
+    const response = await fetch(API_URL + "/entities");
     const data = await response.json();
     const newMappedEntities = Object.keys(data).flatMap((type) =>
       data[type].map((entity: any) => ({
@@ -26,11 +29,23 @@ export const GetEntities = async () => {
 
 export const getHealthChecks = async () => {
   try {
-    const response = await fetch("http://localhost:3000/api/health");
+    const response = await fetch(API_URL + "/health");
     const data = await response.json();
     const mappedHealthChecks = Object.keys(data).map((name) => ({
       name,
       ...data[name],
+      capabilities: data[name].capabilities
+        ? Object.keys(data[name].capabilities).map((cap) => ({
+            name: cap,
+            ...data[name].capabilities[cap],
+          }))
+        : undefined,
+      components: data[name].components
+        ? Object.keys(data[name].components).map((comp) => ({
+            name: comp,
+            ...data[name].components[comp],
+          }))
+        : undefined,
     }));
     return mappedHealthChecks;
   } catch (error) {
@@ -41,7 +56,7 @@ export const getHealthChecks = async () => {
 
 export const getInfo = async () => {
   try {
-    const response = await fetch("http://localhost:3000/api/info");
+    const response = await fetch(API_URL + "/info");
     const data = await response.json();
     return data;
   } catch (error) {
@@ -52,7 +67,7 @@ export const getInfo = async () => {
 
 export const getMetrics = async () => {
   try {
-    const response = await fetch("http://localhost:3000/api/metrics");
+    const response = await fetch(API_URL + "/metrics");
     const data = await response.json();
     return {
       uptime: data.gauges["jvm.attribute.uptime"].value,
@@ -66,7 +81,7 @@ export const getMetrics = async () => {
 
 export const getValues = async () => {
   try {
-    const response = await fetch("http://localhost:3000/api/values");
+    const response = await fetch(API_URL2 + "/values");
     const data = await response.json();
     return data;
   } catch (error) {
@@ -79,9 +94,7 @@ export const getCfg = async (param: string) => {
   try {
     const formattedParam = param.replace(/_/g, "/");
 
-    const response = await fetch(
-      `http://localhost:3000/api/cfg/entities/${formattedParam}`
-    );
+    const response = await fetch(`${API_URL2}/cfg/entities/${formattedParam}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -95,9 +108,7 @@ export const getCfg = async (param: string) => {
 
 export const getDeploymentCfg = async () => {
   try {
-    const response = await fetch(
-      "http://localhost:3000/api/cfg/global/deployment"
-    );
+    const response = await fetch(API_URL2 + "/cfg/global/deployment");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -113,9 +124,7 @@ export const getValuesCfg = async (param: string) => {
   try {
     const formattedParam = param.replace(/_/g, "/");
 
-    const response = await fetch(
-      `http://localhost:3000/api/cfg/values/${formattedParam}`
-    );
+    const response = await fetch(`${API_URL2}/cfg/values/${formattedParam}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

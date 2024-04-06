@@ -43,6 +43,8 @@ export default function DeploymentPage() {
   const [info, setInfo] = useState<InputInfo>({
     name: "",
     version: "",
+    url: "",
+    env: "",
     status: "",
   });
   const [values, setValues] = useState([] as any[]);
@@ -212,7 +214,7 @@ export default function DeploymentPage() {
           >
             <Info
               key="Entities"
-              name={info.name}
+              name={info.url.replace("https://", "").replace("http://", "")}
               version={info.version}
               uptime={metrics.uptime}
               memory={metrics.memory}

@@ -5,19 +5,14 @@ import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/shadcn-ui/button";
 import { Badge } from "@/components/shadcn-ui/badge";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type Payment =
-  | {
-      label: string;
-      status: string;
-      checked: string;
-    }
-  | unknown;
+export type HealthCheck = {
+  label: string;
+  status: string;
+  checked: string;
+  subRows: HealthCheck[];
+};
 
-type PaymentRow = any;
-
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<HealthCheck>[] = [
   {
     accessorKey: "label",
     header: ({ column }) => {
@@ -26,11 +21,28 @@ export const columns: ColumnDef<Payment>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Label
+          Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
+    cell: ({ row, getValue }) => (
+      <div className={`${row.getCanExpand() ? "" : "ml-4"}`}>
+        {getValue<string>()}{" "}
+        {row.getCanExpand() ? (
+          <button
+            {...{
+              onClick: row.getToggleExpandedHandler(),
+              style: { cursor: "pointer" },
+            }}
+          >
+            {row.getIsExpanded() ? "👇" : "👉"}
+          </button>
+        ) : (
+          ""
+        )}
+      </div>
+    ),
   },
   {
     accessorKey: "status",
@@ -45,7 +57,7 @@ export const columns: ColumnDef<Payment>[] = [
         </Button>
       );
     },
-    cell: ({ row }: { row: PaymentRow }) => {
+    cell: ({ row }: { row: Row<HealthCheck> }) => {
       if (row.original) {
         const badgeColor =
           row.original.status === "HEALTHY" ? "default" : "destructive";
@@ -62,7 +74,7 @@ export const columns: ColumnDef<Payment>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Checked
+          Last checked
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
