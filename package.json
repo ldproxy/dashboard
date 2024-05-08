@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "STATIC_EXPORT=true npm run build && rm -r ../xtraplatform/xtraplatform-ops/src/main/resources/dashboard/* && mkdir ../xtraplatform/xtraplatform-ops/src/main/resources/dashboard/_next && cp -r .next/server/app/* ../xtraplatform/xtraplatform-ops/src/main/resources/dashboard/ && cp -r .next/static ../xtraplatform/xtraplatform-ops/src/main/resources/dashboard/_next/"
+    "export": "STATIC_EXPORT=true npm run build && rm -rf ../xtraplatform/xtraplatform-ops/src/main/resources/dashboard/* && cp -r out/* ../xtraplatform/xtraplatform-ops/src/main/resources/dashboard/"
   },
   "dependencies": {
     "@radix-ui/react-context-menu": "^2.1.5",
