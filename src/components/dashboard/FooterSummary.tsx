@@ -17,11 +17,11 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
     <>
       {footer
         ? footer.split(" ").map((word, index, words) => {
-            if (word === "active" && !isNaN(Number(words[index - 1]))) {
+            if (word === "available" && !isNaN(Number(words[index - 1]))) {
               return [
                 <span
                   key={index}
-                  className="text-green-500"
+                  className="text-success"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -29,7 +29,24 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                   }}
                 >
                   <CheckCircledIcon
-                    className="text-green-500"
+                    className="text-success"
+                    key="CheckCircledIcon"
+                    style={{
+                      marginRight: "3px",
+                    }}
+                  />
+                  {words[index - 1]} {word}
+                </span>,
+              ];
+            } else if (word === "limited" && !isNaN(Number(words[index - 1]))) {
+              return [
+                <span
+                  key={index}
+                  className="text-warning"
+                  style={{ display: "flex", alignItems: "center" }}
+                >
+                  <CrossCircledIcon
+                    className="text-warning"
                     key="CheckCircledIcon"
                     style={{
                       marginRight: "3px",
@@ -45,11 +62,11 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
               return [
                 <span
                   key={index}
-                  className="text-red-500"
+                  className="text-destructive"
                   style={{ display: "flex", alignItems: "center" }}
                 >
                   <CrossCircledIcon
-                    className="text-red-500"
+                    className="text-destructive"
                     key="CheckCircledIcon"
                     style={{
                       marginRight: "3px",
@@ -58,54 +75,17 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                   {words[index - 1]} {word}
                 </span>,
               ];
-            } else if (word === "true") {
-              return [
-                <span
-                  key={index}
-                  className="text-green-500"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginRight: "20px",
-                  }}
-                >
-                  <CheckCircledIcon
-                    className="text-green-500"
-                    key="CheckCircledIcon"
-                    style={{
-                      marginRight: "3px",
-                    }}
-                  />
-                  Store is healthy
-                </span>,
-              ];
-            } else if (word === "false") {
-              return [
-                <span
-                  key={index}
-                  className="text-red-500"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginRight: "20px",
-                  }}
-                >
-                  <CheckCircledIcon
-                    className="text-red-500"
-                    key="CheckCircledIcon"
-                    style={{
-                      marginRight: "3px",
-                    }}
-                  />
-                  Store is unhealthy
-                </span>,
-              ];
             } else if (type !== null) {
-              return <Badge key={type}>{type}</Badge>;
+              return (
+                <Badge variant="secondary" key={type}>
+                  {type}
+                </Badge>
+              );
             } else if (
               !isNaN(Number(word)) &&
-              (words[index + 1] === "active" ||
-                words[index + 1] === "defective")
+              (words[index + 1] === "available" ||
+                words[index + 1] === "unavailable" ||
+                words[index + 1] === "limited")
             ) {
               return null;
             } else {

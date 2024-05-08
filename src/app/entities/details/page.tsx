@@ -22,6 +22,7 @@ import Prism from "prismjs";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import { Suspense } from "react";
+import dayjs from "dayjs";
 
 const SuspenseWrapper = () => (
   <Suspense fallback={<div>Loading...</div>}>
@@ -60,6 +61,7 @@ function CustomerPage() {
           check.capabilities
             ? check.capabilities.map((cap) => ({
                 ...cap,
+                timestamp: check.timestamp,
                 components: check.components
                   ? check.components
                       .filter((comp) => comp.capabilities.includes(cap.name))
@@ -74,12 +76,12 @@ function CustomerPage() {
         )
         .map((check) => ({
           label: check.name,
-          status: check.healthy ? "HEALTHY" : "UNHEALTHY",
-          checked: "",
+          status: check.state,
+          checked: dayjs(check.timestamp).format("HH:mm:ss"),
           subRows: check.components.map((comp) => ({
             label: comp.name,
-            status: comp.healthy ? "HEALTHY" : "UNHEALTHY",
-            checked: "",
+            status: comp.state,
+            checked: "", //dayjs(check.timestamp).format("HH:mm:ss"),
           })),
         }));
       setTableData(myCheck);
@@ -178,7 +180,7 @@ function CustomerPage() {
             {entity ? entity.id : "Not Found..."}
           </h2>
         </div>
-        <div className="p-8 pt-6">
+        {/*<div className="p-8 pt-6">
           <Button
             onClick={() => {
               loadEntities();
@@ -189,7 +191,7 @@ function CustomerPage() {
             <ReloadIcon className="mr-2 h-4 w-4" />
             Reload
           </Button>
-        </div>
+          </div>*/}
       </div>
       <div className="p-8 pt-6">
         <Tabs
@@ -202,9 +204,9 @@ function CustomerPage() {
               <TabsTrigger value="overview">
                 <span>Health</span>
               </TabsTrigger>
-              <TabsTrigger value="cfg">
+              {/*<TabsTrigger value="cfg">
                 <span>Configuration</span>
-              </TabsTrigger>
+              </TabsTrigger>*/}
             </TabsList>
           </div>
 

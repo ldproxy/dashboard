@@ -4,6 +4,7 @@ import { ColumnDef, Row } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/shadcn-ui/button";
 import { Badge } from "@/components/shadcn-ui/badge";
+import { ChevronRightIcon, ChevronDownIcon } from "@radix-ui/react-icons";
 
 export type HealthCheck = {
   label: string;
@@ -27,16 +28,17 @@ export const columns: ColumnDef<HealthCheck>[] = [
       );
     },
     cell: ({ row, getValue }) => (
-      <div className={`${row.getCanExpand() ? "" : "ml-4"}`}>
+      <div className={`${row.depth === 0 ? "ml-4 flex items-center" : "ml-8"}`}>
         {getValue<string>()}{" "}
         {row.getCanExpand() ? (
           <button
             {...{
               onClick: row.getToggleExpandedHandler(),
+              className: "ml-2",
               style: { cursor: "pointer" },
             }}
           >
-            {row.getIsExpanded() ? "👇" : "👉"}
+            {row.getIsExpanded() ? <ChevronDownIcon /> : <ChevronRightIcon />}
           </button>
         ) : (
           ""
@@ -60,8 +62,17 @@ export const columns: ColumnDef<HealthCheck>[] = [
     cell: ({ row }: { row: Row<HealthCheck> }) => {
       if (row.original) {
         const badgeColor =
-          row.original.status === "HEALTHY" ? "default" : "destructive";
-        return <Badge variant={badgeColor}>{row.original.status}</Badge>;
+          row.original.status === "HEALTHY" ||
+          row.original.status === "AVAILABLE"
+            ? "success"
+            : row.original.status === "LIMITED"
+            ? "warning"
+            : "destructive";
+        return (
+          <Badge className="ml-4" variant={badgeColor}>
+            {row.original.status}
+          </Badge>
+        );
       }
       return null;
     },
@@ -70,14 +81,21 @@ export const columns: ColumnDef<HealthCheck>[] = [
     accessorKey: "checked",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Last checked
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex items-center justify-start">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Last checked
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
       );
     },
+    cell: ({ row, getValue }) => (
+      <div className="ml-4 flex items-center justify-start">
+        {getValue<string>()}
+      </div>
+    ),
   },
 ];

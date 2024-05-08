@@ -27,6 +27,15 @@ export default function CustomersPage({
   Icon,
   ...props
 }: SummaryProps) {
+  const color =
+    header === "AVAILABLE" || header === "ACTIVE" || header === "true"
+      ? "text-success"
+      : header === "LIMITED"
+      ? "text-warning"
+      : header === "UNAVAILABLE" || header === "false"
+      ? "text-red"
+      : "text-blue-700";
+
   return (
     <Link href={route || "#"}>
       <Card
@@ -35,14 +44,9 @@ export default function CustomersPage({
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
           <CardTitle
-            className={`text-sm font-semibold ${
-              header === "ACTIVE" ||
-              header === "true" ||
-              header === "HEALTHY" ||
-              !isNaN(Number(total))
-                ? "text-blue-700"
-                : "text-red-700"
-            }${!header ? "text-2xl font-bold mb-1" : ""}`}
+            className={`text-sm font-semibold ${color}${
+              !header ? "text-2xl font-bold mb-1" : ""
+            }`}
           >
             {header ? (
               header

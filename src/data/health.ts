@@ -8,6 +8,7 @@ export interface InputCheck {
 export interface Check {
   name: string;
   healthy: boolean;
+  state: string;
   timestamp: string;
   duration: number;
   sources?: { label: string; status: string }[];

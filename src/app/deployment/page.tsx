@@ -5,6 +5,7 @@ import Info from "@/components/dashboard/info";
 import { Button } from "@/components/shadcn-ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
+import dayjs from "dayjs";
 import {
   Tabs,
   TabsList,
@@ -34,6 +35,7 @@ import "prismjs/themes/prism.css";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { ClipLoader } from "react-spinners";
+import { getEntityCounts, getStateSummary } from "../entities/page";
 
 export default function DeploymentPage() {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
@@ -56,8 +58,15 @@ export default function DeploymentPage() {
   let pathname = usePathname();
 
   useEffect(() => {
-    const storeCheck = healthChecks.find((check) => check.name === "store");
-    if (DevDeployment) {
+    const storeCheck = healthChecks
+      .filter((check) => check.name.startsWith("app/"))
+      .map((check) => ({
+        label: check.name.substring(4),
+        status: check.state,
+        checked: dayjs(check.timestamp).format("HH:mm:ss"),
+      }));
+    setTableData(storeCheck);
+    /*if (DevDeployment) {
       console.log("storeCheck data:", storeCheck);
     }
     if (storeCheck && storeCheck.sources && storeCheck.healthy) {
@@ -72,7 +81,7 @@ export default function DeploymentPage() {
     }
     if (DevDeployment) {
       console.log("Table data:", tableData);
-    }
+    }*/
   }, [healthChecks]);
 
   const loadInfo = async () => {
@@ -111,6 +120,15 @@ export default function DeploymentPage() {
   const loadEntities = async () => {
     try {
       const newEntities = await GetEntities();
+      const healthChecks = await getHealthChecks();
+
+      newEntities.forEach((entity) => {
+        const hc = healthChecks.find(
+          (check) => check.name === `entities/${entity.type}/${entity.id}`
+        );
+        entity.status = hc && hc.state ? hc.state : "UNKNOWN";
+      });
+
       setEntities(newEntities);
     } catch (error) {
       console.error("Error loading entities:", error);
@@ -152,41 +170,33 @@ export default function DeploymentPage() {
     router.push(`${pathname}#${tab}`);
   };
 
+  const health =
+    healthChecks.length > 0
+      ? healthChecks.some((check) => check.state !== "AVAILABLE")
+        ? "UNHEALTHY"
+        : "HEALTHY"
+      : "";
+
   const totalSources = tableData.length;
   const totalValues = values.length;
   console.log("Values:", totalValues);
   console.log("totalSources:", totalSources);
   // Following variables are only used for the footer of the entities summary
   const totalEntities = entities.length;
-  const activeEntities = entities.filter(
-    (entity) => entity.status === "ACTIVE" || entity.status === "HEALTHY"
-  ).length;
 
-  const entitiesFooterCaseActive = `${activeEntities} active`;
-  const entitiesFooterCaseInactive =
-    totalEntities !== activeEntities
-      ? `${totalEntities - activeEntities} defective`
-      : "";
-
-  const actualEntitiesFooter =
-    entitiesFooterCaseInactive && entitiesFooterCaseActive
-      ? entitiesFooterCaseActive + " " + entitiesFooterCaseInactive
-      : entitiesFooterCaseActive
-      ? entitiesFooterCaseActive
-      : entitiesFooterCaseInactive
-      ? entitiesFooterCaseInactive
-      : "No entities found";
+  const entityCounts = getEntityCounts(entities);
+  const footer = getStateSummary(entityCounts);
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-2xl font-semibold tracking-tight">Deployment</h2>
-        <div className="flex items-center space-x-2">
+        {/*<div className="flex items-center space-x-2">
           <Button onClick={loadHealthChecks} className="font-bold">
             <ReloadIcon className="mr-2 h-4 w-4" />
             Reload
           </Button>
-        </div>
+        </div>*/}
       </div>
       <Tabs
         value={tab}
@@ -199,11 +209,11 @@ export default function DeploymentPage() {
               <span>Overview</span>
             </TabsTrigger>
             <TabsTrigger value="store">
-              <span>Store</span>
+              <span>Health</span>
             </TabsTrigger>
-            <TabsTrigger value="cfg">
+            {/*<TabsTrigger value="cfg">
               <span>Configuration</span>
-            </TabsTrigger>
+            </TabsTrigger>*/}
           </TabsList>
         </div>
 
@@ -218,7 +228,7 @@ export default function DeploymentPage() {
               version={info.version}
               uptime={metrics.uptime}
               memory={metrics.memory}
-              health={info.status}
+              health={health}
               IconFooter1={getIcon("Clock")}
               IconFooter2={getIcon("Upload")}
               IconFooter3={getIcon("Desktop")}
@@ -229,23 +239,23 @@ export default function DeploymentPage() {
               key="Entities"
               main="Entities"
               route="/entities"
-              footer={actualEntitiesFooter}
+              footer={footer}
               total={totalEntities}
               Icon={getIcon("Id")}
             />
-            <Summary
+            {/*<Summary
               key="Sources"
               main="Sources"
               footer={storeState ? "true" : "false"}
               Icon={getIcon("ListBullet")}
               total={totalSources}
               onClick={() => setTab("store")}
-            />
+            />*/}
             <Summary
               key="Values"
               main="Values"
               route="/values"
-              footer="Go to Values..."
+              footer="&nbsp;"
               total={totalValues}
               Icon={getIcon("Code")}
             />

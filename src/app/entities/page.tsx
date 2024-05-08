@@ -12,11 +12,75 @@ import {
 } from "@/components/shadcn-ui/tabs";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { GetEntities } from "@/lib/utils";
+import { GetEntities, getHealthChecks } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Entity } from "@/data/entities";
 import { DevEntities } from "@/data/constants";
 import { getIcon } from "@/lib/icons";
+
+type Counts = {
+  [key: string]: HealthCounts;
+};
+
+type HealthCounts = { available: number; limited: number; unavailable: number };
+
+const getEntityCategory = (entity: Entity) => {
+  return entity.type === "services" ? "API" : entity.subType.split(/[/]/)[0];
+};
+
+const asLabel = (entityCategory: string) =>
+  entityCategory[0].toUpperCase() + entityCategory.substring(1) + "s";
+
+export const getEntityCounts = (entities: Entity[]): HealthCounts =>
+  entities.reduce(
+    (counts, entity) => {
+      const entityType = getEntityCategory(entity);
+      if (!counts) {
+        counts = { available: 0, limited: 0, unavailable: 0 };
+      }
+      if (entity.status === "AVAILABLE") {
+        counts.available++;
+      } else if (entity.status === "LIMITED") {
+        counts.limited++;
+      } else if (entity.status === "UNAVAILABLE") {
+        counts.unavailable++;
+      }
+      return counts;
+    },
+    { available: 0, limited: 0, unavailable: 0 }
+  );
+
+const getEntityCategoryCounts = (
+  entities: Entity[],
+  categories: string[]
+): Counts =>
+  categories.reduce((counts, category) => {
+    counts[category] = getEntityCounts(
+      entities.filter((entity) => getEntityCategory(entity) === category)
+    );
+    return counts;
+  }, {} as Counts);
+
+export const getStateSummary = (counts: HealthCounts) => {
+  if (!counts || !counts) {
+    return "No entities found";
+  }
+  let summary = "";
+
+  if (counts.available) {
+    summary += `${counts.available} available`;
+  }
+  if (counts.limited) {
+    if (summary.length > 0) summary += " ";
+    summary += `${counts.limited} limited`;
+  }
+  if (counts.unavailable) {
+    if (summary.length > 0) summary += " ";
+    summary += `${counts.unavailable} unavailable`;
+  }
+
+  return summary;
+};
 
 export default function EntitiesPage() {
   const [entities, setEntities] = useState<Entity[]>([]);
@@ -24,29 +88,12 @@ export default function EntitiesPage() {
   const router = useRouter();
   let pathname = usePathname();
 
-  const entityTypes = entities
-    .filter((entity) => {
-      const entityType = entity.subType.split(/[ _/]/)[0];
-      return (
-        !(entityType === "features" && entity.type !== "providers") &&
-        !(entityType === "ogc" && entity.type !== "services") &&
-        !(entityType === "tiles" && entity.type !== "providers")
-      );
-    })
-    .map((entity) => entity.subType.split(/[ _/]/)[0])
-    .filter((value, index, self) => self.indexOf(value) === index);
+  const entityCategories = entities
+    .map(getEntityCategory)
+    .filter((typ, index, self) => self.indexOf(typ) === index);
 
-  const filteredEntities = entities.filter((entity) => {
-    const entityType = entity.subType.split(/[ _/]/)[0];
-    return (
-      !(entityType === "features" && entity.type !== "providers") &&
-      !(entityType === "ogc" && entity.type !== "services") &&
-      !(entityType === "tiles" && entity.type !== "providers")
-    );
-  });
-
-  const entityTypeCounts = filteredEntities.reduce((counts, entity) => {
-    const entityType = entity.subType.split(/[ _/]/)[0];
+  const entityTypeCounts = entities.reduce((counts, entity) => {
+    const entityType = getEntityCategory(entity);
     if (!counts[entityType]) {
       counts[entityType] = 0;
     }
@@ -54,22 +101,23 @@ export default function EntitiesPage() {
     return counts;
   }, {} as { [key: string]: number });
 
-  const entityTypeStatusCounts = filteredEntities.reduce((counts, entity) => {
-    const entityType = entity.subType.split(/[ _/]/)[0];
-    if (!counts[entityType]) {
-      counts[entityType] = { active: 0, defective: 0 };
-    }
-    if (entity.status === "ACTIVE") {
-      counts[entityType].active++;
-    } else if (entity.status === "DEFECTIVE") {
-      counts[entityType].defective++;
-    }
-    return counts;
-  }, {} as { [key: string]: { active: number; defective: number } });
+  const entityTypeStatusCounts = getEntityCategoryCounts(
+    entities,
+    entityCategories
+  );
 
   const loadEntities = async () => {
     try {
       const newEntities = await GetEntities();
+      const healthChecks = await getHealthChecks();
+
+      newEntities.forEach((entity) => {
+        const hc = healthChecks.find(
+          (check) => check.name === `entities/${entity.type}/${entity.id}`
+        );
+        entity.status = hc && hc.state ? hc.state : "UNKNOWN";
+      });
+
       setEntities(newEntities);
     } catch (error) {
       console.error("Error loading entities:", error);
@@ -91,19 +139,19 @@ export default function EntitiesPage() {
   if (DevEntities) {
     console.log("entityTypeStatusCounts:", entityTypeStatusCounts);
     console.log("entities", entities);
-    console.log("Counts:", entityTypeCounts.ogc);
-    console.log("entityTypes", entityTypes);
+    console.log("Counts:", entityTypeCounts.API);
+    console.log("entityTypes", entityCategories);
   }
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-2xl font-semibold tracking-tight">Entities</h2>
-        <div className="flex items-center space-x-2">
+        {/*<div className="flex items-center space-x-2">
           <Button onClick={loadEntities} className="font-bold">
             <ReloadIcon className="mr-2 h-4 w-4" />
             Reload all
           </Button>
-        </div>
+        </div>*/}
       </div>
 
       <Tabs
@@ -116,9 +164,9 @@ export default function EntitiesPage() {
             <TabsTrigger value="overview">
               <span>Overview</span>
             </TabsTrigger>
-            {entityTypes.map((entityType) => (
-              <TabsTrigger key={entityType} value={entityType}>
-                <span>{entityType}</span>
+            {entityCategories.map((entityCategory) => (
+              <TabsTrigger key={entityCategory} value={entityCategory}>
+                <span>{asLabel(entityCategory)}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -126,47 +174,32 @@ export default function EntitiesPage() {
 
         <TabsContent value="overview">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {entityTypes.map((entity) => (
+            {entityCategories.map((entityCategory) => (
               <Summary
-                key={entity}
-                main={entity}
-                footer={
-                  entityTypeStatusCounts &&
-                  entityTypeStatusCounts[entity] &&
-                  entityTypeStatusCounts[entity].active &&
-                  entityTypeStatusCounts[entity].defective
-                    ? `${entityTypeStatusCounts[entity].active} active ${entityTypeStatusCounts[entity].defective} defective`
-                    : entityTypeStatusCounts &&
-                      entityTypeStatusCounts[entity] &&
-                      entityTypeStatusCounts[entity].active
-                    ? `${entityTypeStatusCounts[entity].active} active`
-                    : entityTypeStatusCounts &&
-                      entityTypeStatusCounts[entity] &&
-                      entityTypeStatusCounts[entity].defective
-                    ? `${entityTypeStatusCounts[entity].defective} defective`
-                    : "No entities found"
-                }
-                total={entityTypeCounts[entity]}
-                onClick={() => setTab(entity)}
-                route={`${pathname}#${entity}`}
+                key={entityCategory}
+                main={asLabel(entityCategory)}
+                footer={getStateSummary(entityTypeStatusCounts[entityCategory])}
+                total={entityTypeCounts[entityCategory]}
+                onClick={() => setTab(entityCategory)}
+                route={`${pathname}#${entityCategory}`}
                 Icon={getIcon("Id")}
               />
             ))}
           </div>
         </TabsContent>
-        {entityTypes.map((entityType) => (
-          <TabsContent key={entityType} value={entityType}>
+        {entityCategories.map((entityCategory) => (
+          <TabsContent key={entityCategory} value={entityCategory}>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {filteredEntities
+              {entities
                 .filter(
-                  (entity) => entity.subType.split(/[ _/]/)[0] === entityType
+                  (entity) => getEntityCategory(entity) === entityCategory
                 )
                 .map((entity) => (
                   <Summary
                     key={entity.uid}
                     header={entity.status}
                     main={entity.id}
-                    footer={entity.subType}
+                    footer={entity.subType.toUpperCase()}
                     route={`/entities/details?id=${entity.uid}`}
                   />
                 ))}

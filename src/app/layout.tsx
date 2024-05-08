@@ -39,14 +39,18 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="hidden h-full flex-col md:flex">
-            <div className="flex flex-col items-start justify-between space-y-2 py-4 px-4 lg:px-8 sm:flex-row sm:items-center sm:space-y-0 md:h-16">              
+            <div className="flex flex-col items-start justify-between space-y-2 py-4 px-4 lg:px-8 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
               <h2 className="text-lg font-semibold whitespace-nowrap">
                 <Link href="/">
                   <DashboardIcon className="mr-2 h-4 w-4 inline" />
                   <span>dashboard</span>
                 </Link>
               </h2>
-              <div className="ml-auto flex w-full space-x-2 sm:justify-end"></div>
+              <div className="ml-auto flex w-full space-x-2 sm:justify-end">
+                <Link href="/api" target="_blank">
+                  <span>API</span>
+                </Link>
+              </div>
             </div>
             <div className="border-t">
               <div className="bg-background">
@@ -54,7 +58,7 @@ export default function RootLayout({
                   <Sidebar
                     sections={[
                       {
-                        title: "demo.ldproxy.net",
+                        title: "",
                         entries: [
                           {
                             title: "Deployment",

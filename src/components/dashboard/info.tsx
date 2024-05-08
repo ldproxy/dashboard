@@ -1,5 +1,5 @@
 import { IconProps } from "@radix-ui/react-icons/dist/types";
-import moment from "moment";
+import prettyMs from "pretty-ms";
 import {
   Card,
   CardContent,
@@ -34,15 +34,16 @@ export default function CustomersPage({
   IconFooter3,
 }: SummaryProps) {
   const formattedMemory = filesize(memory, { base: 10 });
-  const formattedUptime = moment.utc(uptime * 1000).format("HH[h] mm[m] ss[s]");
+  const formattedUptime = prettyMs(uptime, { secondsDecimalDigits: 0 });
+
   return (
     <Card className="shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle
           className={`text-sm font-semibold ${
             health === "ACTIVE" || health === "true" || health === "HEALTHY"
-              ? "text-blue-700"
-              : "text-red-700"
+              ? "text-success"
+              : "text-destructive"
           }`}
         >
           {health}
@@ -59,6 +60,35 @@ export default function CustomersPage({
           {name}
         </div>
         <div style={{ marginRight: "225px", marginTop: "-30px" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            {IconFooter3 ? (
+              <IconFooter3
+                className="h-4 w-4 text-muted-foreground"
+                style={{ marginRight: "5px", marginTop: "2px" }}
+              />
+            ) : null}
+            <span
+              style={{
+                color: "dimgray",
+                width: "65px",
+                fontSize: "14px",
+                fontWeight: "bold",
+              }}
+            >
+              Version:
+            </span>
+            <span
+              style={{ color: "dimgray", fontSize: "14px", fontWeight: "bold" }}
+            >
+              {version}
+            </span>
+          </div>
           <div
             style={{
               display: "flex",
@@ -115,35 +145,6 @@ export default function CustomersPage({
               style={{ color: "dimgray", fontSize: "14px", fontWeight: "bold" }}
             >
               {formattedMemory}
-            </span>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            {IconFooter3 ? (
-              <IconFooter3
-                className="h-4 w-4 text-muted-foreground"
-                style={{ marginRight: "5px", marginTop: "2px" }}
-              />
-            ) : null}
-            <span
-              style={{
-                color: "dimgray",
-                width: "65px",
-                fontSize: "14px",
-                fontWeight: "bold",
-              }}
-            >
-              Version:
-            </span>
-            <span
-              style={{ color: "dimgray", fontSize: "14px", fontWeight: "bold" }}
-            >
-              {version}
             </span>
           </div>
         </div>

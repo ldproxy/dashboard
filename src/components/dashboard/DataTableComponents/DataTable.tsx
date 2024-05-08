@@ -75,8 +75,7 @@ export function DataTable<HealthCheck, TValue>({
 
   return (
     <div>
-      <div>{JSON.stringify(expanded)}</div>
-      <div className="flex items-center py-4">
+      {/*<div className="flex items-center py-4">
         <Input
           placeholder="Filter label..."
           value={(table.getColumn("label")?.getFilterValue() as string) ?? ""}
@@ -111,7 +110,7 @@ export function DataTable<HealthCheck, TValue>({
               })}
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
+      </div>*/}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -138,7 +137,7 @@ export function DataTable<HealthCheck, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className={`${row.getCanExpand() ? "" : "bg-muted"}`}
+                  className={`${row.depth === 0 ? "" : "bg-muted"}`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -163,7 +162,7 @@ export function DataTable<HealthCheck, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      {/*<div className="flex items-center justify-end space-x-2 py-4">
         <Button
           variant="outline"
           size="sm"
@@ -180,7 +179,7 @@ export function DataTable<HealthCheck, TValue>({
         >
           Next
         </Button>
-      </div>
+      </div>*/}
     </div>
   );
 }

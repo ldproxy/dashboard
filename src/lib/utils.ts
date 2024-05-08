@@ -6,26 +6,34 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const API_URL = "/api";//"http://localhost:7081/api";
+const API_URL = "http://localhost:7081/api";
 const API_URL2 = "/api";
 
 export const GetEntities = async () => {
   try {
     const response = await fetch(API_URL + "/entities");
     const data = await response.json();
-    const newMappedEntities = Object.keys(data).flatMap((type) =>
-      data[type].map((entity: any) => ({
-        type,
-        uid: `${type}_${entity.id}`,
-        ...entity,
-      }))
-    );
+    const newMappedEntities = Object.keys(data)
+      .flatMap((type) =>
+        data[type].map((entity: any) => ({
+          type,
+          uid: `${type}_${entity.id}`,
+          ...entity,
+        }))
+      )
+      .filter((entity: any) => entity.status !== "DISABLED");
     return newMappedEntities;
   } catch (error) {
     console.error("Error:", error);
     throw error;
   }
 };
+
+function calculateDaysBetweenDates(begin: number, end: number): number {
+  const oneDay = 1000 * 60 * 60 * 24;
+  const diff = end - begin;
+  return Math.floor(diff / oneDay);
+}
 
 export const getHealthChecks = async () => {
   try {
@@ -81,9 +89,15 @@ export const getMetrics = async () => {
 
 export const getValues = async () => {
   try {
-    const response = await fetch(API_URL2 + "/values");
+    const response = await fetch(API_URL + "/values");
     const data = await response.json();
-    return data;
+    return Object.keys(data).flatMap((type) =>
+      data[type].map((value: any) => ({
+        type,
+        uid: `${type}_${value.path}`,
+        ...value,
+      }))
+    );
   } catch (error) {
     console.error("Error:", error);
     throw error;
