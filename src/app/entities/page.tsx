@@ -17,70 +17,12 @@ import { useEffect, useState } from "react";
 import { Entity } from "@/data/entities";
 import { DevEntities } from "@/data/constants";
 import { getIcon } from "@/lib/icons";
-
-type Counts = {
-  [key: string]: HealthCounts;
-};
-
-type HealthCounts = { available: number; limited: number; unavailable: number };
-
-const getEntityCategory = (entity: Entity) => {
-  return entity.type === "services" ? "API" : entity.subType.split(/[/]/)[0];
-};
-
-const asLabel = (entityCategory: string) =>
-  entityCategory[0].toUpperCase() + entityCategory.substring(1) + "s";
-
-export const getEntityCounts = (entities: Entity[]): HealthCounts =>
-  entities.reduce(
-    (counts, entity) => {
-      const entityType = getEntityCategory(entity);
-      if (!counts) {
-        counts = { available: 0, limited: 0, unavailable: 0 };
-      }
-      if (entity.status === "AVAILABLE") {
-        counts.available++;
-      } else if (entity.status === "LIMITED") {
-        counts.limited++;
-      } else if (entity.status === "UNAVAILABLE") {
-        counts.unavailable++;
-      }
-      return counts;
-    },
-    { available: 0, limited: 0, unavailable: 0 }
-  );
-
-const getEntityCategoryCounts = (
-  entities: Entity[],
-  categories: string[]
-): Counts =>
-  categories.reduce((counts, category) => {
-    counts[category] = getEntityCounts(
-      entities.filter((entity) => getEntityCategory(entity) === category)
-    );
-    return counts;
-  }, {} as Counts);
-
-export const getStateSummary = (counts: HealthCounts) => {
-  if (!counts || !counts) {
-    return "No entities found";
-  }
-  let summary = "";
-
-  if (counts.available) {
-    summary += `${counts.available} available`;
-  }
-  if (counts.limited) {
-    if (summary.length > 0) summary += " ";
-    summary += `${counts.limited} limited`;
-  }
-  if (counts.unavailable) {
-    if (summary.length > 0) summary += " ";
-    summary += `${counts.unavailable} unavailable`;
-  }
-
-  return summary;
-};
+import {
+  asLabel,
+  getEntityCategory,
+  getEntityCategoryCounts,
+  getStateSummary,
+} from "@/lib/entities";
 
 export default function EntitiesPage() {
   const [entities, setEntities] = useState<Entity[]>([]);

@@ -35,7 +35,7 @@ import "prismjs/themes/prism.css";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { ClipLoader } from "react-spinners";
-import { getEntityCounts, getStateSummary } from "../entities/page";
+import { getEntityCounts, getStateSummary } from "@/lib/entities";
 
 export default function DeploymentPage() {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
