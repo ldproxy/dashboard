@@ -6,10 +6,10 @@ interface FooterSummaryProps {
 }
 
 export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
-  const type = footer.includes("_")
-    ? footer.split("_")[1]
-    : footer.includes("/")
+  const type = footer.includes("/")
     ? footer.split("/")[1]
+    : footer.includes("OGC_API")
+    ? footer
     : null;
   console.log("footer: ", footer);
   console.log("type1: ", type);
