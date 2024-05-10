@@ -2,6 +2,7 @@ export interface InputCheck {
   healthy: boolean;
   timestamp: string;
   duration: number;
+  message?: string;
   sources?: { label: string; status: string }[];
 }
 
@@ -11,12 +12,19 @@ export interface Check {
   state: string;
   timestamp: string;
   duration: number;
+  message?: string;
   sources?: { label: string; status: string }[];
-  capabilities?: { name: string; healthy: boolean; state: string }[];
+  capabilities?: {
+    name: string;
+    healthy: boolean;
+    state: string;
+    message?: string;
+  }[];
   components?: {
     name: string;
     healthy: boolean;
     state: string;
+    message?: string;
     capabilities: string[];
   }[];
 }

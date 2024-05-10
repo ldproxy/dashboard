@@ -59,7 +59,10 @@ export default function DeploymentPage() {
 
   useEffect(() => {
     const storeCheck = healthChecks
-      .filter((check) => check.name.startsWith("app/"))
+      .filter(
+        (check) =>
+          check.name.startsWith("app/") && check.name !== "app/store/values2"
+      )
       .map((check) => ({
         label: check.name.substring(4),
         status: check.state,
@@ -209,7 +212,7 @@ export default function DeploymentPage() {
               <span>Overview</span>
             </TabsTrigger>
             <TabsTrigger value="store">
-              <span>Health</span>
+              <span>Base Health</span>
             </TabsTrigger>
             {/*<TabsTrigger value="cfg">
               <span>Configuration</span>
@@ -263,6 +266,9 @@ export default function DeploymentPage() {
         </TabsContent>
         <TabsContent value="store">
           <div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Health checks for global components that are used by all entities.
+            </p>
             <DataTable columns={columns} data={tableData} />
           </div>
         </TabsContent>

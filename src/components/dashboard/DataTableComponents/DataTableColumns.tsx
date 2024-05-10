@@ -10,6 +10,7 @@ export type HealthCheck = {
   label: string;
   status: string;
   checked: string;
+  message: string;
   subRows: HealthCheck[];
 };
 
@@ -78,17 +79,26 @@ export const columns: ColumnDef<HealthCheck>[] = [
     },
   },
   {
+    accessorKey: "message",
+    header: ({ column }) => {
+      return (
+        <div className="flex items-center justify-start">
+          <Button variant="ghost">Message</Button>
+        </div>
+      );
+    },
+    cell: ({ row, getValue }) => (
+      <div className="ml-4 flex items-center justify-start">
+        {getValue<string>()}
+      </div>
+    ),
+  },
+  {
     accessorKey: "checked",
     header: ({ column }) => {
       return (
         <div className="flex items-center justify-start">
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Last checked
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
+          <Button variant="ghost">Last checked</Button>
         </div>
       );
     },

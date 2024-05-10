@@ -1,4 +1,8 @@
-import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons";
+import {
+  CheckCircledIcon,
+  CrossCircledIcon,
+  ExclamationTriangleIcon,
+} from "@radix-ui/react-icons";
 import { Badge } from "@/components/shadcn-ui/badge";
 
 interface FooterSummaryProps {
@@ -21,7 +25,7 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
               return [
                 <span
                   key={index}
-                  className="text-success"
+                  className="text-success mr-2"
                   style={{
                     display: "flex",
                     alignItems: "center",
@@ -42,10 +46,10 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
               return [
                 <span
                   key={index}
-                  className="text-warning"
+                  className="text-warning mr-2"
                   style={{ display: "flex", alignItems: "center" }}
                 >
-                  <CrossCircledIcon
+                  <ExclamationTriangleIcon
                     className="text-warning"
                     key="CheckCircledIcon"
                     style={{
@@ -56,13 +60,13 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                 </span>,
               ];
             } else if (
-              word === "defective" &&
+              word === "unavailable" &&
               !isNaN(Number(words[index - 1]))
             ) {
               return [
                 <span
                   key={index}
-                  className="text-destructive"
+                  className="text-destructive mr-2"
                   style={{ display: "flex", alignItems: "center" }}
                 >
                   <CrossCircledIcon

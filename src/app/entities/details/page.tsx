@@ -77,10 +77,12 @@ function CustomerPage() {
         .map((check) => ({
           label: check.name,
           status: check.state,
+          message: check.message,
           checked: dayjs(check.timestamp).format("HH:mm:ss"),
           subRows: check.components.map((comp) => ({
             label: comp.name,
             status: comp.state,
+            message: comp.message,
             checked: "", //dayjs(check.timestamp).format("HH:mm:ss"),
           })),
         }));
@@ -212,6 +214,9 @@ function CustomerPage() {
 
           <TabsContent value="overview">
             <div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Health checks for the capabilities of this entity.
+              </p>
               <DataTable columns={columns} data={tableData} />
             </div>
           </TabsContent>

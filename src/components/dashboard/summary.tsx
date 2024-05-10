@@ -33,7 +33,7 @@ export default function CustomersPage({
       : header === "LIMITED"
       ? "text-warning"
       : header === "UNAVAILABLE" || header === "false"
-      ? "text-red"
+      ? "text-destructive"
       : "text-blue-700";
 
   return (
