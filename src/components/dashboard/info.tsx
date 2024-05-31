@@ -115,7 +115,7 @@ export default function CustomersPage({
             <span
               style={{ color: "dimgray", fontSize: "14px", fontWeight: "bold" }}
             >
-              {formattedUptime}
+              {uptime === -1 ? "" : formattedUptime}
             </span>
           </div>
           <div
@@ -144,7 +144,7 @@ export default function CustomersPage({
             <span
               style={{ color: "dimgray", fontSize: "14px", fontWeight: "bold" }}
             >
-              {formattedMemory}
+              {memory === -1 ? "" : formattedMemory}
             </span>
           </div>
         </div>

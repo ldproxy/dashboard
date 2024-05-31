@@ -41,7 +41,7 @@ export default function DeploymentPage() {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
   const [tab, setTab] = useState("overview");
   const [entities, setEntities] = useState<Entity[]>([]);
-  const [metrics, setMetrics] = useState<Metrics>({ uptime: 0, memory: 0 });
+  const [metrics, setMetrics] = useState<Metrics>({ uptime: -1, memory: -1 });
   const [info, setInfo] = useState<InputInfo>({
     name: "",
     version: "",
@@ -194,6 +194,11 @@ export default function DeploymentPage() {
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-2xl font-semibold tracking-tight">Deployment</h2>
+        {metrics.uptime === -1 && metrics.memory === -1 && (
+          <div className="ml-auto">
+            <ClipLoader color={"#123abc"} loading={true} size={20} />
+          </div>
+        )}
         {/*<div className="flex items-center space-x-2">
           <Button onClick={loadHealthChecks} className="font-bold">
             <ReloadIcon className="mr-2 h-4 w-4" />

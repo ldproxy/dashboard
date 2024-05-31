@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const API_URL = "/api";
+const API_URL = "http://localhost:7081/api";
 const API_URL2 = "/api";
 
 export const GetEntities = async () => {
