@@ -6,7 +6,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const API_URL = "http://localhost:7081/api";
+const multipleDeployments = process.env.MULTIPLE_DEPLOYMENTS;
+console.log("multipleDeployments", multipleDeployments);
+
+const currentUrl = new URL(window.location.href);
+const baseUrl = currentUrl.origin;
+const apiUrl = `${baseUrl}/api`;
+
+const API_URL = apiUrl;
+// const API_URL = "http://localhost:7081/api";
 const API_URL2 = "/api";
 
 export const GetEntities = async () => {
@@ -81,6 +89,17 @@ export const getMetrics = async () => {
       uptime: data.gauges["jvm.attribute.uptime"].value,
       memory: data.gauges["jvm.memory.total.used"].value,
     };
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
+export const getDeployments = async () => {
+  try {
+    const response = await fetch("/api/deployments");
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("Error:", error);
     throw error;

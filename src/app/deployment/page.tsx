@@ -166,7 +166,7 @@ export default function DeploymentPage() {
     loadMetrics();
     loadValues();
     loadCfg();
-  }, []);
+  }, [pathname]);
 
   const onTabChange = (tab: string) => {
     setTab(tab);

@@ -1,9 +1,12 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/shadcn-ui/button";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavButton } from "./nav-button";
 import { getIcon } from "@/lib/icons";
+import { usePathname } from "next/navigation";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   sections: SectionProps[];
@@ -22,6 +25,18 @@ interface EntryProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function Section({ title, entries }: SectionProps) {
+  const pathname = usePathname();
+  const [isHomePage, setIsHomePage] = useState(true);
+  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
+
+  useEffect(() => {
+    setIsHomePage(pathname === "/home");
+  }, [multipleDeployments, pathname]);
+
+  if (isHomePage && multipleDeployments === "true") {
+    return;
+  }
+
   return (
     <div className="px-3 py-2">
       <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
