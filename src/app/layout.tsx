@@ -15,7 +15,8 @@ import {
 
 import "./globals.css";
 import { icons } from "@/lib/icons";
-import { Button } from "@/components/shadcn-ui/button";
+import { useState, useEffect } from "react";
+import { getDeployments } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -24,6 +25,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [deployments, setDeployments] = useState([{ name: "", url: "" }]);
+  const [deploymentName, setDeploymentName] = useState("");
+
+  const currentUrl = new URL(window.location.href);
+
+  useEffect(() => {
+    getDeployments().then((data: any) => setDeployments(data));
+  }, []);
+
+  useEffect(() => {
+    if (deployments.length > 0) {
+      const currentDeployment = deployments.find(
+        (deployment) => deployment.url === currentUrl.href
+      );
+      if (currentDeployment) {
+        setDeploymentName(currentDeployment.name);
+      }
+    }
+    // leaving out currentUrl from dependencies since it is not needed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deployments]);
+
   return (
     <html lang="en">
       <body
@@ -58,7 +81,7 @@ export default function RootLayout({
                   <Sidebar
                     sections={[
                       {
-                        title: "",
+                        title: deploymentName ? deploymentName : "",
                         entries: [
                           {
                             title: "Deployment",

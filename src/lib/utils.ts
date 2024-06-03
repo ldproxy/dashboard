@@ -7,7 +7,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 const multipleDeployments = process.env.MULTIPLE_DEPLOYMENTS;
-console.log("multipleDeployments", multipleDeployments);
 
 const currentUrl = new URL(window.location.href);
 const baseUrl = currentUrl.origin;

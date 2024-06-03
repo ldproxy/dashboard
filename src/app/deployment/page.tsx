@@ -67,7 +67,6 @@ export default function DeploymentPage() {
     getDeployments().then((data: any) => setDeployments(data));
   }, []);
 
-  console.log("iehf", deployments, currentUrl);
   useEffect(() => {
     if (deployments.length > 0) {
       const currentDeployment = deployments.find(
