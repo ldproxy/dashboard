@@ -20,6 +20,7 @@ import {
   getMetrics,
   getValues,
   getDeploymentCfg,
+  getDeployments,
 } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Check } from "@/data/health";
@@ -36,6 +37,7 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { getEntityCounts, getStateSummary } from "@/lib/entities";
+import { url } from "inspector";
 
 export default function DeploymentPage() {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
@@ -56,6 +58,28 @@ export default function DeploymentPage() {
   const [hasError, setHasError] = useState(false);
   const router = useRouter();
   let pathname = usePathname();
+  const [deployments, setDeployments] = useState([{ name: "", url: "" }]);
+  const [deploymentName, setDeploymentName] = useState("");
+
+  const currentUrl = new URL(window.location.href);
+
+  useEffect(() => {
+    getDeployments().then((data: any) => setDeployments(data));
+  }, []);
+
+  console.log("iehf", deployments, currentUrl);
+  useEffect(() => {
+    if (deployments.length > 0) {
+      const currentDeployment = deployments.find(
+        (deployment) => deployment.url === currentUrl.href
+      );
+      if (currentDeployment) {
+        setDeploymentName(currentDeployment.name);
+      }
+    }
+    // leaving out currentUrl from dependencies since it is not needed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deployments]);
 
   useEffect(() => {
     const storeCheck = healthChecks
@@ -232,7 +256,11 @@ export default function DeploymentPage() {
           >
             <Info
               key="Entities"
-              name={info.url.replace("https://", "").replace("http://", "")}
+              name={`${info.url
+                .replace("https://", "")
+                .replace("http://", "")}${
+                deploymentName ? ` (${deploymentName})` : ""
+              }`}
               version={info.version}
               uptime={metrics.uptime}
               memory={metrics.memory}
