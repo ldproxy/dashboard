@@ -2,6 +2,7 @@
 import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import Summary from "@/components/dashboard/summary";
 import Info from "@/components/dashboard/info";
+import JobInfo from "@/components/dashboard/job-info";
 import { Button } from "@/components/shadcn-ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
@@ -21,6 +22,7 @@ import {
   getValues,
   getDeploymentCfg,
   getDeployments,
+  getJobs,
 } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Check } from "@/data/health";
@@ -28,6 +30,7 @@ import { getIcon } from "@/lib/icons";
 import { Entity } from "@/data/entities";
 import { InputInfo } from "@/data/info";
 import { Metrics } from "@/data/metrics";
+import { Jobs, Job } from "@/data/jobs";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { DevDeployment } from "@/data/constants";
 import Prism from "prismjs";
@@ -44,6 +47,7 @@ export default function DeploymentPage() {
   const [tab, setTab] = useState("overview");
   const [entities, setEntities] = useState<Entity[]>([]);
   const [metrics, setMetrics] = useState<Metrics>({ uptime: -1, memory: -1 });
+  const [jobs, setJobs] = useState([]);
   const [info, setInfo] = useState<InputInfo>({
     name: "",
     version: "",
@@ -143,6 +147,15 @@ export default function DeploymentPage() {
     }
   };
 
+  const loadJobs = async () => {
+    try {
+      const newJobs = await getJobs();
+      setJobs(newJobs);
+    } catch (error) {
+      console.error("Error loading jobs:", error);
+    }
+  };
+
   const loadEntities = async () => {
     try {
       const newEntities = await GetEntities();
@@ -187,6 +200,7 @@ export default function DeploymentPage() {
     loadEntities();
     loadInfo();
     loadMetrics();
+    loadJobs();
     loadValues();
     loadCfg();
   }, [pathname]);
@@ -207,6 +221,7 @@ export default function DeploymentPage() {
   const totalValues = values.length;
   console.log("Values:", totalValues);
   console.log("totalSources:", totalSources);
+  console.log("Jobs", jobs);
   // Following variables are only used for the footer of the entities summary
   const totalEntities = entities.length;
 
@@ -241,6 +256,9 @@ export default function DeploymentPage() {
             </TabsTrigger>
             <TabsTrigger value="store">
               <span>Base Health</span>
+            </TabsTrigger>
+            <TabsTrigger value="jobs">
+              <span>Jobs</span>
             </TabsTrigger>
             {/*<TabsTrigger value="cfg">
               <span>Configuration</span>
@@ -303,6 +321,27 @@ export default function DeploymentPage() {
             </p>
             <DataTable columns={columns} data={tableData} />
           </div>
+        </TabsContent>
+        <TabsContent value="jobs">
+          {jobs.length > 0
+            ? jobs.map((job: Job) => (
+                <>
+                  <div
+                    className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
+                    style={{ marginBottom: "10px" }}
+                  >
+                    <JobInfo
+                      key={job.id}
+                      entity={job.entity}
+                      label={job.label}
+                      tilesets={job.details.tileSets}
+                      percent={job.percent}
+                    />
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>
+                </>
+              ))
+            : null}
         </TabsContent>
         <TabsContent value="cfg">
           <div

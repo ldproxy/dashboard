@@ -94,6 +94,17 @@ export const getMetrics = async () => {
   }
 };
 
+export const getJobs = async () => {
+  try {
+    const response = await fetch(API_URL + "/jobs");
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
 export const getDeployments = async () => {
   try {
     const response = await fetch("/api/deployments");
