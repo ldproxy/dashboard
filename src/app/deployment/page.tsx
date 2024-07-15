@@ -151,6 +151,20 @@ export default function DeploymentPage() {
     try {
       const newJobs = await getJobs();
       setJobs(newJobs);
+      if (newJobs.some((job: Job) => job.percent && job.percent !== 100)) {
+        const interval = setInterval(async () => {
+          const updatedJobs = await getJobs();
+          setJobs(updatedJobs);
+          if (
+            updatedJobs.every(
+              (job: Job) => job.percent === undefined || job.percent === 100
+            )
+          ) {
+            clearInterval(interval);
+          }
+        }, 2000);
+        return () => clearInterval(interval);
+      }
     } catch (error) {
       console.error("Error loading jobs:", error);
     }
