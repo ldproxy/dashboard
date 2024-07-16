@@ -5,8 +5,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/shadcn-ui/card";
-import { Progress } from "@/components/shadcn-ui/progress";
+// import { Progress } from "@/components/shadcn-ui/progress";
 import React from "react";
+import { Progress } from "@/components/dashboard/Progress";
 
 interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   entity: string;
@@ -37,7 +38,7 @@ export default function CustomersPage({
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex justify-between items-center">
+      <CardContent className="flex justify-between items-start">
         <div
           className="text-2xl font-bold break-normal"
           style={{
@@ -47,14 +48,23 @@ export default function CustomersPage({
         >
           <span>{entity}</span>
           <div>
-            <div className="flex flex-col justify-center items-center w-5/6 animate-pulse mt-9">
-              <Progress value={percent} />
+            <div
+              className={`flex flex-col justify-center items-center w-5/6 ${
+                percent === 100 ? "" : "animate-pulse"
+              } mt-9`}
+            >
+              <Progress
+                value={percent}
+                indicatorColor={`${
+                  percent === 100 ? "bg-green-400" : "bg-blue-400"
+                }`}
+              />
               <span className="w-1/6 text-right mt-4">{percent}%</span>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col w-[360px]">
           {Object.keys(tilesets).length > 0 && (
             <div style={{ marginRight: "225px", marginTop: "-30px" }}>
               {Object.entries(tilesets).map(([key, value]) => (

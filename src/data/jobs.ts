@@ -35,12 +35,7 @@ export const Jobs = [
     details: {
       tileProvider: "lika-tiles",
       tileSets: {
-        verwaltungseinheit: {},
-        gebaeude_bauwerk: {},
-        flurstueck: {},
-        flurstueck_punkt: {},
-        nutzung: {},
-        katasterbezirk: {},
+        wed_o: {},
       },
       reseed: false,
     },
@@ -57,7 +52,7 @@ export const Jobs = [
     setup: {},
     cleanup: {},
     done: false,
-    percent: 42,
+    percent: 100,
   },
 ];
 
