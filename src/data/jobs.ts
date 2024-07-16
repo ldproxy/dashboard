@@ -29,7 +29,7 @@ export const Jobs = [
     followUps: [],
     errors: [],
     startedAt: 1721031971,
-    updatedAt: 100,
+    updatedAt: 1721031999,
     total: 38,
     current: 16,
     label: "Tile cache seeding",

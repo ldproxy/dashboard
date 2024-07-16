@@ -7,6 +7,7 @@ import {
 } from "@/components/shadcn-ui/card";
 // import { Progress } from "@/components/shadcn-ui/progress";
 import React from "react";
+import prettyMs from "pretty-ms";
 import { Progress } from "@/components/dashboard/Progress";
 
 interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -26,6 +27,9 @@ export default function CustomersPage({
   startedAt,
   updatedAt,
 }: SummaryProps) {
+  const durationInMs = (updatedAt - startedAt) * 1000;
+  const readableDuration = prettyMs(durationInMs, { compact: true });
+
   return (
     <Card className="shadow-lg" style={{ height: "275px", overflowY: "auto" }}>
       <CardHeader>
@@ -42,12 +46,11 @@ export default function CustomersPage({
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex justify-between items-start mb-9.5">
+      <CardContent className="flex justify-between items-start">
         <div
           className="text-2xl font-bold break-normal"
           style={{
             width: "30%",
-            marginTop: "15px",
           }}
         >
           <span>{entity}</span>
@@ -55,8 +58,18 @@ export default function CustomersPage({
             <div
               className={`flex flex-col justify-center items-center w-5/6 ${
                 percent === 100 ? "" : "animate-pulse"
-              } mt-9`}
+              } mt-1`}
             >
+              <div
+                className="text-center"
+                style={{
+                  marginTop: "30px",
+                  fontSize: "14px",
+                  color: "gray",
+                }}
+              >
+                Duration: {readableDuration}
+              </div>
               <Progress
                 value={percent}
                 indicatorColor={`${
