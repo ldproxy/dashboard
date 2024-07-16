@@ -17,6 +17,7 @@ import { columns } from "@/components/dashboard/DataTableComponents/ColumnsValue
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { autoRefreshInterval } from "@/data/constants";
 
 interface TableDataItem {
   label: string;
@@ -45,11 +46,14 @@ export default function EntitiesPage() {
   };
 
   useEffect(() => {
-    loadValues();
+    const interval = setInterval(() => {
+      loadValues();
+    }, autoRefreshInterval);
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
-  }, []);
+    return () => clearInterval(interval);
+  }, [pathname]);
 
   const onTabChange = (tab: string) => {
     setTab(tab);

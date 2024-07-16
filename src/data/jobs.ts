@@ -53,7 +53,7 @@ export const Jobs = [
     label: "Tile cache seeding",
     description:
       " (Tilesets: [verwaltungseinheit, gebaeude_bauwerk, flurstueck, flurstueck_punkt, nutzung, katasterbezirk])",
-    entity: "krankenhaus-tiles",
+    entity: "lika-tiles",
     setup: {},
     cleanup: {},
     done: false,

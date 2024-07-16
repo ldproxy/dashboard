@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Entity } from "@/data/entities";
 import { Check } from "@/data/health";
-import { DevEntities } from "@/data/constants";
+import { autoRefreshInterval, DevEntities } from "@/data/constants";
 import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -117,20 +117,6 @@ function CustomerPage() {
     try {
       const newJobs = await getJobs();
       setJobs(newJobs);
-      if (newJobs.some((job: Job) => job.percent && job.percent !== 100)) {
-        const interval = setInterval(async () => {
-          const updatedJobs = await getJobs();
-          setJobs(updatedJobs);
-          if (
-            updatedJobs.every(
-              (job: Job) => job.percent === undefined || job.percent === 100
-            )
-          ) {
-            clearInterval(interval);
-          }
-        }, 2000);
-        return () => clearInterval(interval);
-      }
     } catch (error) {
       console.error("Error loading jobs:", error);
     }
@@ -185,8 +171,10 @@ function CustomerPage() {
         console.log("cfg", cfg);
       }
     };
-
-    loadData();
+    const interval = setInterval(() => {
+      loadData();
+    }, autoRefreshInterval);
+    return () => clearInterval(interval);
     // some dependencies ignored to avoid indefinite loop
     // eslint-disable-next-line
   }, [tiles]);

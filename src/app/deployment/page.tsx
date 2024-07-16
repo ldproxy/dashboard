@@ -32,7 +32,7 @@ import { InputInfo } from "@/data/info";
 import { Metrics } from "@/data/metrics";
 import { Jobs, Job } from "@/data/jobs";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
-import { DevDeployment } from "@/data/constants";
+import { DevDeployment, autoRefreshInterval } from "@/data/constants";
 import Prism from "prismjs";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
@@ -40,7 +40,6 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { getEntityCounts, getStateSummary } from "@/lib/entities";
-import { url } from "inspector";
 
 export default function DeploymentPage() {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
@@ -151,20 +150,6 @@ export default function DeploymentPage() {
     try {
       const newJobs = await getJobs();
       setJobs(newJobs);
-      if (newJobs.some((job: Job) => job.percent && job.percent !== 100)) {
-        const interval = setInterval(async () => {
-          const updatedJobs = await getJobs();
-          setJobs(updatedJobs);
-          if (
-            updatedJobs.every(
-              (job: Job) => job.percent === undefined || job.percent === 100
-            )
-          ) {
-            clearInterval(interval);
-          }
-        }, 2000);
-        return () => clearInterval(interval);
-      }
     } catch (error) {
       console.error("Error loading jobs:", error);
     }
@@ -210,13 +195,16 @@ export default function DeploymentPage() {
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
-    loadHealthChecks();
-    loadEntities();
-    loadInfo();
-    loadMetrics();
-    loadJobs();
-    loadValues();
-    loadCfg();
+    const interval = setInterval(() => {
+      loadHealthChecks();
+      loadEntities();
+      loadInfo();
+      loadMetrics();
+      loadJobs();
+      loadValues();
+      loadCfg();
+    }, autoRefreshInterval);
+    return () => clearInterval(interval);
   }, [pathname]);
 
   const onTabChange = (tab: string) => {
@@ -233,9 +221,11 @@ export default function DeploymentPage() {
 
   const totalSources = tableData.length;
   const totalValues = values.length;
-  console.log("Values:", totalValues);
-  console.log("totalSources:", totalSources);
-  console.log("Jobs", jobs);
+  if (DevDeployment) {
+    console.log("Values:", totalValues);
+    console.log("totalSources:", totalSources);
+    console.log("Jobs", jobs);
+  }
   // Following variables are only used for the footer of the entities summary
   const totalEntities = entities.length;
 
