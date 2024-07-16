@@ -23,7 +23,7 @@ export default function CustomersPage({
   percent,
 }: SummaryProps) {
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg" style={{ height: "275px", overflowY: "auto" }}>
       <CardHeader>
         <CardTitle className="text-2xl font-bold break-normal mb-5">
           <div
@@ -38,7 +38,7 @@ export default function CustomersPage({
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex justify-between items-start">
+      <CardContent className="flex justify-between items-start mb-9.5">
         <div
           className="text-2xl font-bold break-normal"
           style={{
@@ -66,7 +66,13 @@ export default function CustomersPage({
 
         <div className="flex flex-col w-[360px]">
           {Object.keys(tilesets).length > 0 && (
-            <div style={{ marginRight: "225px", marginTop: "-30px" }}>
+            <div
+              style={{
+                marginRight: "225px",
+                marginTop: "-18px",
+                height: "50px",
+              }}
+            >
               {Object.entries(tilesets).map(([key, value]) => (
                 <div
                   key={key}
