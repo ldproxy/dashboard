@@ -14,6 +14,8 @@ interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   tilesets: { [key: string]: any }[];
   label: string;
   percent: number;
+  startedAt: number;
+  updatedAt: number;
 }
 
 export default function CustomersPage({
@@ -21,6 +23,8 @@ export default function CustomersPage({
   tilesets,
   label,
   percent,
+  startedAt,
+  updatedAt,
 }: SummaryProps) {
   return (
     <Card className="shadow-lg" style={{ height: "275px", overflowY: "auto" }}>

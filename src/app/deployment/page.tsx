@@ -23,6 +23,7 @@ import {
   getDeploymentCfg,
   getDeployments,
   getJobs,
+  sortCards,
 } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Check } from "@/data/health";
@@ -232,6 +233,8 @@ export default function DeploymentPage() {
   const entityCounts = getEntityCounts(entities);
   const footer = getStateSummary(entityCounts);
 
+  const sortedJobs = sortCards(jobs);
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between space-y-2">
@@ -327,8 +330,8 @@ export default function DeploymentPage() {
           </div>
         </TabsContent>
         <TabsContent value="jobs">
-          {jobs.length > 0
-            ? jobs.map((job: Job) => (
+          {sortedJobs.length > 0
+            ? sortedJobs.map((job: Job) => (
                 <>
                   <div
                     className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
@@ -340,6 +343,8 @@ export default function DeploymentPage() {
                       label={job.label}
                       tilesets={job.details.tileSets}
                       percent={job.percent}
+                      startedAt={job.startedAt}
+                      updatedAt={job.updatedAt}
                     />
                   </div>
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>

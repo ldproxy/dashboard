@@ -1,6 +1,12 @@
 "use client";
 import { Button } from "@/components/shadcn-ui/button";
-import { GetEntities, getCfg, getHealthChecks, getJobs } from "@/lib/utils";
+import {
+  GetEntities,
+  getCfg,
+  getHealthChecks,
+  getJobs,
+  sortCards,
+} from "@/lib/utils";
 import { ReloadIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -183,6 +189,8 @@ function CustomerPage() {
     setTab(tab);
   };
 
+  const sortedJobs = sortCards(jobs);
+
   //const entity = entities ? entities.find((e) => (e.uid = params.id)) : null; Diese Funktion hat UIDs in entities verändert.
 
   if (isLoading) {
@@ -257,10 +265,10 @@ function CustomerPage() {
           </TabsContent>
           <TabsContent value="jobs">
             {id &&
-            jobs.filter(
+            sortedJobs.filter(
               (job: Job) => job.entity === id.split("_").slice(1).join("_")
             ).length > 0
-              ? jobs
+              ? sortedJobs
                   .filter(
                     (job: Job) =>
                       job.entity === id.split("_").slice(1).join("_")
@@ -277,6 +285,8 @@ function CustomerPage() {
                           label={job.label}
                           tilesets={job.details.tileSets}
                           percent={job.percent}
+                          startedAt={job.startedAt}
+                          updatedAt={job.updatedAt}
                         />
                       </div>
                       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>

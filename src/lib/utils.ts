@@ -178,3 +178,13 @@ export const getValuesCfg = async (param: string) => {
     throw error;
   }
 };
+
+export const sortCards = (cards: any) => {
+  return cards.sort((a: any, b: any) => {
+    if (a.startedAt === -1) return 1;
+    if (b.startedAt === -1) return -1;
+    if (a.percent === 100 && b.percent !== 100) return 1;
+    if (b.percent === 100 && a.percent !== 100) return -1;
+    return b.startedAt - a.startedAt;
+  });
+};
