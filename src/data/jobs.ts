@@ -5,9 +5,15 @@ export const Jobs = [
     details: {
       tileProvider: "lika-tiles",
       tileSets: {
-        verwaltungseinheit: {},
-        gebaeude_bauwerk: {},
-        flurstueck: {},
+        verwaltungseinheitasdfghjkljhuhuhuhhuhuhuh: {
+          progress: { total: 5, WebMercatorQuad: { 5: 45, 6: 100, 7: 77 } },
+        },
+        gebaeude_bauwerk: {
+          progress: { total: 100, WebMercatorQuad: { 5: 100, 6: 100, 7: 100 } },
+        },
+        flurstueck: {
+          progress: { total: 5, WebMercatorQuad: { 5: 45, 6: 55, 7: 77 } },
+        },
         flurstueck_punkt: {},
         nutzung: {},
         katasterbezirk: {},
@@ -47,7 +53,9 @@ export const Jobs = [
     details: {
       tileProvider: "lika-tiles",
       tileSets: {
-        wed_o: {},
+        wed_o: {
+          progress: { total: 100, WebMercatorQuad: { 5: 100, 6: 100, 7: 100 } },
+        },
         wed_i: {},
         wed_a: {},
       },
@@ -74,7 +82,9 @@ export const Jobs = [
     details: {
       tileProvider: "lika-tiles",
       tileSets: {
-        wed_o: {},
+        wed_o: {
+          progress: { total: 50, WebMercatorQuad: { 5: 45, 6: 55, 7: 77 } },
+        },
       },
       reseed: false,
     },
@@ -99,7 +109,9 @@ export const Jobs = [
     details: {
       tileProvider: "lika-tiles",
       tileSets: {
-        wed_o: {},
+        wed_o: {
+          progress: { total: 45, WebMercatorQuad: { 5: 45, 6: 55, 7: 77 } },
+        },
         test: {},
       },
       reseed: false,
@@ -121,11 +133,28 @@ export const Jobs = [
   },
 ];
 
+interface TileSetProgress {
+  total: number;
+  WebMercatorQuad?: { [level: number]: number };
+}
+
+export interface TileSets {
+  [key: string]: {
+    progress?: TileSetProgress;
+  };
+}
+
+interface JobDetails {
+  tileProvider: string;
+  tileSets: TileSets;
+  reseed: boolean;
+}
+
 export interface Job {
   id: string;
   entity: string;
   label: string;
-  details: { [key: string]: any };
+  details: JobDetails;
   percent: number;
   startedAt: number;
   updatedAt: number;
