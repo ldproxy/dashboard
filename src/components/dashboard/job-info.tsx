@@ -18,6 +18,7 @@ interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   percent: number;
   startedAt: number;
   updatedAt: number;
+  id: string;
 }
 
 export default function CustomersPage({
@@ -27,6 +28,7 @@ export default function CustomersPage({
   percent,
   startedAt,
   updatedAt,
+  id,
 }: SummaryProps) {
   const durationInMs = (updatedAt - startedAt) * 1000;
   const readableDuration = prettyMs(durationInMs, { compact: true });
@@ -52,18 +54,22 @@ export default function CustomersPage({
               display: "flex",
               flexDirection: "row",
               justifyContent: "space-between",
+              width: "100%",
             }}
           >
-            <span className="text-blue-600">{label}</span>
-            <span style={{ marginRight: "275px" }}>Tilesets</span>
+            <span className="text-blue-600" style={{ width: "50%" }}>
+              {label}
+            </span>
+            <span style={{ width: "50%" }}>Tilesets</span>
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex justify-between items-start">
+      <CardContent className="flex items-start">
         <div
           className="text-2xl font-bold break-normal"
           style={{
             width: "30%",
+            marginRight: "220px",
           }}
         >
           <span>{entity}</span>
@@ -118,7 +124,7 @@ export default function CustomersPage({
                     }}
                   >
                     <button
-                      onClick={() => toggleSection(`${entity} + ${key}`)}
+                      onClick={() => toggleSection(`${id} + ${key}`)}
                       style={{
                         background: "none",
                         border: "none",
@@ -129,9 +135,7 @@ export default function CustomersPage({
                         justifyContent: "center",
                       }}
                     >
-                      {expandedSections.includes(`${entity} + ${key}`)
-                        ? "▼"
-                        : "▶"}
+                      {expandedSections.includes(`${id} + ${key}`) ? "▼" : "▶"}
                     </button>
                     <div
                       style={{
@@ -166,7 +170,7 @@ export default function CustomersPage({
                     )}
                   </div>
 
-                  {expandedSections.includes(`${entity} + ${key}`) &&
+                  {expandedSections.includes(`${id} + ${key}`) &&
                     value.progress &&
                     Object.keys(value.progress)[1] && (
                       <div
@@ -176,7 +180,7 @@ export default function CustomersPage({
                           marginLeft: "35px",
                           marginBottom: "5px",
                           color: "#808080",
-                          fontSize: "14px",
+                          fontSize: "12px",
                           fontWeight: "bold",
                           marginRight: "20px",
                         }}

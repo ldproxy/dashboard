@@ -345,6 +345,7 @@ export default function DeploymentPage() {
                       percent={job.percent}
                       startedAt={job.startedAt}
                       updatedAt={job.updatedAt}
+                      id={job.id}
                     />
                   </div>
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>
