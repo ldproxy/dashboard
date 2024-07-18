@@ -31,6 +31,7 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                     alignItems: "center",
                     marginRight: "15px",
                   }}
+                  title={`${words[index - 1]} ${word}`}
                 >
                   <CheckCircledIcon
                     className="text-success"
@@ -39,7 +40,7 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                       marginRight: "3px",
                     }}
                   />
-                  {words[index - 1]} {word}
+                  {words[index - 1]}
                 </span>,
               ];
             } else if (word === "limited" && !isNaN(Number(words[index - 1]))) {
@@ -47,7 +48,12 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                 <span
                   key={index}
                   className="text-warning mr-2"
-                  style={{ display: "flex", alignItems: "center" }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginRight: "15px",
+                  }}
+                  title={`${words[index - 1]} ${word}`}
                 >
                   <ExclamationTriangleIcon
                     className="text-warning"
@@ -56,7 +62,7 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                       marginRight: "3px",
                     }}
                   />
-                  {words[index - 1]} {word}
+                  {words[index - 1]}
                 </span>,
               ];
             } else if (
@@ -67,7 +73,12 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                 <span
                   key={index}
                   className="text-destructive mr-2"
-                  style={{ display: "flex", alignItems: "center" }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginRight: "15px",
+                  }}
+                  title={`${words[index - 1]} ${word}`}
                 >
                   <CrossCircledIcon
                     className="text-destructive"
@@ -76,7 +87,7 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                       marginRight: "3px",
                     }}
                   />
-                  {words[index - 1]} {word}
+                  {words[index - 1]}
                 </span>,
               ];
             } else if (type !== null) {
