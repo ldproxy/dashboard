@@ -233,7 +233,10 @@ export default function DeploymentPage() {
   const entityCounts = getEntityCounts(entities);
   const footer = getStateSummary(entityCounts);
 
-  const sortedJobs = sortCards(jobs);
+  let sortedJobs = [];
+  if (jobs.length > 0) {
+    sortedJobs = sortCards(jobs);
+  }
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">

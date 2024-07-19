@@ -189,8 +189,10 @@ function CustomerPage() {
     setTab(tab);
   };
 
-  const sortedJobs = sortCards(jobs);
-
+  let sortedJobs = [];
+  if (jobs.length > 0) {
+    sortedJobs = sortCards(jobs);
+  }
   //const entity = entities ? entities.find((e) => (e.uid = params.id)) : null; Diese Funktion hat UIDs in entities verändert.
 
   if (isLoading) {
@@ -265,6 +267,7 @@ function CustomerPage() {
           </TabsContent>
           <TabsContent value="jobs">
             {id &&
+            sortedJobs.length > 0 &&
             sortedJobs.filter(
               (job: Job) => job.entity === id.split("_").slice(1).join("_")
             ).length > 0

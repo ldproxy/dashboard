@@ -180,6 +180,7 @@ export const getValuesCfg = async (param: string) => {
 };
 
 export const sortCards = (cards: any) => {
+  if (cards.length === 0) return undefined;
   return cards.sort((a: any, b: any) => {
     if (a.startedAt === -1) return 1;
     if (b.startedAt === -1) return -1;
