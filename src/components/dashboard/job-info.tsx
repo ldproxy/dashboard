@@ -46,7 +46,10 @@ export default function CustomersPage({
   };
 
   return (
-    <Card className="shadow-lg" style={{ height: "275px", overflowY: "auto" }}>
+    <Card
+      className="shadow-lg"
+      style={{ height: "290px", overflow: "auto", boxSizing: "border-box" }}
+    >
       <CardHeader>
         <CardTitle className="text-2xl font-bold break-normal mb-5">
           <div
@@ -100,7 +103,7 @@ export default function CustomersPage({
           </div>
         </div>
 
-        <div className="flex flex-col w-[360px]">
+        <div className="flex flex-col w-[360px] mt-[-10px]">
           {Object.keys(tilesets).length > 0 && (
             <div
               style={{
