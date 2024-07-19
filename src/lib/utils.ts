@@ -8,15 +8,17 @@ export function cn(...inputs: ClassValue[]) {
 
 const multipleDeployments = process.env.MULTIPLE_DEPLOYMENTS;
 
+/*
 const currentUrl = new URL(window.location.href);
 const baseUrl = currentUrl.origin;
 const apiUrl = `${baseUrl}/api`;
-
 const API_URL = apiUrl;
+*/
+
 // const API_URL = "http://localhost:7081/api";
 const API_URL2 = "/api";
 
-export const GetEntities = async () => {
+export const GetEntities = async (API_URL: string) => {
   try {
     const response = await fetch(API_URL + "/entities");
     const data = await response.json();
@@ -42,7 +44,7 @@ function calculateDaysBetweenDates(begin: number, end: number): number {
   return Math.floor(diff / oneDay);
 }
 
-export const getHealthChecks = async () => {
+export const getHealthChecks = async (API_URL: string) => {
   try {
     const response = await fetch(API_URL + "/health");
     const data = await response.json();
@@ -69,7 +71,7 @@ export const getHealthChecks = async () => {
   }
 };
 
-export const getInfo = async () => {
+export const getInfo = async (API_URL: string) => {
   try {
     const response = await fetch(API_URL + "/info");
     const data = await response.json();
@@ -80,7 +82,7 @@ export const getInfo = async () => {
   }
 };
 
-export const getMetrics = async () => {
+export const getMetrics = async (API_URL: string) => {
   try {
     const response = await fetch(API_URL + "/metrics");
     const data = await response.json();
@@ -105,7 +107,7 @@ export const getDeployments = async () => {
   }
 };
 
-export const getValues = async () => {
+export const getValues = async (API_URL: string) => {
   try {
     const response = await fetch(API_URL + "/values");
     const data = await response.json();

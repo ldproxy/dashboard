@@ -20,6 +20,7 @@ interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   IconFooter1?: React.FunctionComponent<IconProps>;
   IconFooter2?: React.FunctionComponent<IconProps>;
   IconFooter3?: React.FunctionComponent<IconProps>;
+  className?: string;
 }
 
 export default function CustomersPage({
@@ -32,12 +33,13 @@ export default function CustomersPage({
   IconFooter1,
   IconFooter2,
   IconFooter3,
+  className,
 }: SummaryProps) {
   const formattedMemory = filesize(memory, { base: 10 });
   const formattedUptime = prettyMs(uptime, { secondsDecimalDigits: 0 });
 
   return (
-    <Card className="shadow-lg">
+    <Card className={`shadow-lg ${className}`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle
           className={`text-sm font-semibold ${
@@ -84,7 +86,11 @@ export default function CustomersPage({
               Version:
             </span>
             <span
-              style={{ color: "dimgray", fontSize: "14px", fontWeight: "bold" }}
+              style={{
+                color: "dimgray",
+                fontSize: "14px",
+                fontWeight: "bold",
+              }}
             >
               {version}
             </span>
@@ -113,7 +119,11 @@ export default function CustomersPage({
               Uptime:
             </span>
             <span
-              style={{ color: "dimgray", fontSize: "14px", fontWeight: "bold" }}
+              style={{
+                color: "dimgray",
+                fontSize: "14px",
+                fontWeight: "bold",
+              }}
             >
               {uptime === -1 ? "" : formattedUptime}
             </span>
@@ -142,7 +152,11 @@ export default function CustomersPage({
               Memory:
             </span>
             <span
-              style={{ color: "dimgray", fontSize: "14px", fontWeight: "bold" }}
+              style={{
+                color: "dimgray",
+                fontSize: "14px",
+                fontWeight: "bold",
+              }}
             >
               {memory === -1 ? "" : formattedMemory}
             </span>

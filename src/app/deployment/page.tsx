@@ -37,7 +37,6 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { getEntityCounts, getStateSummary } from "@/lib/entities";
-import { url } from "inspector";
 
 export default function DeploymentPage() {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);

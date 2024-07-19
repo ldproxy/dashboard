@@ -11,5 +11,5 @@ export const info = {
   version: "3.6.2",
   status: "HEALTHY",
   url: "foo",
-  env: "DEV"
+  env: "DEV",
 };
