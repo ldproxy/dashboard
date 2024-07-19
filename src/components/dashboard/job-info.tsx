@@ -60,7 +60,12 @@ export default function CustomersPage({
               width: "100%",
             }}
           >
-            <span className="text-blue-600" style={{ width: "50%" }}>
+            <span
+              className={`${
+                percent === 100 ? "text-green-500" : "text-blue-500"
+              }`}
+              style={{ width: "50%" }}
+            >
               {label}
             </span>
             <span style={{ width: "50%" }}>Tilesets</span>
@@ -85,12 +90,11 @@ export default function CustomersPage({
               <div
                 className="text-center"
                 style={{
-                  marginTop: "30px",
-                  fontSize: "14px",
-                  color: "gray",
+                  marginTop: "25px",
+                  marginBottom: "10px",
                 }}
               >
-                Duration: {readableDuration}
+                <span>{readableDuration}</span>
               </div>
               <Progress
                 value={percent}
@@ -98,7 +102,7 @@ export default function CustomersPage({
                   percent === 100 ? "bg-green-400" : "bg-blue-400"
                 }`}
               />
-              <span className="w-1/6 text-right mt-4">{percent}%</span>
+              <span className="w-1/6 text-right mt-3">{percent}%</span>
             </div>
           </div>
         </div>
