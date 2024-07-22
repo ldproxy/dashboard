@@ -11,6 +11,7 @@ import { Metrics } from "@/data/metrics";
 import { Deployment } from "@/data/deployments";
 import Info from "@/components/dashboard/info";
 import { ClipLoader } from "react-spinners";
+import { useRouter } from "next/navigation";
 
 type InfoType = { [key: string]: InputInfo };
 type MetricsType = { [key: string]: Metrics };
@@ -23,6 +24,15 @@ export default function HomePage() {
   const [info, setInfo] = useState<InfoType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  const router = useRouter();
+  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
+  console.log("multipleDeployments", multipleDeployments);
+  useEffect(() => {
+    if (multipleDeployments === "false") {
+      router.replace("/404");
+    }
+  }, [multipleDeployments, router]);
 
   useEffect(() => {
     getDeployments().then((data: any) => {
