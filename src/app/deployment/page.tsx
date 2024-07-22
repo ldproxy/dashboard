@@ -220,7 +220,11 @@ export default function DeploymentPage() {
 
   const onTabChange = (tab: string) => {
     setTab(tab);
-    router.push(`${pathname}?did=${deploymentId}#${tab}`);
+    if (deploymentId !== "") {
+      router.push(`${pathname}?did=${deploymentId}#${tab}`);
+    } else {
+      router.push(`${pathname}#${tab}`);
+    }
   };
 
   const health =
@@ -300,7 +304,9 @@ export default function DeploymentPage() {
             <Summary
               key="Entities"
               main="Entities"
-              route="/entities"
+              route={`/entities${
+                deploymentId !== "" ? `?did=${deploymentId}` : ""
+              }`}
               footer={footer}
               total={totalEntities}
               Icon={getIcon("Id")}
@@ -316,7 +322,9 @@ export default function DeploymentPage() {
             <Summary
               key="Values"
               main="Values"
-              route="/values"
+              route={`/values${
+                deploymentId !== "" ? `?did=${deploymentId}` : ""
+              }`}
               footer="&nbsp;"
               total={totalValues}
               Icon={getIcon("Code")}

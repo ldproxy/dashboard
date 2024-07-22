@@ -90,7 +90,11 @@ export default function EntitiesPage() {
 
   const onTabChange = (tab: string) => {
     setTab(tab);
-    router.push(`${pathname}?did=${deploymentId}#${tab}`);
+    if (deploymentId !== "") {
+      router.push(`${pathname}?did=${deploymentId}#${tab}`);
+    } else {
+      router.push(`${pathname}#${tab}`);
+    }
   };
 
   if (DevEntities) {
@@ -138,7 +142,9 @@ export default function EntitiesPage() {
                 footer={getStateSummary(entityTypeStatusCounts[entityCategory])}
                 total={entityTypeCounts[entityCategory]}
                 onClick={() => setTab(entityCategory)}
-                route={`${pathname}?did=${deploymentId}#${entityCategory}`}
+                route={`${pathname}${
+                  deploymentId !== "" ? `?did=${deploymentId}` : ""
+                }#${entityCategory}`}
                 Icon={getIcon("Id")}
               />
             ))}
@@ -157,7 +163,9 @@ export default function EntitiesPage() {
                     header={entity.status}
                     main={entity.id}
                     footer={entity.subType.toUpperCase()}
-                    route={`/entities/details?did=${deploymentId}&id=${entity.uid}`}
+                    route={`/entities/details${
+                      deploymentId ? `?did=${deploymentId}&` : "?"
+                    }id=${entity.uid}`}
                   />
                 ))}
             </div>

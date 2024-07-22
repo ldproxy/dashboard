@@ -68,7 +68,11 @@ export default function EntitiesPage() {
 
   const onTabChange = (tab: string) => {
     setTab(tab);
-    router.push(`${pathname}?did=${deploymentId}#${tab}`);
+    if (deploymentId !== "") {
+      router.push(`${pathname}?did=${deploymentId}#${tab}`);
+    } else {
+      router.push(`${pathname}#${tab}`);
+    }
   };
 
   const valueTypes = values
@@ -125,7 +129,9 @@ export default function EntitiesPage() {
                   setTab(valueType);
                 }}
                 Icon={getIcon("Code")}
-                route={`${pathname}?did=${deploymentId}#${valueType}`}
+                route={`${pathname}${
+                  deploymentId !== "" ? `?did=${deploymentId}` : ""
+                }#${valueType}`}
               />
             ))}
           </div>
