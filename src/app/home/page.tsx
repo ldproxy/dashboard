@@ -10,6 +10,8 @@ import { InputInfo } from "@/data/info";
 import { Metrics } from "@/data/metrics";
 import { Deployment } from "@/data/deployments";
 import Info from "@/components/dashboard/info";
+import { ClipLoader } from "react-spinners";
+import { init } from "next/dist/compiled/webpack/webpack";
 
 type InfoType = { [key: string]: InputInfo };
 type MetricsType = { [key: string]: Metrics };
@@ -20,6 +22,8 @@ export default function HomePage() {
   const [healthChecks, setHealthChecks] = useState<HealthChecksType>({});
   const [metrics, setMetrics] = useState<MetricsType[]>([]);
   const [info, setInfo] = useState<InfoType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
     getDeployments().then((data: any) => {
@@ -76,13 +80,36 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      loadHealthChecks();
-      loadInfo();
-      loadMetrics();
-    }, 2000);
-    return () => clearInterval(interval);
-    // to avoid indefinite loops
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        await Promise.all([loadHealthChecks(), loadInfo(), loadMetrics()]);
+      } catch (error) {
+        console.error(
+          "Ein Fehler ist beim Laden der Daten aufgetreten:",
+          error
+        );
+      } finally {
+        setIsLoading(false);
+        setIsInitialLoad(false);
+      }
+    };
+    if (isInitialLoad && deployments.length > 0) {
+      loadData();
+    }
+    // not all dependendies to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deployments]);
+
+  useEffect(() => {
+    if (!isInitialLoad) {
+      const loadData = async () => {
+        await Promise.all([loadHealthChecks(), loadInfo(), loadMetrics()]);
+      };
+      const interval = setInterval(loadData, 2000);
+      return () => clearInterval(interval);
+    }
+    // not all dependendies to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deployments]);
 
@@ -107,17 +134,17 @@ export default function HomePage() {
   const baseUrl = currentUrl.origin;
   const deploymentUrl = `${baseUrl}/deployment`;
 
-  console.log("info", info, "metrics", metrics, "healthChecks", healthChecks);
-
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
+      <div className="flex items-center justify-between mb-9 mt-8">
+        <h2 className="text-2xl font-semibold tracking-tight">Deployments</h2>
+        {isLoading && (
+          <div className="ml-auto">
+            <ClipLoader color={"#123abc"} loading={true} size={20} />
+          </div>
+        )}
+      </div>
       <div className="justify-between space-y-2">
-        <h2
-          className="text-2xl font-semibold tracking-tight"
-          style={{ marginBottom: "50px" }}
-        >
-          Deployments
-        </h2>
         <div
           className="grid gap-4 md:grid-cols-1 lg:grid-cols-1 "
           style={{ marginBottom: "10px" }}

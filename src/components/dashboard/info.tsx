@@ -57,11 +57,12 @@ export default function CustomersPage({
           className="text-2xl font-bold break-normal"
           style={{
             marginBottom: "3px",
+            width: "65%",
           }}
         >
           {name}
         </div>
-        <div style={{ marginRight: "225px", marginTop: "-30px" }}>
+        <div style={{ width: "35%", marginTop: "-30px" }}>
           <div
             style={{
               display: "flex",
