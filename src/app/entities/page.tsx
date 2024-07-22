@@ -138,7 +138,7 @@ export default function EntitiesPage() {
                 footer={getStateSummary(entityTypeStatusCounts[entityCategory])}
                 total={entityTypeCounts[entityCategory]}
                 onClick={() => setTab(entityCategory)}
-                route={`${pathname}#${entityCategory}`}
+                route={`${pathname}?did=${deploymentId}#${entityCategory}`}
                 Icon={getIcon("Id")}
               />
             ))}

@@ -13,6 +13,8 @@ import {
   MixIcon,
 } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import "./globals.css";
 import { icons } from "@/lib/icons";
@@ -25,24 +27,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [deploymentId, setDeploymentId] = useState("");
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
-  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
+  useEffect(() => {
+    const getDeploymentId = () => {
+      let did;
+      if (searchParams) {
+        console.log("params", searchParams.get("did"));
+        did = searchParams.get("did");
+      }
+      if (did && typeof did === "string") {
+        setDeploymentId(did);
+      }
+    };
 
-  const getDeploymentId = async () => {
-    const currentUrl = new URL(window.location.href);
-    const queryParams = new URLSearchParams(currentUrl.search);
-    const did = queryParams.get("did");
-    if (did) {
-      setDeploymentId(did);
-    }
-  };
-
-  if (multipleDeployments === "true") {
-    setInterval(() => {
+    if (process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS === "true") {
       getDeploymentId();
-    }, 2000);
-  }
-  console.log("deploymentId", deploymentId);
+    }
+  }, [pathname, searchParams]);
+
   return (
     <html lang="en">
       <body

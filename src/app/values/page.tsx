@@ -125,7 +125,7 @@ export default function EntitiesPage() {
                   setTab(valueType);
                 }}
                 Icon={getIcon("Code")}
-                route={`${pathname}#${valueType}`}
+                route={`${pathname}?did=${deploymentId}#${valueType}`}
               />
             ))}
           </div>
