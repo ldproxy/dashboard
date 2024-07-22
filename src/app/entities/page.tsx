@@ -29,6 +29,18 @@ export default function EntitiesPage() {
   const [tab, setTab] = useState("overview");
   const router = useRouter();
   let pathname = usePathname();
+  const [deploymentId, setDeploymentId] = useState("");
+
+  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
+
+  const getDeploymentId = async () => {
+    const currentUrl = new URL(window.location.href);
+    const queryParams = new URLSearchParams(currentUrl.search);
+    const did = queryParams.get("did");
+    if (did) {
+      setDeploymentId(did);
+    }
+  };
 
   const entityCategories = entities
     .map(getEntityCategory)
@@ -71,11 +83,14 @@ export default function EntitiesPage() {
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
-  }, []);
+    if (multipleDeployments === "true") {
+      getDeploymentId();
+    }
+  }, [multipleDeployments, pathname]);
 
   const onTabChange = (tab: string) => {
     setTab(tab);
-    router.push(`${pathname}#${tab}`);
+    router.push(`${pathname}?did=${deploymentId}#${tab}`);
   };
 
   if (DevEntities) {
@@ -142,7 +157,7 @@ export default function EntitiesPage() {
                     header={entity.status}
                     main={entity.id}
                     footer={entity.subType.toUpperCase()}
-                    route={`/entities/details?id=${entity.uid}`}
+                    route={`/entities/details?did=${deploymentId}&id=${entity.uid}`}
                   />
                 ))}
             </div>

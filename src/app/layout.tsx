@@ -12,6 +12,7 @@ import {
   IdCardIcon,
   MixIcon,
 } from "@radix-ui/react-icons";
+import { useEffect, useState } from "react";
 
 import "./globals.css";
 import { icons } from "@/lib/icons";
@@ -23,6 +24,25 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [deploymentId, setDeploymentId] = useState("");
+
+  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
+
+  const getDeploymentId = async () => {
+    const currentUrl = new URL(window.location.href);
+    const queryParams = new URLSearchParams(currentUrl.search);
+    const did = queryParams.get("did");
+    if (did) {
+      setDeploymentId(did);
+    }
+  };
+
+  if (multipleDeployments === "true") {
+    setInterval(() => {
+      getDeploymentId();
+    }, 2000);
+  }
+  console.log("deploymentId", deploymentId);
   return (
     <html lang="en">
       <body
@@ -62,17 +82,23 @@ export default function RootLayout({
                           {
                             title: "Deployment",
                             icon: icons.Play,
-                            route: "/deployment",
+                            route: deploymentId
+                              ? `/deployment?did=${deploymentId}`
+                              : "/deployment",
                           },
                           {
                             title: "Entities",
                             icon: icons.Id,
-                            route: "/entities",
+                            route: deploymentId
+                              ? `/entities?did=${deploymentId}`
+                              : "/entities",
                           },
                           {
                             title: "Values",
                             icon: icons.Code,
-                            route: "/values",
+                            route: deploymentId
+                              ? `/values?did=${deploymentId}`
+                              : "/values",
                           },
                         ],
                       },

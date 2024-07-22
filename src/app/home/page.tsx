@@ -198,7 +198,10 @@ export default function HomePage() {
               );
 
               return (
-                <Link href={deploymentUrl} key={index}>
+                <Link
+                  href={`${deploymentUrl}?did=${deployment.id}`}
+                  key={index}
+                >
                   <Info
                     key={index}
                     name={

@@ -1,6 +1,8 @@
 "use client";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { useState, useEffect } from "react";
+import { Deployment } from "@/data/deployments";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -18,9 +20,48 @@ const API_URL = apiUrl;
 // const API_URL = "http://localhost:7081/api";
 const API_URL2 = "/api";
 
-export const GetEntities = async (API_URL: string) => {
+export async function GetApiUrl(): Promise<string> {
+  let apiUrl = "";
+
+  const deployments = await getDeployments();
+
+  const currentUrl = new URL(window.location.href);
+
+  if (currentUrl && deployments.length > 0) {
+    const url = new URL(currentUrl.href);
+    const queryParams = new URLSearchParams(url.search);
+    const deploymentId = queryParams.get("did");
+
+    let matchingDeployment;
+    // case multipleDeployments === "true"
+    if (deploymentId) {
+      matchingDeployment = deployments.find(
+        (deployment: Deployment) => deployment.id === deploymentId
+      );
+      // case multipleDeployments === "false"
+    } else {
+      const baseUrl = currentUrl.origin;
+      const apiUrl = `${baseUrl}/api`;
+
+      return apiUrl;
+    }
+
+    if (matchingDeployment && matchingDeployment.apiUrl) {
+      apiUrl = matchingDeployment.apiUrl;
+    }
+
+    return apiUrl;
+  }
+  return apiUrl;
+}
+
+export const GetEntities = async (API_URL?: string) => {
+  let apiUrl = API_URL;
+  if (!apiUrl) {
+    apiUrl = await GetApiUrl();
+  }
   try {
-    const response = await fetch(API_URL + "/entities");
+    const response = await fetch(apiUrl + "/entities");
     const data = await response.json();
     const newMappedEntities = Object.keys(data)
       .flatMap((type) =>
@@ -44,9 +85,13 @@ function calculateDaysBetweenDates(begin: number, end: number): number {
   return Math.floor(diff / oneDay);
 }
 
-export const getHealthChecks = async (API_URL: string) => {
+export const getHealthChecks = async (API_URL?: string) => {
+  let apiUrl = API_URL;
+  if (!apiUrl) {
+    apiUrl = await GetApiUrl();
+  }
   try {
-    const response = await fetch(API_URL + "/health");
+    const response = await fetch(apiUrl + "/health");
     if (!response.ok) {
       throw new Error(`API call failed with status: ${response.status}`);
     }
@@ -74,9 +119,13 @@ export const getHealthChecks = async (API_URL: string) => {
   }
 };
 
-export const getInfo = async (API_URL: string) => {
+export const getInfo = async (API_URL?: string) => {
+  let apiUrl = API_URL;
+  if (!apiUrl) {
+    apiUrl = await GetApiUrl();
+  }
   try {
-    const response = await fetch(API_URL + "/info");
+    const response = await fetch(apiUrl + "/info");
     const data = await response.json();
     return data;
   } catch (error) {
@@ -85,9 +134,13 @@ export const getInfo = async (API_URL: string) => {
   }
 };
 
-export const getMetrics = async (API_URL: string) => {
+export const getMetrics = async (API_URL?: string) => {
+  let apiUrl = API_URL;
+  if (!apiUrl) {
+    apiUrl = await GetApiUrl();
+  }
   try {
-    const response = await fetch(API_URL + "/metrics");
+    const response = await fetch(apiUrl + "/metrics");
     const data = await response.json();
     return {
       uptime: data.gauges["jvm.attribute.uptime"].value,
@@ -110,9 +163,13 @@ export const getDeployments = async () => {
   }
 };
 
-export const getValues = async (API_URL: string) => {
+export const getValues = async (API_URL?: string) => {
+  let apiUrl = API_URL;
+  if (!apiUrl) {
+    apiUrl = await GetApiUrl();
+  }
   try {
-    const response = await fetch(API_URL + "/values");
+    const response = await fetch(apiUrl + "/values");
     const data = await response.json();
     return Object.keys(data).flatMap((type) =>
       data[type].map((value: any) => ({

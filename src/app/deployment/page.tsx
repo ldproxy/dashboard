@@ -37,6 +37,8 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { getEntityCounts, getStateSummary } from "@/lib/entities";
+import { Deployment } from "@/data/deployments";
+import { match } from "assert";
 
 export default function DeploymentPage() {
   const [healthChecks, setHealthChecks] = useState<Check[]>([]);
@@ -57,39 +59,64 @@ export default function DeploymentPage() {
   const [hasError, setHasError] = useState(false);
   const router = useRouter();
   let pathname = usePathname();
-  const [deployments, setDeployments] = useState([{ name: "", url: "" }]);
+  const [deployments, setDeployments] = useState([
+    { name: "", url: "", apiUrl: "", id: "" },
+  ] as Deployment[]);
   const [deploymentName, setDeploymentName] = useState("");
+  const [deploymentId, setDeploymentId] = useState("");
 
-  const currentUrl = new URL(window.location.href);
+  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
+
+  const getDeploymentId = async () => {
+    const currentUrl = new URL(window.location.href);
+    const queryParams = new URLSearchParams(currentUrl.search);
+    const did = queryParams.get("did");
+    if (did) {
+      setDeploymentId(did);
+    }
+  };
 
   useEffect(() => {
     getDeployments().then((data: any) => setDeployments(data));
-  }, []);
+    if (multipleDeployments === "true") {
+      getDeploymentId();
+    }
+  }, [multipleDeployments]);
 
   useEffect(() => {
-    if (deployments.length > 0) {
+    const currentUrl = new URL(window.location.href);
+
+    if (currentUrl && deployments.length > 0) {
       const currentDeployment = deployments.find(
         (deployment) => deployment.url === currentUrl.href
       );
+
       if (currentDeployment) {
         setDeploymentName(currentDeployment.name);
       }
     }
-    // leaving out currentUrl from dependencies since it is not needed
+    // leaving out apiUrl to avoid indefinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deployments]);
 
   useEffect(() => {
     const storeCheck = healthChecks
       .filter(
-        (check) =>
-          check.name.startsWith("app/") && check.name !== "app/store/values2"
+        (check: Check) =>
+          check &&
+          check.name &&
+          check.name.startsWith("app/") &&
+          check.name !== "app/store/values2"
       )
-      .map((check) => ({
-        label: check.name.substring(4),
-        status: check.state,
-        checked: dayjs(check.timestamp).format("HH:mm:ss"),
-      }));
+      .map(
+        (check) =>
+          check &&
+          check.name && {
+            label: check.name.substring(4),
+            status: check.state,
+            checked: dayjs(check.timestamp).format("HH:mm:ss"),
+          }
+      );
     setTableData(storeCheck);
     /*if (DevDeployment) {
       console.log("storeCheck data:", storeCheck);
@@ -112,6 +139,7 @@ export default function DeploymentPage() {
   const loadInfo = async () => {
     try {
       const newInfo = await getInfo();
+      console.log("newInfo:", newInfo);
       setInfo(newInfo);
     } catch (error) {
       console.error("Error loading info:", error);
@@ -192,7 +220,7 @@ export default function DeploymentPage() {
 
   const onTabChange = (tab: string) => {
     setTab(tab);
-    router.push(`${pathname}#${tab}`);
+    router.push(`${pathname}?did=${deploymentId}#${tab}`);
   };
 
   const health =
