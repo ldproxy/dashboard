@@ -47,6 +47,9 @@ function calculateDaysBetweenDates(begin: number, end: number): number {
 export const getHealthChecks = async (API_URL: string) => {
   try {
     const response = await fetch(API_URL + "/health");
+    if (!response.ok) {
+      throw new Error(`API call failed with status: ${response.status}`);
+    }
     const data = await response.json();
     const mappedHealthChecks = Object.keys(data).map((name) => ({
       name,

@@ -8,11 +8,11 @@ export interface InputCheck {
 }
 
 export interface Check {
-  name: string;
-  healthy: boolean;
+  name?: string;
+  healthy?: boolean;
   state: string;
-  timestamp: string;
-  duration: number;
+  timestamp?: string;
+  duration?: number;
   message?: string;
   sources?: { label: string; status: string }[];
   capabilities?: {

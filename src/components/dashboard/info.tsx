@@ -45,6 +45,8 @@ export default function CustomersPage({
           className={`text-sm font-semibold ${
             health === "ACTIVE" || health === "true" || health === "HEALTHY"
               ? "text-success"
+              : health === "OFFLINE"
+              ? "text-muted-foreground"
               : "text-destructive"
           }`}
         >

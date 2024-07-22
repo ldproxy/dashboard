@@ -11,7 +11,6 @@ import { Metrics } from "@/data/metrics";
 import { Deployment } from "@/data/deployments";
 import Info from "@/components/dashboard/info";
 import { ClipLoader } from "react-spinners";
-import { init } from "next/dist/compiled/webpack/webpack";
 
 type InfoType = { [key: string]: InputInfo };
 type MetricsType = { [key: string]: Metrics };
@@ -68,8 +67,18 @@ export default function HomePage() {
       if (deployments.length > 0) {
         let healthChecksObj: HealthChecksType = {};
         const promises = deployments.map(async (deployment: any) => {
-          const newHealthChecks = await getHealthChecks(deployment.apiUrl);
-          healthChecksObj[deployment.name] = newHealthChecks;
+          try {
+            const newHealthChecks = await getHealthChecks(deployment.apiUrl);
+            healthChecksObj[deployment.name] = newHealthChecks;
+          } catch (error) {
+            console.error(
+              "Error fetching health checks for",
+              deployment.name,
+              ":",
+              error
+            );
+            healthChecksObj[deployment.name] = [{ state: "OFFLINE" }];
+          }
         });
         await Promise.all(promises);
         setHealthChecks(healthChecksObj);
@@ -117,12 +126,19 @@ export default function HomePage() {
     if (deployments.length > 0) {
       return deployments.map((deployment: Deployment) => {
         const checks = healthChecks[deployment.name];
-        const healthStatus =
-          checks && checks.length > 0
-            ? checks.some((check: Check) => check.state !== "AVAILABLE")
-              ? "UNHEALTHY"
-              : "HEALTHY"
-            : "";
+
+        let healthStatus = "";
+
+        if (checks && checks.length > 0) {
+          if (checks.some((check) => check.state === "UNAVAILABLE")) {
+            healthStatus = "UNHEALTHY";
+          } else if (checks.every((check) => check.state === "AVAILABLE")) {
+            healthStatus = "HEALTHY";
+          } else if (checks.some((check) => check.state === "OFFLINE")) {
+            healthStatus = "OFFLINE";
+          }
+        }
+
         return { name: deployment.name, healthStatus };
       });
     } else return null;
