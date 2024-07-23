@@ -152,6 +152,8 @@ function CustomerPage() {
     };
 
     loadData();
+    // leaving out dependencies to avoid indefinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onTabChange = (tab: string) => {

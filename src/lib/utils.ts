@@ -163,6 +163,23 @@ export const getDeployments = async () => {
   }
 };
 
+export const postDeployment = async (deployment: Deployment) => {
+  try {
+    const response = await fetch("/api/deployments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(deployment),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
 export const getValues = async (API_URL?: string) => {
   let apiUrl = API_URL;
   if (!apiUrl) {

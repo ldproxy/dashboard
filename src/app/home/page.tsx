@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getDeployments } from "../../lib/utils";
+import { getDeployments, postDeployment } from "../../lib/utils";
 import { getIcon } from "@/lib/icons";
 import Link from "next/link";
 import { GetEntities, getHealthChecks, getInfo, getMetrics } from "@/lib/utils";
@@ -12,6 +12,10 @@ import { Deployment } from "@/data/deployments";
 import Info from "@/components/dashboard/info";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
+import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
+import { PopUpDialog } from "@/lib/PopUp";
+import { buttonVariants } from "@/components/shadcn-ui/button";
+import { PlusCircledIcon } from "@radix-ui/react-icons";
 
 type InfoType = { [key: string]: InputInfo };
 type MetricsType = { [key: string]: Metrics };
@@ -24,6 +28,10 @@ export default function HomePage() {
   const [info, setInfo] = useState<InfoType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [healthStatuses, setHealthStatuses] = useState<
+    { name: string; healthStatus: string }[] | null
+  >(null);
+  const [popUp, setPopUp] = useState<boolean>(false);
 
   const router = useRouter();
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
@@ -40,6 +48,23 @@ export default function HomePage() {
       console.log("deployments", data);
     });
   }, []);
+
+  const createDeployment = async (data: any) => {
+    try {
+      await postDeployment({
+        name: data.name,
+        apiUrl: `http://${data.url}/api`,
+        url: `http://${data.url}/deployment`,
+        id: data.id,
+      });
+      const deploymentsData = await getDeployments();
+      setDeployments(deploymentsData);
+      return { success: true };
+    } catch (error) {
+      console.error("Fehler beim Erstellen des Deployments", error);
+      return { success: false };
+    }
+  };
 
   const loadInfo = async () => {
     try {
@@ -92,6 +117,8 @@ export default function HomePage() {
         });
         await Promise.all(promises);
         setHealthChecks(healthChecksObj);
+        const healthStatuses = await getHealthStatuses(healthChecksObj);
+        setHealthStatuses(healthStatuses);
       }
     } catch (error) {
       console.error("Error loading health checks:", error);
@@ -132,7 +159,7 @@ export default function HomePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deployments]);
 
-  const getHealthStatuses = () => {
+  const getHealthStatuses = async (healthChecks: HealthChecksType) => {
     if (deployments.length > 0) {
       return deployments.map((deployment: Deployment) => {
         const checks = healthChecks[deployment.name];
@@ -154,8 +181,6 @@ export default function HomePage() {
     } else return null;
   };
 
-  const healthStatuses = getHealthStatuses();
-
   const currentUrl = new URL(window.location.href);
   const baseUrl = currentUrl.origin;
   const deploymentUrl = `${baseUrl}/deployment`;
@@ -165,10 +190,23 @@ export default function HomePage() {
       <div className="flex items-center justify-between mb-9 mt-8">
         <h2 className="text-2xl font-semibold tracking-tight">Deployments</h2>
         {isLoading && (
-          <div className="ml-auto">
+          <div className="ml-auto mr-10">
             <ClipLoader color={"#123abc"} loading={true} size={20} />
           </div>
         )}
+        {/* <Button className="font-bold" onClick={createDeployment}>
+          Create Deployment
+        </Button> */}
+        <Dialog onOpenChange={(open) => setPopUp(open)}>
+          <DialogTrigger
+            className={buttonVariants({ variant: "default" })}
+            style={{ fontWeight: "bold" }}
+          >
+            <PlusCircledIcon className="mr-2 h-4 w-4" />
+            Neu
+          </DialogTrigger>
+          <PopUpDialog onSubmit={createDeployment} />
+        </Dialog>
       </div>
       <div className="justify-between space-y-2">
         <div
