@@ -56,19 +56,21 @@ export default function CustomersPage({
             style={{
               display: "flex",
               flexDirection: "row",
-              justifyContent: "space-between",
-              width: "100%",
             }}
           >
             <span
               className={`${
                 percent === 100 ? "text-green-500" : "text-blue-500"
               }`}
-              style={{ width: "50%" }}
+              style={{
+                width: "360px",
+                marginRight: "220px",
+              }}
             >
               {label}
             </span>
-            <span style={{ width: "50%" }}>Tilesets</span>
+
+            <span style={{ marginRight: "275px" }}>Tilesets</span>
           </div>
         </CardTitle>
       </CardHeader>
@@ -76,7 +78,7 @@ export default function CustomersPage({
         <div
           className="text-2xl font-bold break-normal"
           style={{
-            width: "30%",
+            width: "360px",
             marginRight: "220px",
           }}
         >

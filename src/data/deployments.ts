@@ -8,7 +8,7 @@ export const deployments = [
     url: "http://localhost:8081/deployment",
   },
   {
-    name: "ldproxy 3001",
+    name: "ldproxy 3000",
     url: "http://localhost:3001/deployment",
   },
 ];
