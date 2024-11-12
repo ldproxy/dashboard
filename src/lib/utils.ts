@@ -1,4 +1,5 @@
 "use client";
+import { Job } from "@/data/jobs";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useState, useEffect } from "react";
@@ -152,6 +153,36 @@ export const getMetrics = async (API_URL?: string) => {
   }
 };
 
+export const getJobs = async () => {
+  try {
+    const response = await fetch(API_URL + "/jobs");
+    const data = await response.json();
+    return expandJobs(data.sets);
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
+const expandJobs = (jobs: Job[]): Job[] => {
+  const allJobs = [...jobs];
+
+  for (const followUp of jobs.flatMap(expandJob)) {
+    if (!allJobs.some((job) => job.id === followUp.id)) {
+      allJobs.push(followUp);
+    }
+  }
+
+  return allJobs;
+};
+const expandJob = (job: Job): Job[] => {
+  if (job.followUps.length > 0) {
+    return [job, ...job.followUps.flatMap(expandJob)];
+  }
+
+  return [job];
+};
+
 export const getDeployments = async () => {
   try {
     const response = await fetch("/api/deployments");
@@ -245,4 +276,17 @@ export const getValuesCfg = async (param: string) => {
     console.error("Error:", error);
     throw error;
   }
+};
+
+export const sortCards = (cards: any[]) => {
+  if (cards.length === 0) return [];
+  return cards.sort((a: any, b: any) => {
+    if (a.percent === 100 && b.percent !== 100) return 1;
+    if (b.percent === 100 && a.percent !== 100) return -1;
+    if (a.startedAt === -1 && b.startedAt > -1) return 1;
+    if (b.startedAt === -1 && a.startedAt > -1) return -1;
+    if (a.updatedAt <= 0 && b.updatedAt > 0) return 1;
+    if (b.updatedAt <= 0 && a.updatedAt > 0) return -1;
+    return b.startedAt - a.startedAt;
+  });
 };

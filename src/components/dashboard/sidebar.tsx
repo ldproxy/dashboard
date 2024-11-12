@@ -32,7 +32,8 @@ export function Section({ title, entries }: SectionProps) {
   const [isHomePage, setIsHomePage] = useState(true);
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 
-  const currentUrl = new URL(window.location.href);
+  /*const currentUrl =
+    typeof window !== "undefined" ? new URL(window.location.href) : null;
 
   useEffect(() => {
     getDeployments().then((data: any) => setDeployments(data));
@@ -41,7 +42,7 @@ export function Section({ title, entries }: SectionProps) {
   useEffect(() => {
     if (deployments.length > 0) {
       const currentDeployment = deployments.find(
-        (deployment) => deployment.url === currentUrl.href
+        (deployment) => deployment.url === currentUrl?.href
       );
       if (currentDeployment) {
         setDeploymentName(currentDeployment.name);
@@ -49,7 +50,7 @@ export function Section({ title, entries }: SectionProps) {
     }
     // leaving out currentUrl from dependencies since it is not needed
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deployments, pathname]);
+  }, [deployments, pathname]);*/
 
   useEffect(() => {
     setIsHomePage(pathname === "/home");
