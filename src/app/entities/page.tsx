@@ -15,7 +15,7 @@ import { usePathname } from "next/navigation";
 import { GetEntities, getHealthChecks } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Entity } from "@/data/entities";
-import { DevEntities } from "@/data/constants";
+import { autoRefreshInterval, DevEntities } from "@/data/constants";
 import { getIcon } from "@/lib/icons";
 import {
   asLabel,
@@ -67,11 +67,14 @@ export default function EntitiesPage() {
   };
 
   useEffect(() => {
-    loadEntities();
+    const interval = setInterval(() => {
+      loadEntities();
+    }, autoRefreshInterval);
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
-  }, []);
+    return () => clearInterval(interval);
+  }, [pathname]);
 
   const onTabChange = (tab: string) => {
     setTab(tab);

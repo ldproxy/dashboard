@@ -15,8 +15,8 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
     : footer.includes("OGC_API")
     ? footer
     : null;
-  console.log("footer: ", footer);
-  console.log("type1: ", type);
+  //console.log("footer: ", footer);
+  //console.log("type1: ", type);
   return (
     <>
       {footer
@@ -30,16 +30,20 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                     display: "flex",
                     alignItems: "center",
                     marginRight: "15px",
+                    fontSize: "20px",
                   }}
+                  title={`${words[index - 1]} ${word}`}
                 >
                   <CheckCircledIcon
                     className="text-success"
+                    width="20px"
+                    height="20px"
                     key="CheckCircledIcon"
                     style={{
-                      marginRight: "3px",
+                      marginRight: "5px",
                     }}
                   />
-                  {words[index - 1]} {word}
+                  {words[index - 1]}
                 </span>,
               ];
             } else if (word === "limited" && !isNaN(Number(words[index - 1]))) {
@@ -47,16 +51,24 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                 <span
                   key={index}
                   className="text-warning mr-2"
-                  style={{ display: "flex", alignItems: "center" }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginRight: "15px",
+                    fontSize: "20px",
+                  }}
+                  title={`${words[index - 1]} ${word}`}
                 >
                   <ExclamationTriangleIcon
                     className="text-warning"
+                    width="20px"
+                    height="20px"
                     key="CheckCircledIcon"
                     style={{
-                      marginRight: "3px",
+                      marginRight: "5px",
                     }}
                   />
-                  {words[index - 1]} {word}
+                  {words[index - 1]}
                 </span>,
               ];
             } else if (
@@ -67,16 +79,24 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
                 <span
                   key={index}
                   className="text-destructive mr-2"
-                  style={{ display: "flex", alignItems: "center" }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginRight: "15px",
+                    fontSize: "20px",
+                  }}
+                  title={`${words[index - 1]} ${word}`}
                 >
                   <CrossCircledIcon
                     className="text-destructive"
+                    width="20px"
+                    height="20px"
                     key="CheckCircledIcon"
                     style={{
-                      marginRight: "3px",
+                      marginRight: "5px",
                     }}
                   />
-                  {words[index - 1]} {word}
+                  {words[index - 1]}
                 </span>,
               ];
             } else if (type !== null) {

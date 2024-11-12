@@ -1,16 +1,24 @@
 "use client";
 import { Button } from "@/components/shadcn-ui/button";
-import { GetEntities, getCfg, getHealthChecks } from "@/lib/utils";
+import {
+  GetEntities,
+  getCfg,
+  getHealthChecks,
+  getJobs,
+  sortCards,
+} from "@/lib/utils";
 import { ReloadIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Entity } from "@/data/entities";
 import { Check } from "@/data/health";
-import { DevEntities } from "@/data/constants";
+import { autoRefreshInterval, DevEntities } from "@/data/constants";
 import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ClipLoader } from "react-spinners";
+import JobInfo from "@/components/dashboard/job-info";
+import { Jobs, Job } from "@/data/jobs";
 
 import {
   Tabs,
@@ -42,6 +50,8 @@ function CustomerPage() {
   const [tableData, setTableData] = useState([] as any[]);
   const [tab, setTab] = useState("overview");
   const [hasError, setHasError] = useState(false);
+  const [tiles, setTiles] = useState(false);
+  const [jobs, setJobs] = useState<Job[]>([]);
 
   let id: string | null = "";
   let searchParams = useSearchParams();
@@ -50,6 +60,13 @@ function CustomerPage() {
     const urllId = searchParams.get("id");
     id = urllId;
   }
+
+  useEffect(() => {
+    if (id) {
+      const isTiles = id.endsWith("tiles");
+      setTiles(isTiles);
+    }
+  }, [id]);
 
   useEffect(() => {
     if (healthChecks && entity) {
@@ -102,6 +119,15 @@ function CustomerPage() {
     }
   };
 
+  const loadJobs = async () => {
+    try {
+      const newJobs = await getJobs();
+      setJobs(newJobs);
+    } catch (error) {
+      console.error("Error loading jobs:", error);
+    }
+  };
+
   const loadCfg = async () => {
     try {
       if (id !== null) {
@@ -142,7 +168,8 @@ function CustomerPage() {
     const loadData = async () => {
       await loadEntities();
       await loadHealthChecks();
-      await loadCfg();
+      await loadJobs();
+      //await loadCfg();
       setIsLoading(false);
       if (DevEntities) {
         console.log("entities[id]", entities);
@@ -150,14 +177,22 @@ function CustomerPage() {
         console.log("cfg", cfg);
       }
     };
-
-    loadData();
-  }, []);
+    const interval = setInterval(() => {
+      loadData();
+    }, autoRefreshInterval);
+    return () => clearInterval(interval);
+    // some dependencies ignored to avoid indefinite loop
+    // eslint-disable-next-line
+  }, [tiles]);
 
   const onTabChange = (tab: string) => {
     setTab(tab);
   };
 
+  let sortedJobs = [];
+  if (jobs.length > 0) {
+    sortedJobs = sortCards(jobs);
+  }
   //const entity = entities ? entities.find((e) => (e.uid = params.id)) : null; Diese Funktion hat UIDs in entities verändert.
 
   if (isLoading) {
@@ -206,6 +241,16 @@ function CustomerPage() {
               <TabsTrigger value="overview">
                 <span>Health</span>
               </TabsTrigger>
+              {id &&
+                tiles &&
+                jobs &&
+                jobs.some(
+                  (job: Job) => job.entity === id?.split("_").slice(1).join("_")
+                ) && (
+                  <TabsTrigger value="jobs">
+                    <span>Jobs</span>
+                  </TabsTrigger>
+                )}
               {/*<TabsTrigger value="cfg">
                 <span>Configuration</span>
               </TabsTrigger>*/}
@@ -219,6 +264,40 @@ function CustomerPage() {
               </p>
               <DataTable columns={columns} data={tableData} />
             </div>
+          </TabsContent>
+          <TabsContent value="jobs">
+            {id &&
+            sortedJobs.length > 0 &&
+            sortedJobs.filter(
+              (job: Job) => job.entity === id?.split("_").slice(1).join("_")
+            ).length > 0
+              ? sortedJobs
+                  .filter(
+                    (job: Job) =>
+                      job.entity === id?.split("_").slice(1).join("_")
+                  )
+                  .map((job: Job) => (
+                    <>
+                      <div
+                        className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
+                        style={{ marginBottom: "10px" }}
+                      >
+                        <JobInfo
+                          key={job.id}
+                          entity={job.entity}
+                          label={job.label}
+                          tilesets={job.details.tileSets}
+                          percent={job.percent}
+                          startedAt={job.startedAt}
+                          updatedAt={job.updatedAt}
+                          info={`${job.current}/${job.total}`}
+                          id={job.id}
+                        />
+                      </div>
+                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>
+                    </>
+                  ))
+              : null}
           </TabsContent>
           <TabsContent value="cfg">
             <div

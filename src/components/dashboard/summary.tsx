@@ -40,6 +40,7 @@ export default function CustomersPage({
     <Link href={route || "#"}>
       <Card
         className="shadow-lg hover:bg-gray-100 transition-colors duration-200"
+        style={{ height: "140px" }}
         {...props}
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0">
@@ -49,9 +50,13 @@ export default function CustomersPage({
             }`}
           >
             {header ? (
-              header
+              <span className="text-1xl font-bold mb-1 inline-block">
+                {header}
+              </span>
             ) : (
-              <span className="text-2xl font-bold mb-1">{total}</span>
+              <span className="text-2xl font-bold mb-1 mt-[-20px] inline-block">
+                {total}
+              </span>
             )}
           </CardTitle>
         </CardHeader>
@@ -82,7 +87,11 @@ export default function CustomersPage({
           <div style={{ display: "flex", flexWrap: "wrap" }}>
             <p
               className="text-xs text-muted-foreground"
-              style={{ display: "flex", flexDirection: "row" }}
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                marginTop: "5px",
+              }}
             >
               {footer ? <FooterSummary footer={footer} /> : null}
             </p>

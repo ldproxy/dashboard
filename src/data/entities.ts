@@ -16,34 +16,34 @@ export const fetchedEntities: { [key: string]: InputEntity[] } = {
   providers: [
     {
       id: "bergbau",
-      status: "ACTIVE",
+      status: "AVAILABLE",
       subType: "features/wfs",
     },
     {
       id: "krankenhaus",
-      status: "ACTIVE",
+      status: "AVAILABLE",
       subType: "features/sql",
     },
     {
       id: "krankenhaus-tiles",
-      status: "ACTIVE",
+      status: "LIMITED",
       subType: "tiles/mbtiles",
     },
   ],
   services: [
     {
       id: "bergbau",
-      status: "ACTIVE",
+      status: "LIMITED",
       subType: "ogc_api",
     },
     {
       id: "krankenhaus",
-      status: "ACTIVE",
+      status: "UNAVAILABLE",
       subType: "ogc_api",
     },
     {
       id: "test",
-      status: "DEFECTIVE",
+      status: "UNAVAILABLE",
       subType: "ogc_api",
     },
   ],

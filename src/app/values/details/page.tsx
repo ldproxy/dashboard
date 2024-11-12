@@ -10,18 +10,17 @@ import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import { ClipLoader } from "react-spinners";
 import { Suspense } from "react";
-
+import { autoRefreshInterval } from "@/data/constants";
 
 const SuspenseWrapper = () => (
-    <Suspense fallback={<div>Loading...</div>}>
-      <CustomerPage />
-    </Suspense>
-  );
+  <Suspense fallback={<div>Loading...</div>}>
+    <CustomerPage />
+  </Suspense>
+);
 
-  export default SuspenseWrapper;
+export default SuspenseWrapper;
 
-
-  function CustomerPage() {
+function CustomerPage() {
   const [cfg, setCfg] = useState<{}>({});
   const [hasError, setHasError] = useState(false);
   const router = useRouter();
@@ -36,15 +35,14 @@ const SuspenseWrapper = () => (
 
   const loadCfg = async () => {
     try {
-        if (id !== null) {
-      const newCfg = await getValuesCfg(id);
-      if (newCfg.message === "Method not allowed") {
-        setHasError(true);
-      
-      } else {
-        setCfg(newCfg);
+      if (id !== null) {
+        const newCfg = await getValuesCfg(id);
+        if (newCfg.message === "Method not allowed") {
+          setHasError(true);
+        } else {
+          setCfg(newCfg);
+        }
       }
-    }
     } catch (error) {
       setHasError(true);
       console.error("Error loading cfg:", error);
@@ -52,7 +50,12 @@ const SuspenseWrapper = () => (
   };
 
   useEffect(() => {
-    loadCfg();
+    const interval = setInterval(() => {
+      loadCfg();
+    }, autoRefreshInterval);
+    return () => clearInterval(interval);
+    // ignored dependency to avoid indefinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
