@@ -47,7 +47,7 @@ export default function DeploymentPage() {
   const [tab, setTab] = useState("overview");
   const [entities, setEntities] = useState<Entity[]>([]);
   const [metrics, setMetrics] = useState<Metrics>({ uptime: -1, memory: -1 });
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [info, setInfo] = useState<InputInfo>({
     name: "",
     version: "",
@@ -65,7 +65,7 @@ export default function DeploymentPage() {
   const [deployments, setDeployments] = useState([{ name: "", url: "" }]);
   const [deploymentName, setDeploymentName] = useState("");
 
-  const currentUrl = new URL(window.location.href);
+  /*const currentUrl = new URL(window.location.href);
 
   useEffect(() => {
     getDeployments().then((data: any) => setDeployments(data));
@@ -82,7 +82,7 @@ export default function DeploymentPage() {
     }
     // leaving out currentUrl from dependencies since it is not needed
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deployments]);
+  }, [deployments]);*/
 
   useEffect(() => {
     const storeCheck = healthChecks
@@ -203,7 +203,7 @@ export default function DeploymentPage() {
       loadMetrics();
       loadJobs();
       loadValues();
-      loadCfg();
+      //loadCfg();
     }, autoRefreshInterval);
     return () => clearInterval(interval);
   }, [pathname]);
@@ -348,6 +348,7 @@ export default function DeploymentPage() {
                       percent={job.percent}
                       startedAt={job.startedAt}
                       updatedAt={job.updatedAt}
+                      info={`${job.current}/${job.total}`}
                       id={job.id}
                     />
                   </div>

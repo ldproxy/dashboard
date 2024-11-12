@@ -15,8 +15,8 @@ export const FooterSummary: React.FC<FooterSummaryProps> = ({ footer }) => {
     : footer.includes("OGC_API")
     ? footer
     : null;
-  console.log("footer: ", footer);
-  console.log("type1: ", type);
+  //console.log("footer: ", footer);
+  //console.log("type1: ", type);
   return (
     <>
       {footer

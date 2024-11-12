@@ -51,7 +51,7 @@ function CustomerPage() {
   const [tab, setTab] = useState("overview");
   const [hasError, setHasError] = useState(false);
   const [tiles, setTiles] = useState(false);
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
 
   let id: string | null = "";
   let searchParams = useSearchParams();
@@ -169,7 +169,7 @@ function CustomerPage() {
       await loadEntities();
       await loadHealthChecks();
       await loadJobs();
-      await loadCfg();
+      //await loadCfg();
       setIsLoading(false);
       if (DevEntities) {
         console.log("entities[id]", entities);
@@ -245,7 +245,7 @@ function CustomerPage() {
                 tiles &&
                 jobs &&
                 jobs.some(
-                  (job: Job) => job.entity === id.split("_").slice(1).join("_")
+                  (job: Job) => job.entity === id?.split("_").slice(1).join("_")
                 ) && (
                   <TabsTrigger value="jobs">
                     <span>Jobs</span>
@@ -269,12 +269,12 @@ function CustomerPage() {
             {id &&
             sortedJobs.length > 0 &&
             sortedJobs.filter(
-              (job: Job) => job.entity === id.split("_").slice(1).join("_")
+              (job: Job) => job.entity === id?.split("_").slice(1).join("_")
             ).length > 0
               ? sortedJobs
                   .filter(
                     (job: Job) =>
-                      job.entity === id.split("_").slice(1).join("_")
+                      job.entity === id?.split("_").slice(1).join("_")
                   )
                   .map((job: Job) => (
                     <>
@@ -290,6 +290,7 @@ function CustomerPage() {
                           percent={job.percent}
                           startedAt={job.startedAt}
                           updatedAt={job.updatedAt}
+                          info={`${job.current}/${job.total}`}
                           id={job.id}
                         />
                       </div>

@@ -162,8 +162,8 @@ export const Jobs = [
 ];
 
 interface TileSetProgress {
-  total: number;
-  WebMercatorQuad?: { [level: number]: number };
+  percent: number;
+  levels?: { [tms: string]: number[] };
 }
 
 export interface TileSets {
@@ -186,4 +186,7 @@ export interface Job {
   percent: number;
   startedAt: number;
   updatedAt: number;
+  current: number;
+  total: number;
+  followUps: Job[];
 }

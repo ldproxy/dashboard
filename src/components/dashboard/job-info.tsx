@@ -19,6 +19,7 @@ interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   startedAt: number;
   updatedAt: number;
   id: string;
+  info: string;
 }
 
 export default function CustomersPage({
@@ -29,9 +30,15 @@ export default function CustomersPage({
   startedAt,
   updatedAt,
   id,
+  info,
 }: SummaryProps) {
   const durationInMs = (updatedAt - startedAt) * 1000;
-  const readableDuration = prettyMs(durationInMs, { compact: true });
+  const readableDuration =
+    startedAt <= 0
+      ? "waiting"
+      : updatedAt <= 0
+      ? "starting"
+      : prettyMs(durationInMs);
 
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
 
@@ -48,7 +55,7 @@ export default function CustomersPage({
   return (
     <Card
       className="shadow-lg"
-      style={{ height: "290px", overflow: "auto", boxSizing: "border-box" }}
+      style={{ height: "250px", overflow: "auto", boxSizing: "border-box" }}
     >
       <CardHeader>
         <CardTitle className="text-2xl font-bold break-normal mb-5">
@@ -58,31 +65,44 @@ export default function CustomersPage({
               flexDirection: "row",
             }}
           >
-            <span
-              className={`${
+            <div
+              className={`flex-none ${
                 percent === 100 ? "text-green-500" : "text-blue-500"
               }`}
               style={{
                 width: "360px",
-                marginRight: "220px",
+                marginRight: "90px",
+                paddingRight: "60px",
+                textAlign: "center",
               }}
             >
               {label}
-            </span>
+            </div>
 
-            <span style={{ marginRight: "275px" }}>Tilesets</span>
+            <div>{entity}</div>
           </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="flex items-start">
         <div
-          className="text-2xl font-bold break-normal"
+          className="text-xl font-bold break-normal"
           style={{
             width: "360px",
-            marginRight: "220px",
+            marginRight: "90px",
           }}
         >
-          <span>{entity}</span>
+          {/*<div
+            title={entity}
+            className="w-5/6"
+            style={{
+              textWrap: "nowrap",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+            }}
+          >
+            {entity}
+          </div>*/}
+          {/*TODO <span>&nbsp;{info}</span>*/}
           <div>
             <div
               className={`flex flex-col justify-center items-center w-5/6 ${
@@ -92,7 +112,7 @@ export default function CustomersPage({
               <div
                 className="text-center"
                 style={{
-                  marginTop: "25px",
+                  marginTop: "0px",
                   marginBottom: "10px",
                 }}
               >
@@ -148,7 +168,7 @@ export default function CustomersPage({
                     </button>
                     <div
                       style={{
-                        width: "175px",
+                        width: "300px",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
@@ -161,16 +181,16 @@ export default function CustomersPage({
                     >
                       {key}
                     </div>
-                    {value.progress && value.progress.total && (
+                    {value.progress && value.progress.percent !== undefined && (
                       <div
                         className={`flex flex-col justify-center items-center w-1/6 ${
-                          value.progress.total === 100 ? "" : "animate-pulse"
+                          value.progress.percent === 100 ? "" : "animate-pulse"
                         } mt-1`}
                       >
                         <Progress
-                          value={value.progress.total}
+                          value={value.progress.percent}
                           indicatorColor={`${
-                            value.progress.total === 100
+                            value.progress.percent === 100
                               ? "bg-green-400"
                               : "bg-blue-400"
                           }`}
@@ -181,8 +201,10 @@ export default function CustomersPage({
 
                   {expandedSections.includes(`${id} + ${key}`) &&
                     value.progress &&
-                    Object.keys(value.progress)[1] && (
+                    value.progress.levels &&
+                    Object.keys(value.progress.levels).map((tms) => (
                       <div
+                        key={tms}
                         style={{
                           display: "flex",
                           flexDirection: "row",
@@ -194,45 +216,27 @@ export default function CustomersPage({
                           marginRight: "20px",
                         }}
                       >
-                        <div
-                          className={`mr-2 ${
-                            value.progress.total === 100 ? "text-green-400" : ""
-                          }`}
-                        >
-                          {Object.keys(value.progress)[1]}:
-                        </div>
+                        <div>{tms}:&nbsp;&nbsp;</div>
                         {value.progress &&
-                          Object.keys(
-                            Object.values(value.progress)[1] as {
-                              [key: string]: number;
-                            }
-                          ).map((zoomlevel, index, array) => {
-                            if (!value.progress) {
-                              return null;
-                            }
-                            const progressValues = Object.values(
-                              value.progress
-                            )[1] as { [zoomlevel: string]: number };
-                            const isComplete =
-                              progressValues[zoomlevel] === 100;
-
-                            return (
-                              <span
-                                key={zoomlevel}
-                                className={`${
-                                  !isComplete
-                                    ? "animate-pulse"
-                                    : "text-green-400"
-                                }`}
-                                style={{ marginRight: "5px" }}
-                              >
-                                {zoomlevel}
-                                {index < array.length - 1 ? ", " : ""}
-                              </span>
-                            );
-                          })}
+                          value.progress.levels &&
+                          value.progress.levels[tms].map(
+                            (levelProgress, level) =>
+                              levelProgress > -1 ? (
+                                <span
+                                  key={level}
+                                  className={`${
+                                    levelProgress > 0
+                                      ? "animate-pulse"
+                                      : "text-green-400"
+                                  }`}
+                                  style={{ marginRight: "5px" }}
+                                >
+                                  {level}&nbsp;
+                                </span>
+                              ) : null
+                          )}
                       </div>
-                    )}
+                    ))}
                 </div>
               ))}
             </div>
