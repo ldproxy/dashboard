@@ -12,10 +12,6 @@ import { Deployment } from "@/data/deployments";
 import Info from "@/components/dashboard/info";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
-import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
-import { PopUpDialog } from "@/lib/PopUp";
-import { buttonVariants } from "@/components/shadcn-ui/button";
-import { PlusCircledIcon } from "@radix-ui/react-icons";
 
 type InfoType = { [key: string]: InputInfo };
 type MetricsType = { [key: string]: Metrics };
@@ -31,7 +27,6 @@ export default function HomePage() {
   const [healthStatuses, setHealthStatuses] = useState<
     { name: string; healthStatus: string }[] | null
   >(null);
-  const [popUp, setPopUp] = useState<boolean>(false);
 
   const router = useRouter();
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
@@ -48,23 +43,6 @@ export default function HomePage() {
       console.log("deployments", data);
     });
   }, []);
-
-  const createDeployment = async (data: any) => {
-    try {
-      await postDeployment({
-        name: data.name,
-        apiUrl: `http://${data.url}/api`,
-        url: `http://${data.url}/deployment`,
-        id: data.id,
-      });
-      const deploymentsData = await getDeployments();
-      setDeployments(deploymentsData);
-      return { success: true };
-    } catch (error) {
-      console.error("Fehler beim Erstellen des Deployments", error);
-      return { success: false };
-    }
-  };
 
   const loadInfo = async () => {
     try {
@@ -194,19 +172,6 @@ export default function HomePage() {
             <ClipLoader color={"#123abc"} loading={true} size={20} />
           </div>
         )}
-        {/* <Button className="font-bold" onClick={createDeployment}>
-          Create Deployment
-        </Button> */}
-        <Dialog onOpenChange={(open) => setPopUp(open)}>
-          <DialogTrigger
-            className={buttonVariants({ variant: "default" })}
-            style={{ fontWeight: "bold" }}
-          >
-            <PlusCircledIcon className="mr-2 h-4 w-4" />
-            Neu
-          </DialogTrigger>
-          <PopUpDialog onSubmit={createDeployment} />
-        </Dialog>
       </div>
       <div className="justify-between space-y-2">
         <div
