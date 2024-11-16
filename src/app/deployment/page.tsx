@@ -102,7 +102,7 @@ export default function DeploymentPage() {
     }
     // leaving out apiUrl to avoid indefinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deployments]);*/
+  }, [deployments]);
 
   useEffect(() => {
     const storeCheck = healthChecks

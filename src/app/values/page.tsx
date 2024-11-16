@@ -64,11 +64,11 @@ export default function EntitiesPage() {
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
-    return () => clearInterval(interval);
     if (multipleDeployments === "true") {
       getDeploymentId();
     }
-  }, [pathnamemultipleDeployments, pathname]);
+    return () => clearInterval(interval);
+  }, [multipleDeployments, pathname]);
 
   const onTabChange = (tab: string) => {
     setTab(tab);

@@ -169,7 +169,7 @@ function CustomerPage() {
       await loadEntities();
       await loadHealthChecks();
       await loadJobs();
-      //await loadCfg();
+      await loadCfg();
       setIsLoading(false);
       if (DevEntities) {
         console.log("entities[id]", entities);

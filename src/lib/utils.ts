@@ -93,9 +93,11 @@ export const getHealthChecks = async (API_URL?: string) => {
   }
   try {
     const response = await fetch(apiUrl + "/health");
+    /*
     if (!response.ok) {
       throw new Error(`API call failed with status: ${response.status}`);
     }
+      */
     const data = await response.json();
     const mappedHealthChecks = Object.keys(data).map((name) => ({
       name,
@@ -153,7 +155,11 @@ export const getMetrics = async (API_URL?: string) => {
   }
 };
 
-export const getJobs = async () => {
+export const getJobs = async (API_URL?: string) => {
+  let apiUrl = API_URL;
+  if (!apiUrl) {
+    apiUrl = await GetApiUrl();
+  }
   try {
     const response = await fetch(API_URL + "/jobs");
     const data = await response.json();

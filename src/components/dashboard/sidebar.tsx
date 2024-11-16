@@ -26,35 +26,48 @@ interface EntryProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function Section({ title, entries }: SectionProps) {
-  const [deployments, setDeployments] = useState([{ name: "", url: "" }]);
+  const [deployments, setDeployments] = useState([
+    { name: "", url: "", id: "" },
+  ]);
   const [deploymentName, setDeploymentName] = useState("");
   const pathname = usePathname();
   const [isHomePage, setIsHomePage] = useState(true);
+  const [deploymentId, setDeploymentId] = useState("");
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 
-  /*const currentUrl =
-    typeof window !== "undefined" ? new URL(window.location.href) : null;
+  const getDeploymentId = async () => {
+    const currentUrl = new URL(window.location.href);
+    const queryParams = new URLSearchParams(currentUrl.search);
+    const did = queryParams.get("did");
+    if (did) {
+      setDeploymentId(did);
+    }
+  };
 
   useEffect(() => {
+    if (multipleDeployments === "true") {
+      getDeploymentId();
+    }
     getDeployments().then((data: any) => setDeployments(data));
-  }, [pathname]);
+  }, [pathname, multipleDeployments]);
 
   useEffect(() => {
     if (deployments.length > 0) {
+      console.log("deployments", deployments);
       const currentDeployment = deployments.find(
-        (deployment) => deployment.url === currentUrl?.href
+        (deployment) => deployment.id === deploymentId
       );
+      console.log("hahahihi", currentDeployment);
       if (currentDeployment) {
         setDeploymentName(currentDeployment.name);
       }
     }
     // leaving out currentUrl from dependencies since it is not needed
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deployments, pathname]);*/
-
-  useEffect(() => {
-    setIsHomePage(pathname === "/home");
-  }, [multipleDeployments, pathname]);
+  }, [deployments, pathname]),
+    useEffect(() => {
+      setIsHomePage(pathname === "/home");
+    }, [multipleDeployments, pathname]);
 
   if (isHomePage && multipleDeployments === "true") {
     return;
