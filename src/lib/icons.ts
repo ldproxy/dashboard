@@ -8,6 +8,7 @@ import {
   ClockIcon,
   DesktopIcon,
   HomeIcon,
+  ReaderIcon,
 } from "@radix-ui/react-icons";
 import { IconProps } from "@radix-ui/react-icons/dist/types";
 
@@ -20,6 +21,7 @@ export const icons = {
   Clock: "Clock",
   Desktop: "Desktop",
   Home: "Home",
+  Reader: "Reader",
 };
 
 export const getIcon = (
@@ -42,6 +44,8 @@ export const getIcon = (
       return DesktopIcon;
     case icons.Home:
       return HomeIcon;
+    case icons.Reader:
+      return ReaderIcon;
     default:
       return undefined;
   }

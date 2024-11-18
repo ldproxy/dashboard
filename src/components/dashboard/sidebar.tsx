@@ -8,6 +8,7 @@ import { NavButton } from "./nav-button";
 import { getIcon } from "@/lib/icons";
 import { usePathname } from "next/navigation";
 import { getDeployments } from "@/lib/utils";
+import { set } from "react-hook-form";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   sections: SectionProps[];
@@ -16,6 +17,7 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 interface SectionProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   entries: EntryProps[];
+  global: EntryProps[];
 }
 
 interface EntryProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -25,15 +27,25 @@ interface EntryProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: string;
 }
 
-export function Section({ title, entries }: SectionProps) {
+export function Section({ title, entries, global }: SectionProps) {
   const [deployments, setDeployments] = useState([
     { name: "", url: "", id: "" },
   ]);
   const [deploymentName, setDeploymentName] = useState("");
   const pathname = usePathname();
   const [isHomePage, setIsHomePage] = useState(true);
+  const [isCfgPage, setIsCfgPage] = useState(true);
   const [deploymentId, setDeploymentId] = useState("");
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
+
+  const removeQueryFromUrl = (url: string) => {
+    const urlObj = new URL(url, window.location.origin);
+    urlObj.search = ""; // Entfernt alle Query-Parameter
+    return urlObj.toString();
+  };
+
+  const hasNoQueryParams =
+    new URLSearchParams(window.location.search).toString() === "";
 
   const getDeploymentId = async () => {
     const currentUrl = new URL(window.location.href);
@@ -43,7 +55,6 @@ export function Section({ title, entries }: SectionProps) {
       setDeploymentId(did);
     }
   };
-
   useEffect(() => {
     if (multipleDeployments === "true") {
       getDeploymentId();
@@ -53,11 +64,9 @@ export function Section({ title, entries }: SectionProps) {
 
   useEffect(() => {
     if (deployments.length > 0) {
-      console.log("deployments", deployments);
       const currentDeployment = deployments.find(
         (deployment) => deployment.id === deploymentId
       );
-      console.log("hahahihi", currentDeployment);
       if (currentDeployment) {
         setDeploymentName(currentDeployment.name);
       }
@@ -67,46 +76,101 @@ export function Section({ title, entries }: SectionProps) {
   }, [deployments, pathname]),
     useEffect(() => {
       setIsHomePage(pathname === "/home");
+      setIsCfgPage(pathname === "/configurations");
     }, [multipleDeployments, pathname]);
 
-  if (isHomePage && multipleDeployments === "true") {
-    return;
-  }
-
-  return (
-    <div className="px-3 py-2">
-      <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-        {deploymentName}
-      </h2>
-      <div className="space-y-1">
-        {entries.map(({ title, selected, route, icon }) =>
-          route ? (
-            <NavButton key={title} title={title} route={route} icon={icon} />
-          ) : (
-            <Button
-              key={title}
-              variant={selected ? "secondary" : "ghost"}
-              className="w-full justify-start"
-            >
-              {(() => {
-                const Icon = icon ? getIcon(icon) : null;
-                return Icon ? <Icon className="mr-2 h-4 w-4" /> : null;
-              })()}
-              {title}
-            </Button>
-          )
-        )}
+  if (
+    (isHomePage && multipleDeployments === "true") ||
+    (isCfgPage && hasNoQueryParams && multipleDeployments === "true")
+  ) {
+    return (
+      <div className="px-3 py-2">
+        <div className="space-y-1">
+          {global.map(({ title, selected, route, icon }) =>
+            route ? (
+              <NavButton
+                key={title}
+                title={title}
+                route={removeQueryFromUrl(route)}
+                icon={icon}
+              />
+            ) : (
+              <Button
+                key={title}
+                variant={selected ? "secondary" : "ghost"}
+                className="w-full justify-start"
+              >
+                {(() => {
+                  const Icon = icon ? getIcon(icon) : null;
+                  return Icon ? <Icon className="mr-2 h-4 w-4" /> : null;
+                })()}
+                {title}
+              </Button>
+            )
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  } else {
+    return (
+      <div className="px-3 py-2">
+        <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+          {deploymentName}
+        </h2>
+        <div className="space-y-1">
+          {entries.map(({ title, selected, route, icon }) =>
+            route ? (
+              <NavButton key={title} title={title} route={route} icon={icon} />
+            ) : (
+              <Button
+                key={title}
+                variant={selected ? "secondary" : "ghost"}
+                className="w-full justify-start"
+              >
+                {(() => {
+                  const Icon = icon ? getIcon(icon) : null;
+                  return Icon ? <Icon className="mr-2 h-4 w-4" /> : null;
+                })()}
+                {title}
+              </Button>
+            )
+          )}
+        </div>
+        <div className="space-y-1 mt-24">
+          {global.map(({ title, selected, route, icon }) =>
+            route ? (
+              <NavButton key={title} title={title} route={route} icon={icon} />
+            ) : (
+              <Button
+                key={title}
+                variant={selected ? "secondary" : "ghost"}
+                className="w-full justify-start"
+              >
+                {(() => {
+                  const Icon = icon ? getIcon(icon) : null;
+                  return Icon ? <Icon className="mr-2 h-4 w-4" /> : null;
+                })()}
+                {title}
+              </Button>
+            )
+          )}
+        </div>
+      </div>
+    );
+  }
 }
 
 export function Sidebar({ className, sections }: SidebarProps) {
   return (
     <div className={cn("pb-12", className)}>
       <div className="space-y-4 py-4">
-        {sections.map(({ title, entries }) => (
-          <Section key={title} title={title} entries={entries} />
+        {sections.map(({ title, entries, global }) => (
+          <Section
+            key={title}
+            title={title}
+            entries={entries}
+            global={global}
+          />
         ))}
       </div>
     </div>

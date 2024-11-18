@@ -7,14 +7,13 @@ export const deployments = [
     url: "http://localhost:3000/deployment",
     id: "3",
   },
-  /*
+
   {
     name: "ldproxy 7080",
     apiUrl: "http://localhost:7081/api",
     url: "http://localhost:7081/deployment",
     id: "1",
   },
-  */
 ];
 
 export default function handler(req: any, res: any) {
