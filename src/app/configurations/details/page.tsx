@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getCfgs } from "../../lib/utils";
+import { getCfgs } from "../../../lib/utils";
 import { ClipLoader } from "react-spinners";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import InfoCfg from "@/components/dashboard/infoCfg";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 
@@ -26,6 +26,14 @@ export default function HomePage() {
   const [configurations, setConfigurations] = useState<Configuration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  let id: string | null = "";
+  let searchParams = useSearchParams();
+
+  if (searchParams !== null) {
+    const urllId = searchParams.get("id");
+    id = urllId;
+  }
+
   const router = useRouter();
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
   console.log("multipleDeployments", multipleDeployments);
@@ -38,21 +46,16 @@ export default function HomePage() {
     });
   }, []);
 
-  const hasNoQueryParams =
-    new URLSearchParams(window.location.search).toString() === "";
-
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between mb-9 mt-8">
         <div className="flex items-center">
-          {hasNoQueryParams && (
-            <a
-              onClick={() => router.back()}
-              className="font-bold flex items-center cursor-pointer text-blue-500 hover:text-blue-400 mr-2.5"
-            >
-              <ChevronLeftIcon className="mr-[-1px] h-6 w-6" />
-            </a>
-          )}
+          <a
+            onClick={() => router.back()}
+            className="font-bold flex items-center cursor-pointer text-blue-500 hover:text-blue-400 mr-2.5"
+          >
+            <ChevronLeftIcon className="mr-[-1px] h-6 w-6" />
+          </a>
           <h2 className="text-2xl font-semibold tracking-tight">
             Configurations
           </h2>
@@ -68,13 +71,18 @@ export default function HomePage() {
           className="grid gap-4 md:grid-cols-1 lg:grid-cols-1 "
           style={{ marginBottom: "10px" }}
         >
-          {configurations.map((cfg, cfgIndex) => (
-            <InfoCfg
-              key={`${cfgIndex}`}
-              name={cfg.name}
-              className="additional-class"
-            />
-          ))}
+          {configurations
+            .filter((cfg) => cfg.name === id)
+            .map((cfg, cfgIndex) =>
+              cfg.entities.map((entity, entityIndex) => (
+                <InfoCfg
+                  key={`${cfgIndex}-${entityIndex}`}
+                  title={cfg.name}
+                  name={entity.title}
+                  className="additional-class"
+                />
+              ))
+            )}
         </div>
       </div>
     </div>
