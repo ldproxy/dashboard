@@ -53,11 +53,9 @@ export function Section({ title, entries }: SectionProps) {
 
   useEffect(() => {
     if (deployments.length > 0) {
-      console.log("deployments", deployments);
       const currentDeployment = deployments.find(
         (deployment) => deployment.id === deploymentId
       );
-      console.log("hahahihi", currentDeployment);
       if (currentDeployment) {
         setDeploymentName(currentDeployment.name);
       }
