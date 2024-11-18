@@ -105,6 +105,15 @@ export default function RootLayout({
                               : "/values",
                           },
                         ],
+                        global: [
+                          {
+                            title: "Configurations",
+                            icon: icons.Reader,
+                            route: deploymentId
+                              ? `/configurations?did=${deploymentId}`
+                              : "/configurations",
+                          },
+                        ],
                       },
                     ]}
                     className="hidden lg:block"
