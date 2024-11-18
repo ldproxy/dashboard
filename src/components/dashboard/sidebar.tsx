@@ -78,7 +78,9 @@ export function Section({ title, entries, global }: SectionProps) {
     useEffect(() => {
       setIsHomePage(pathname === "/home");
       setIsCfgPage(
-        pathname === "/configurations" || pathname === "/configurations/details"
+        pathname === "/configurations" ||
+          pathname === "/configurations/details" ||
+          pathname === "/configurations/details/cfg"
       );
     }, [multipleDeployments, pathname]);
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Card,
   CardContent,
@@ -20,12 +20,13 @@ export default function InfoCfg({ title, name, className }: SummaryProps) {
 
   const hasIdParam = params.has("id");
 
-  // Überprüfen, ob der 'id'-Parameter bereits vorhanden ist
-  if (!params.has("id")) {
+  if (!hasIdParam) {
     params.append("id", name);
+  } else {
+    params.append("cfg", name);
   }
 
-  // Entfernen Sie doppelte 'id'-Parameter
+  // Entfernen Sie doppelte Parameter
   const uniqueParams = new URLSearchParams();
   params.forEach((value, key) => {
     if (!uniqueParams.has(key)) {
@@ -33,28 +34,16 @@ export default function InfoCfg({ title, name, className }: SummaryProps) {
     }
   });
 
-  const newPathname = `${url.pathname}/details`;
+  let newPathname = url.pathname;
+  if (!newPathname.includes("/details")) {
+    newPathname += "/details";
+  } else {
+    newPathname += "/cfg";
+  }
 
   const route = `${url.origin}${newPathname}?${uniqueParams.toString()}`;
 
-  return hasIdParam ? (
-    <Card className={`shadow-lg ${className}`}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-semibold">{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="flex justify-between items-center">
-        <div
-          className="text-2xl font-bold break-normal"
-          style={{
-            marginBottom: "3px",
-            width: "100%",
-          }}
-        >
-          {name}
-        </div>
-      </CardContent>
-    </Card>
-  ) : (
+  return (
     <Link href={route}>
       <Card className={`shadow-lg ${className}`}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
