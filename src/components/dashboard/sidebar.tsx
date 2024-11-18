@@ -44,8 +44,9 @@ export function Section({ title, entries, global }: SectionProps) {
     return urlObj.toString();
   };
 
-  const hasNoQueryParams =
-    new URLSearchParams(window.location.search).toString() === "";
+  const hasDidQueryParam = new URLSearchParams(window.location.search).has(
+    "did"
+  );
 
   const getDeploymentId = async () => {
     const currentUrl = new URL(window.location.href);
@@ -76,7 +77,9 @@ export function Section({ title, entries, global }: SectionProps) {
   }, [deployments, pathname]),
     useEffect(() => {
       setIsHomePage(pathname === "/home");
-      setIsCfgPage(pathname === "/configurations");
+      setIsCfgPage(
+        pathname === "/configurations" || pathname === "/configurations/details"
+      );
     }, [multipleDeployments, pathname]);
 
   if (isHomePage && multipleDeployments === "true") {
@@ -94,7 +97,10 @@ export function Section({ title, entries, global }: SectionProps) {
     );
   }
 
-  if (isCfgPage && hasNoQueryParams && multipleDeployments === "true") {
+  if (
+    (isHomePage && multipleDeployments === "true") ||
+    (isCfgPage && !hasDidQueryParam && multipleDeployments === "true")
+  ) {
     return (
       <div className="px-3 py-2">
         <div className="space-y-1">
