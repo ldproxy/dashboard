@@ -205,6 +205,26 @@ export const postCfg = async (cfg: any) => {
   }
 };
 
+export const deleteConfig = async (name: string, title?: string) => {
+  try {
+    const response = await fetch("/api/cfg", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, title }),
+    });
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
 export const getValues = async (API_URL?: string) => {
   const apiUrls = [API_URL];
   let apiUrl = apiUrls[0];

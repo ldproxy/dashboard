@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getCfgs } from "../../../lib/utils";
 import { ClipLoader } from "react-spinners";
 import { useRouter, useSearchParams } from "next/navigation";
-import InfoCfg from "@/components/dashboard/infoCfg";
+import InfoCfg from "@/components/dashboard/infoCfgEntities";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 
 interface Entity {
@@ -79,6 +79,7 @@ export default function HomePage() {
                   key={`${cfgIndex}-${entityIndex}`}
                   title={cfg.name}
                   name={entity.title}
+                  setConfigurations={setConfigurations}
                   className="additional-class"
                 />
               ))
