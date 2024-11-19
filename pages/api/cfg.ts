@@ -6,6 +6,7 @@ export const cfgs = [
     entities: [
       {
         title: "vineyards",
+        url: "https://github.com/ldproxy/dashboard",
         content: {
           id: "vineyards",
           enabled: true,
@@ -15,6 +16,7 @@ export const cfgs = [
       },
       {
         title: "daraa",
+        url: "https://github.com/ldproxy/dashboard2",
         content: {
           id: "daraa",
           enabled: true,
@@ -29,6 +31,7 @@ export const cfgs = [
     entities: [
       {
         title: "vineyards2",
+        url: "https://github.com/ldproxy/dashboard3",
         content: {
           id: "vineyards",
           enabled: true,
@@ -38,6 +41,7 @@ export const cfgs = [
       },
       {
         title: "daraa2",
+        url: "https://github.com/ldproxy/dashboard4",
         content: {
           id: "daraa",
           enabled: true,

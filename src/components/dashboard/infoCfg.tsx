@@ -47,7 +47,9 @@ export default function InfoCfg({ title, name, className }: SummaryProps) {
     <Link href={route}>
       <Card className={`shadow-lg ${className}`}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-semibold">{title}</CardTitle>
+          <CardTitle className="text-sm font-semibold text-blue-700">
+            {title}
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex justify-between items-center">
           <div

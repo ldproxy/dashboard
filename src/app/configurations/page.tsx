@@ -9,6 +9,7 @@ import { ChevronLeftIcon } from "@radix-ui/react-icons";
 
 interface Entity {
   title: string;
+  url: string;
   content: {
     id: string;
     enabled: boolean;
@@ -72,6 +73,7 @@ export default function HomePage() {
             <InfoCfg
               key={`${cfgIndex}`}
               name={cfg.name}
+              title={cfg.entities.length > 0 ? cfg.entities[0].url : ""}
               className="additional-class"
             />
           ))}
