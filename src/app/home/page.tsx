@@ -40,7 +40,7 @@ export default function HomePage() {
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
   console.log("multipleDeployments", multipleDeployments);
   useEffect(() => {
-    if (multipleDeployments === "false") {
+    if (multipleDeployments === "single") {
       router.replace("/404");
     }
   }, [multipleDeployments, router]);

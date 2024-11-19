@@ -69,7 +69,7 @@ export default function EntitiesPage() {
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
-    if (multipleDeployments === "true") {
+    if (multipleDeployments === "multi" || multipleDeployments === "saas") {
       getDeploymentId();
     }
     return () => clearInterval(interval);

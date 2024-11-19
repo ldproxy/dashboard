@@ -140,6 +140,27 @@ export default function DeploymentPage() {
     }
   };
 
+  useEffect(() => {
+    getDeployments().then((data: any) => setDeployments(data));
+    if (multipleDeployments === "multi" || multipleDeployments === "saas") {
+      getDeploymentId();
+    }
+  }, [multipleDeployments]);
+
+  useEffect(() => {
+    const currentUrl = new URL(window.location.href);
+
+    if (currentUrl && deployments.length > 0) {
+      const currentDeployment = deployments.find(
+        (deployment) => deployment.url === currentUrl.href
+      );
+
+      if (currentDeployment) {
+        setDeploymentName(currentDeployment.name);
+      }
+    }
+  });
+
   const loadMetrics = async () => {
     try {
       if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {

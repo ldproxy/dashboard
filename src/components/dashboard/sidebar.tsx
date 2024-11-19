@@ -57,7 +57,7 @@ export function Section({ title, entries, global }: SectionProps) {
     }
   };
   useEffect(() => {
-    if (multipleDeployments === "true") {
+    if (multipleDeployments === "multi" || multipleDeployments === "saas") {
       getDeploymentId();
     }
     getDeployments().then((data: any) => setDeployments(data));
@@ -100,8 +100,11 @@ export function Section({ title, entries, global }: SectionProps) {
   }
 
   if (
-    (isHomePage && multipleDeployments === "true") ||
-    (isCfgPage && !hasDidQueryParam && multipleDeployments === "true")
+    (isHomePage &&
+      (multipleDeployments === "multi" || multipleDeployments === "saas")) ||
+    (isCfgPage &&
+      !hasDidQueryParam &&
+      (multipleDeployments === "multi" || multipleDeployments === "saas"))
   ) {
     return (
       <div className="px-3 py-2">
