@@ -56,7 +56,7 @@ export default function InfoCfg({
 
   const deleteCfg = async () => {
     try {
-      await deleteConfig(name);
+      await deleteConfig(title || "", name);
       const cfgData = await getCfgs();
       setConfigurations(cfgData);
       return { success: true };

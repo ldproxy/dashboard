@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getCfgs, postCfg } from "../../lib/utils";
+import { deleteConfig, getCfgs, postCfg } from "../../lib/utils";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
 import InfoCfg from "@/components/dashboard/infoCfg";
@@ -115,6 +115,7 @@ export default function HomePage() {
               key={`${cfgIndex}`}
               name={cfg.name}
               title={cfg.entities.length > 0 ? cfg.entities[0].url : ""}
+              setConfigurations={setConfigurations}
               className="additional-class"
             />
           ))}
