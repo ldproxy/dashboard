@@ -83,7 +83,7 @@ export default function DeploymentPage() {
 
   useEffect(() => {
     getDeployments().then((data: any) => setDeployments(data));
-    if (multipleDeployments === "true") {
+    if (multipleDeployments === "multi" || multipleDeployments === "saas") {
       getDeploymentId();
     }
   }, [multipleDeployments]);

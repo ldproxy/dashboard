@@ -37,7 +37,7 @@ export default function HomePage() {
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
   console.log("multipleDeployments", multipleDeployments);
   useEffect(() => {
-    if (multipleDeployments === "false") {
+    if (multipleDeployments === "single") {
       router.replace("/404");
     }
   }, [multipleDeployments, router]);
@@ -197,16 +197,18 @@ export default function HomePage() {
         {/* <Button className="font-bold" onClick={createDeployment}>
           Create Deployment
         </Button> */}
-        <Dialog onOpenChange={(open) => setPopUp(open)}>
-          <DialogTrigger
-            className={buttonVariants({ variant: "default" })}
-            style={{ fontWeight: "bold" }}
-          >
-            <PlusCircledIcon className="mr-2 h-4 w-4" />
-            Neu
-          </DialogTrigger>
-          <PopUpDialog onSubmit={createDeployment} />
-        </Dialog>
+        {process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS === "saas" && (
+          <Dialog onOpenChange={(open) => setPopUp(open)}>
+            <DialogTrigger
+              className={buttonVariants({ variant: "default" })}
+              style={{ fontWeight: "bold" }}
+            >
+              <PlusCircledIcon className="mr-2 h-4 w-4" />
+              Neu
+            </DialogTrigger>
+            <PopUpDialog onSubmit={createDeployment} />
+          </Dialog>
+        )}
       </div>
       <div className="justify-between space-y-2">
         <div

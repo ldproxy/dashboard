@@ -10,9 +10,12 @@ export default function ValuesPage() {
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 
   useEffect(() => {
-    if (multipleDeployments === "false") {
+    if (multipleDeployments === "single") {
       router.push("/deployment");
-    } else if (multipleDeployments === "true") {
+    } else if (
+      multipleDeployments === "multi" ||
+      multipleDeployments === "saas"
+    ) {
       router.push("/home");
     }
   }, [router, multipleDeployments]);

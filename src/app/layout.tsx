@@ -1,17 +1,10 @@
 "use client";
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/shadcn-ui/theme";
 import { Sidebar } from "@/components/dashboard/sidebar";
-import {
-  PlayIcon,
-  DashboardIcon,
-  CodeIcon,
-  IdCardIcon,
-  MixIcon,
-} from "@radix-ui/react-icons";
+import { DashboardIcon } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
@@ -42,7 +35,10 @@ export default function RootLayout({
       }
     };
 
-    if (process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS === "true") {
+    if (
+      process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS === "multi" ||
+      process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS === "saas"
+    ) {
       getDeploymentId();
     }
   }, [pathname, searchParams]);
@@ -105,15 +101,19 @@ export default function RootLayout({
                               : "/values",
                           },
                         ],
-                        global: [
-                          {
-                            title: "Configurations",
-                            icon: icons.Reader,
-                            route: deploymentId
-                              ? `/configurations?did=${deploymentId}`
-                              : "/configurations",
-                          },
-                        ],
+                        global:
+                          process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS ===
+                          "saas"
+                            ? [
+                                {
+                                  title: "Configurations",
+                                  icon: icons.Reader,
+                                  route: deploymentId
+                                    ? `/configurations?did=${deploymentId}`
+                                    : "/configurations",
+                                },
+                              ]
+                            : [],
                       },
                     ]}
                     className="hidden lg:block"
