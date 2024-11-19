@@ -217,6 +217,23 @@ export const postDeployment = async (deployment: Deployment) => {
   }
 };
 
+export const postCfg = async (cfg: any) => {
+  try {
+    const response = await fetch("/api/cfg", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(cfg),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
 export const getValues = async (API_URL?: string) => {
   let apiUrl = API_URL;
   if (!apiUrl) {
