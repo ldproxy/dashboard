@@ -22,26 +22,28 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle style={{ marginBottom: "20px" }}>
+        <DialogTitle style={{ margin: "20px" }}>
           Wollen Sie die Konfiguration wirklich löschen?
         </DialogTitle>
       </DialogHeader>
       <DialogFooter className="flex justify-center">
-        <Button
-          onClick={onSubmit}
-          style={{ fontWeight: "bold", marginRight: "10px" }}
-        >
-          Ja
-        </Button>
-        <Button
-          onClick={() => {
-            setPopUp(false);
-          }}
-          variant="secondary"
-          style={{ fontWeight: "bold" }}
-        >
-          Nein
-        </Button>
+        <div className="flex justify-center w-full">
+          <Button
+            onClick={onSubmit}
+            style={{ fontWeight: "bold", marginRight: "10px", width: "100px" }}
+          >
+            Ja
+          </Button>
+          <Button
+            onClick={() => {
+              setPopUp(false);
+            }}
+            variant="secondary"
+            style={{ fontWeight: "bold", width: "100px" }}
+          >
+            Nein
+          </Button>
+        </div>
       </DialogFooter>
     </DialogContent>
   );
