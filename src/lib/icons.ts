@@ -13,6 +13,7 @@ import {
   QuestionMarkCircledIcon,
   ReaderIcon,
   TrashIcon,
+  Pencil1Icon,
 } from "@radix-ui/react-icons";
 import { IconProps } from "@radix-ui/react-icons/dist/types";
 
@@ -30,6 +31,7 @@ export const icons = {
   QuestionMark: "QuestionMark",
   Reader: "Reader",
   Trash: "Trash",
+  Pencil1: "Pencil1",
 };
 
 export const getIcon = (
@@ -62,6 +64,8 @@ export const getIcon = (
       return ReaderIcon;
     case icons.Trash:
       return TrashIcon;
+    case icons.Pencil1:
+      return Pencil1Icon;
     default:
       return undefined;
   }

@@ -86,6 +86,27 @@ const deleteConfiguration = (
   return configurations;
 };
 
+const updateConfiguration = (
+  configurations: typeof cfgs,
+  oldName: string,
+  newName: string,
+  oldTitle: string,
+  newTitle: string
+): typeof cfgs => {
+  const configIndex = configurations.findIndex((cfg) => cfg.name === oldName);
+  if (configIndex !== -1) {
+    const entityIndex = configurations[configIndex].entities.findIndex(
+      (entity) => entity.url === oldTitle
+    );
+    if (entityIndex !== -1) {
+      configurations[configIndex].name = newName;
+      configurations[configIndex].entities[entityIndex].url = newTitle;
+    }
+    configurations[configIndex].name = newName;
+  }
+  return configurations;
+};
+
 export default function handler(req: any, res: any) {
   if (req.method === "GET") {
     res.status(200).json(cfgs);
@@ -93,6 +114,10 @@ export default function handler(req: any, res: any) {
     const newCfg = req.body;
     addOrUpdateConfiguration(cfgs, newCfg);
     res.status(201).json(newCfg);
+  } else if (req.method === "PUT") {
+    const { oldName, newName, oldTitle, newTitle } = req.body;
+    updateConfiguration(cfgs, oldName, newName, oldTitle, newTitle);
+    res.status(200).json({ message: "Configuration updated" });
   } else if (req.method === "DELETE") {
     const { name, title } = req.body;
     deleteConfiguration(cfgs, name, title);
