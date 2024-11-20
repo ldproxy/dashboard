@@ -3,10 +3,10 @@
 export const cfgs = [
   {
     name: "demo",
+    url: "https://github.com/ldproxy/dashboard",
     entities: [
       {
         title: "vineyards",
-        url: "https://github.com/ldproxy/dashboard",
         content: {
           id: "vineyards",
           enabled: true,
@@ -16,7 +16,6 @@ export const cfgs = [
       },
       {
         title: "daraa",
-        url: "https://github.com/ldproxy/dashboard2",
         content: {
           id: "daraa",
           enabled: true,
@@ -28,10 +27,10 @@ export const cfgs = [
   },
   {
     name: "demo2",
+    url: "https://github.com/ldproxy/dashboard2",
     entities: [
       {
         title: "vineyards2",
-        url: "https://github.com/ldproxy/dashboard3",
         content: {
           id: "vineyards",
           enabled: true,
@@ -49,11 +48,7 @@ const addConfiguration = (
 ): any => {
   configurations.push({
     name: newCfg.name,
-    entities: [
-      {
-        url: newCfg.url,
-      },
-    ],
+    url: newCfg.url,
   });
 
   return configurations;
@@ -61,26 +56,11 @@ const addConfiguration = (
 
 const deleteConfiguration = (
   configurations: typeof cfgs,
-  name: string,
-  title?: string
+  name: string
 ): typeof cfgs => {
   const configIndex = configurations.findIndex((cfg) => cfg.name === name);
   if (configIndex !== -1) {
-    if (title) {
-      const entityIndex = configurations[configIndex].entities.findIndex(
-        (entity) => entity.title === title
-      );
-      if (entityIndex !== -1) {
-        configurations[configIndex].entities.splice(entityIndex, 1);
-        // Wenn keine Entities mehr vorhanden sind, entfernen Sie die gesamte Konfiguration
-        if (configurations[configIndex].entities.length === 0) {
-          configurations.splice(configIndex, 1);
-        }
-      }
-    } else {
-      // Entfernen Sie die gesamte Konfiguration, wenn kein title angegeben ist
-      configurations.splice(configIndex, 1);
-    }
+    configurations.splice(configIndex, 1);
   }
   return configurations;
 };
@@ -89,19 +69,15 @@ const updateConfiguration = (
   configurations: typeof cfgs,
   oldName: string,
   newName: string,
-  oldTitle: string,
-  newTitle: string
+  oldUrl: string,
+  newUrl: string
 ): typeof cfgs => {
-  const configIndex = configurations.findIndex((cfg) => cfg.name === oldName);
+  const configIndex = configurations.findIndex(
+    (cfg) => cfg.name === oldName && cfg.url === oldUrl
+  );
   if (configIndex !== -1) {
-    const entityIndex = configurations[configIndex].entities.findIndex(
-      (entity) => entity.url === oldTitle
-    );
-    if (entityIndex !== -1) {
-      configurations[configIndex].name = newName;
-      configurations[configIndex].entities[entityIndex].url = newTitle;
-    }
     configurations[configIndex].name = newName;
+    configurations[configIndex].url = newUrl;
   }
   return configurations;
 };
@@ -114,12 +90,12 @@ export default function handler(req: any, res: any) {
     addConfiguration(cfgs, newCfg);
     res.status(201).json(newCfg);
   } else if (req.method === "PUT") {
-    const { oldName, newName, oldTitle, newTitle } = req.body;
-    updateConfiguration(cfgs, oldName, newName, oldTitle, newTitle);
+    const { oldName, newName, oldUrl, newUrl } = req.body;
+    updateConfiguration(cfgs, oldName, newName, oldUrl, newUrl);
     res.status(200).json({ message: "Configuration updated" });
   } else if (req.method === "DELETE") {
-    const { name, title } = req.body;
-    deleteConfiguration(cfgs, name, title);
+    const { name } = req.body;
+    deleteConfiguration(cfgs, name);
     res.status(200).json({ message: "Configuration deleted" });
   } else {
     res.status(405).json({ message: "Method not allowed" });

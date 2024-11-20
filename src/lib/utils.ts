@@ -237,8 +237,8 @@ export const postCfg = async (cfg: any) => {
 export const updateCfg = async (
   oldName: string,
   newName: string,
-  oldTitle?: string,
-  newTitle?: string
+  oldUrl: string,
+  newUrl: string
 ) => {
   try {
     const response = await fetch("/api/cfg", {
@@ -246,7 +246,7 @@ export const updateCfg = async (
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ oldName, newName, oldTitle, newTitle }),
+      body: JSON.stringify({ oldName, newName, oldUrl, newUrl }),
     });
     const data = await response.json();
     return data;
@@ -256,14 +256,14 @@ export const updateCfg = async (
   }
 };
 
-export const deleteConfig = async (name: string, title?: string) => {
+export const deleteConfig = async (name: string) => {
   try {
     const response = await fetch("/api/cfg", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, title }),
+      body: JSON.stringify({ name }),
     });
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);

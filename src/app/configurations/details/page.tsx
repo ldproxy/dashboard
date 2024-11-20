@@ -19,6 +19,7 @@ interface Entity {
 
 interface Configuration {
   name: string;
+  url: string;
   entities: Entity[];
 }
 
@@ -48,7 +49,7 @@ export default function HomePage() {
   }, []);
 
   const filteredConfigurations = configurations.filter(
-    (cfg) => cfg.name === id && cfg.entities.some((entity) => entity.title)
+    (cfg) => cfg.name === id && cfg.entities?.some((entity) => entity.title)
   );
 
   useEffect(() => {

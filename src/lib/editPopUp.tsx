@@ -29,7 +29,7 @@ import { updateCfg } from "./utils";
 
 interface PopUpDialogProps {
   name: string;
-  title: string;
+  cfgUrl: string;
   handleEdit: (data: any) => Promise<{ success: boolean }>;
 }
 
@@ -45,7 +45,7 @@ const profileFormSchema = z.object({
     .refine((value) => !/[äöüÄÖÜ]/.test(value), {
       message: "Name darf keine Umlaute enthalten.",
     }),
-  title: z
+  url: z
     .string()
     .min(1, {
       message: "Url muss min. 1 Zeichen lang sein.",
@@ -63,7 +63,7 @@ export type ProfileFormValues = z.infer<typeof profileFormSchema>;
 export const EditPopUpDialog: React.FC<PopUpDialogProps> = ({
   handleEdit,
   name,
-  title,
+  cfgUrl,
 }) => {
   const [submitResult, setSubmitResult] = useState<{ success: boolean } | null>(
     null
@@ -74,7 +74,7 @@ export const EditPopUpDialog: React.FC<PopUpDialogProps> = ({
     mode: "onChange",
     defaultValues: {
       name: name,
-      title: title,
+      url: cfgUrl,
     },
   });
 
@@ -93,9 +93,9 @@ export const EditPopUpDialog: React.FC<PopUpDialogProps> = ({
   useEffect(() => {
     form.reset({
       name: name,
-      title: title,
+      url: cfgUrl,
     });
-  }, [name, title, form]);
+  }, [name, cfgUrl, form]);
 
   return (
     <DialogContent>
@@ -113,7 +113,7 @@ export const EditPopUpDialog: React.FC<PopUpDialogProps> = ({
         >
           <FormField
             control={form.control}
-            name="title"
+            name="url"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>URL</FormLabel>
