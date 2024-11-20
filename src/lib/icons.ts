@@ -14,6 +14,7 @@ import {
   ReaderIcon,
   TrashIcon,
   Pencil1Icon,
+  ExternalLinkIcon,
 } from "@radix-ui/react-icons";
 import { IconProps } from "@radix-ui/react-icons/dist/types";
 
@@ -32,6 +33,7 @@ export const icons = {
   Reader: "Reader",
   Trash: "Trash",
   Pencil1: "Pencil1",
+  ExternalLink: "ExternalLink",
 };
 
 export const getIcon = (
@@ -66,6 +68,8 @@ export const getIcon = (
       return TrashIcon;
     case icons.Pencil1:
       return Pencil1Icon;
+    case icons.ExternalLink:
+      return ExternalLinkIcon;
     default:
       return undefined;
   }
