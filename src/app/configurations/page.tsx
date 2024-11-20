@@ -51,18 +51,7 @@ export default function HomePage() {
     try {
       await postCfg({
         name: data.name,
-        entities: [
-          {
-            title: "daraa2",
-            url: "https://github.com/ldproxy/dashboard4",
-            content: {
-              id: "daraa",
-              enabled: true,
-              providerType: "FEATURE",
-              providerSubType: "SQL",
-            },
-          },
-        ],
+        url: data.url,
       });
       const cfgData = await getCfgs();
       setConfigurations(cfgData);

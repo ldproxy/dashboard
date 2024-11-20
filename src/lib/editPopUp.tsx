@@ -51,7 +51,7 @@ const profileFormSchema = z.object({
       message: "Url muss min. 1 Zeichen lang sein.",
     })
     .max(50, {
-      message: "Url darf max. 30 Zeichen lang sein.",
+      message: "Url darf max. 50 Zeichen lang sein.",
     })
     .refine((value) => !/[äöüÄÖÜ]/.test(value), {
       message: "Url darf keine Umlaute enthalten.",

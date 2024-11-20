@@ -43,19 +43,18 @@ export const cfgs = [
   },
 ];
 
-const addOrUpdateConfiguration = (
-  configurations: typeof cfgs,
-  newCfg: (typeof cfgs)[0]
-): typeof cfgs => {
-  const existingConfigIndex = configurations.findIndex(
-    (cfg) => cfg.name === newCfg.name
-  );
-
-  if (existingConfigIndex !== -1) {
-    configurations[existingConfigIndex].entities.push(...newCfg.entities);
-  } else {
-    configurations.push(newCfg);
-  }
+const addConfiguration = (
+  configurations: any,
+  newCfg: { name: string; url: string }
+): any => {
+  configurations.push({
+    name: newCfg.name,
+    entities: [
+      {
+        url: newCfg.url,
+      },
+    ],
+  });
 
   return configurations;
 };
@@ -112,7 +111,7 @@ export default function handler(req: any, res: any) {
     res.status(200).json(cfgs);
   } else if (req.method === "POST") {
     const newCfg = req.body;
-    addOrUpdateConfiguration(cfgs, newCfg);
+    addConfiguration(cfgs, newCfg);
     res.status(201).json(newCfg);
   } else if (req.method === "PUT") {
     const { oldName, newName, oldTitle, newTitle } = req.body;
