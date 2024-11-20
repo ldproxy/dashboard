@@ -25,6 +25,7 @@ interface Configuration {
 export default function HomePage() {
   const [configurations, setConfigurations] = useState<Configuration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showNoConfigMessage, setShowNoConfigMessage] = useState(false);
 
   let id: string | null = "";
   let searchParams = useSearchParams();
@@ -45,6 +46,19 @@ export default function HomePage() {
       setIsLoading(false);
     });
   }, []);
+
+  const filteredConfigurations = configurations.filter(
+    (cfg) => cfg.name === id && cfg.entities.some((entity) => entity.title)
+  );
+
+  useEffect(() => {
+    if (filteredConfigurations.length === 0) {
+      const timer = setTimeout(() => {
+        setShowNoConfigMessage(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, configurations]);
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
@@ -71,9 +85,10 @@ export default function HomePage() {
           className="grid gap-4 md:grid-cols-1 lg:grid-cols-1 "
           style={{ marginBottom: "10px" }}
         >
-          {configurations
-            .filter((cfg) => cfg.name === id)
-            .map((cfg, cfgIndex) =>
+          {filteredConfigurations.length === 0 && showNoConfigMessage ? (
+            <div>Keine Konfigurationen gefunden</div>
+          ) : (
+            filteredConfigurations.map((cfg, cfgIndex) =>
               cfg.entities.map((entity, entityIndex) => (
                 <InfoCfg
                   key={`${cfgIndex}-${entityIndex}`}
@@ -83,7 +98,8 @@ export default function HomePage() {
                   className="additional-class"
                 />
               ))
-            )}
+            )
+          )}
         </div>
       </div>
     </div>

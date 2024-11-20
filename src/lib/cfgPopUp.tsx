@@ -42,6 +42,17 @@ const profileFormSchema = z.object({
     .refine((value) => !/[äöüÄÖÜ]/.test(value), {
       message: "Name darf keine Umlaute enthalten.",
     }),
+  url: z
+    .string()
+    .min(1, {
+      message: "Url muss min. 1 Zeichen lang sein.",
+    })
+    .max(50, {
+      message: "Url darf max. 50 Zeichen lang sein.",
+    })
+    .refine((value) => !/[äöüÄÖÜ]/.test(value), {
+      message: "Name darf keine Umlaute enthalten.",
+    }),
 });
 
 export type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -56,6 +67,7 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
     mode: "onChange",
     defaultValues: {
       name: "",
+      url: "",
     },
   });
 
@@ -85,6 +97,19 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
           className="space-y-8"
           style={{ marginBottom: "25px" }}
         >
+          <FormField
+            control={form.control}
+            name="url"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Url</FormLabel>
+                <FormControl>
+                  <Input placeholder="Url" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="name"
