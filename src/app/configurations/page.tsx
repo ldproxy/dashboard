@@ -24,7 +24,7 @@ interface Entity {
 
 interface Configuration {
   name: string;
-  entities: Entity[];
+  url: string;
 }
 
 export default function HomePage() {
@@ -103,7 +103,7 @@ export default function HomePage() {
             <InfoCfg
               key={`${cfgIndex}`}
               name={cfg.name}
-              title={cfg.entities.length > 0 ? cfg.entities[0].url : ""}
+              cfgUrl={cfg.url}
               setConfigurations={setConfigurations}
               className="additional-class"
             />

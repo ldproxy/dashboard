@@ -15,13 +15,13 @@ import { EditPopUpDialog } from "@/lib/editPopUp";
 
 interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
-  title: string;
+  cfgUrl: string;
   className?: string;
   setConfigurations: any;
 }
 
 export default function InfoCfg({
-  title,
+  cfgUrl,
   name,
   setConfigurations,
   className,
@@ -78,7 +78,7 @@ export default function InfoCfg({
 
   const handleEdit = async (data: any) => {
     try {
-      await updateCfg(name, data.name, title, data.title);
+      await updateCfg(name, data.name, cfgUrl, data.url);
       const cfgData = await getCfgs();
       setConfigurations(cfgData);
       setPopUp(false);
@@ -95,7 +95,7 @@ export default function InfoCfg({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-semibold text-blue-700">
-              {title}
+              {cfgUrl}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex justify-center items-center">
@@ -115,7 +115,7 @@ export default function InfoCfg({
         <DialogTrigger asChild>
           <IconPencil className="absolute right-40 top-1/2 transform -translate-y-1/2 h-8 w-8 text-blue-500 cursor-pointer" />
         </DialogTrigger>
-        <EditPopUpDialog handleEdit={handleEdit} name={name} title={title} />
+        <EditPopUpDialog handleEdit={handleEdit} name={name} cfgUrl={cfgUrl} />
       </Dialog>
       <Dialog open={popUp} onOpenChange={(open) => setPopUp(open)}>
         <DialogTrigger asChild>
