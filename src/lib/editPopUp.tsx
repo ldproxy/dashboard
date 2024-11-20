@@ -25,9 +25,12 @@ import { Input } from "@/components/shadcn-ui/input";
 import React, { useEffect, useState } from "react";
 import { Separator } from "@radix-ui/react-separator";
 import { Button } from "@/components/shadcn-ui/button";
+import { updateCfg } from "./utils";
 
 interface PopUpDialogProps {
-  onSubmit: (data: any) => Promise<{ success: boolean }>;
+  name: string;
+  title: string;
+  handleEdit: (data: any) => Promise<{ success: boolean }>;
 }
 
 const profileFormSchema = z.object({
@@ -42,11 +45,26 @@ const profileFormSchema = z.object({
     .refine((value) => !/[äöüÄÖÜ]/.test(value), {
       message: "Name darf keine Umlaute enthalten.",
     }),
+  title: z
+    .string()
+    .min(1, {
+      message: "Url muss min. 1 Zeichen lang sein.",
+    })
+    .max(50, {
+      message: "Url darf max. 30 Zeichen lang sein.",
+    })
+    .refine((value) => !/[äöüÄÖÜ]/.test(value), {
+      message: "Url darf keine Umlaute enthalten.",
+    }),
 });
 
 export type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
-export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
+export const EditPopUpDialog: React.FC<PopUpDialogProps> = ({
+  handleEdit,
+  name,
+  title,
+}) => {
   const [submitResult, setSubmitResult] = useState<{ success: boolean } | null>(
     null
   );
@@ -55,13 +73,14 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
     resolver: zodResolver(profileFormSchema),
     mode: "onChange",
     defaultValues: {
-      name: "",
+      name: name,
+      title: title,
     },
   });
 
   const handleSubmit = async (data: ProfileFormValues) => {
     try {
-      const result = await onSubmit(data);
+      const result = await handleEdit(data);
       if (result) {
         setSubmitResult(result);
         form.reset();
@@ -71,11 +90,18 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
     }
   };
 
+  useEffect(() => {
+    form.reset({
+      name: name,
+      title: title,
+    });
+  }, [name, title, form]);
+
   return (
     <DialogContent>
       <DialogHeader>
         <div style={{ marginBottom: "15px" }}>
-          <DialogTitle>Konfiguration hinzufügen</DialogTitle>
+          <DialogTitle>Konfiguration umbennen</DialogTitle>
         </div>
         <Separator />
       </DialogHeader>
@@ -87,12 +113,25 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
         >
           <FormField
             control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>URL</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Name" {...field} />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -103,7 +142,7 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
             type="submit"
             disabled={!form.formState.isValid ? true : false}
           >
-            Create
+            Change
           </Button>
         </form>
       </Form>
@@ -111,7 +150,7 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
         <div style={{ color: "red" }}>Ein Fehler ist aufgetreten.</div>
       ) : submitResult && submitResult.success ? (
         <div style={{ color: "green" }}>
-          Konfiguration wurde erfolgreich hinzugefügt.
+          Konfiguration wurde erfolgreich umbenannt.
         </div>
       ) : (
         ""

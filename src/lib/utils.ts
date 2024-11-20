@@ -234,6 +234,28 @@ export const postCfg = async (cfg: any) => {
   }
 };
 
+export const updateCfg = async (
+  oldName: string,
+  newName: string,
+  oldTitle?: string,
+  newTitle?: string
+) => {
+  try {
+    const response = await fetch("/api/cfg", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ oldName, newName, oldTitle, newTitle }),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
 export const deleteConfig = async (name: string, title?: string) => {
   try {
     const response = await fetch("/api/cfg", {

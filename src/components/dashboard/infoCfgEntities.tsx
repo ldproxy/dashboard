@@ -6,11 +6,6 @@ import {
   CardTitle,
 } from "@/components/shadcn-ui/card";
 import Link from "next/link";
-import { getIcon } from "@/lib/icons";
-import { IconProps } from "@radix-ui/react-icons/dist/types";
-import { deleteConfig, getCfgs } from "../../lib/utils";
-import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
-import { PopUpDialog } from "@/lib/deletePopUp";
 
 interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
@@ -25,8 +20,6 @@ export default function InfoCfg({
   setConfigurations,
   className,
 }: SummaryProps) {
-  const [popUp, setPopUp] = useState<boolean>(false);
-
   const currentUrl = window.location.href;
   const url = new URL(currentUrl);
   const params = new URLSearchParams(url.search);
@@ -55,21 +48,7 @@ export default function InfoCfg({
   }
 
   const route = `${url.origin}${newPathname}?${uniqueParams.toString()}`;
-  const Icon: React.FunctionComponent<IconProps> =
-    getIcon("Trash") || (() => <span />);
 
-  const deleteCfg = async () => {
-    try {
-      await deleteConfig(title || "", name);
-      const cfgData = await getCfgs();
-      setConfigurations(cfgData);
-      setPopUp(false);
-      return { success: true };
-    } catch (error) {
-      console.error("Fehler beim Löschen der Konfiguration", error);
-      return { success: false };
-    }
-  };
   return (
     <div className={`relative shadow-lg ${className}`}>
       <Link href={route}>
@@ -92,12 +71,6 @@ export default function InfoCfg({
           </CardContent>
         </Card>
       </Link>
-      <Dialog open={popUp} onOpenChange={(open) => setPopUp(open)}>
-        <DialogTrigger asChild>
-          <Icon className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 text-red-500 cursor-pointer mr-20" />
-        </DialogTrigger>
-        <PopUpDialog onSubmit={deleteCfg} setPopUp={setPopUp} />
-      </Dialog>
     </div>
   );
 }
