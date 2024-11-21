@@ -211,54 +211,60 @@ export default function HomePage() {
                 deploymentHealthStatus
               );
 
-              return (
+              const infoComponent = (
+                <Info
+                  key={index}
+                  name={
+                    (deploymentInfo &&
+                    typeof deploymentInfo.info.url === "string"
+                      ? (deploymentInfo.info.url as string)
+                          .replace("https://", "")
+                          .replace("http://", "")
+                          .replace(/\/$/, "") +
+                        (deployment.name ? ` (${deployment.name})` : "")
+                      : "") || ""
+                  }
+                  version={
+                    deploymentInfo &&
+                    typeof deploymentInfo.info.version === "string"
+                      ? deploymentInfo.info.version
+                      : ""
+                  }
+                  uptime={
+                    deploymentMetrics &&
+                    deploymentMetrics.metrics.uptime &&
+                    typeof deploymentMetrics.metrics.uptime === "number"
+                      ? deploymentMetrics.metrics.uptime
+                      : 0
+                  }
+                  memory={
+                    deploymentMetrics &&
+                    deploymentMetrics.metrics.memory &&
+                    typeof deploymentMetrics.metrics.memory === "number"
+                      ? deploymentMetrics.metrics.memory
+                      : 0
+                  }
+                  health={
+                    deploymentHealthStatus &&
+                    typeof deploymentHealthStatus === "string"
+                      ? deploymentHealthStatus
+                      : ""
+                  }
+                  IconFooter1={getIcon("Clock")}
+                  IconFooter2={getIcon("Upload")}
+                  IconFooter3={getIcon("Desktop")}
+                  className="hover:bg-gray-100 transition-colors duration-200"
+                />
+              );
+
+              return deploymentHealthStatus === "OFFLINE" ? (
+                <div key={index}>{infoComponent}</div>
+              ) : (
                 <Link
                   href={`${deploymentUrl}?did=${deployment.id}`}
                   key={index}
                 >
-                  <Info
-                    key={index}
-                    name={
-                      (deploymentInfo &&
-                      typeof deploymentInfo.info.url === "string"
-                        ? (deploymentInfo.info.url as string)
-                            .replace("https://", "")
-                            .replace("http://", "")
-                            .replace(/\/$/, "") +
-                          (deployment.name ? ` (${deployment.name})` : "")
-                        : "") || ""
-                    }
-                    version={
-                      deploymentInfo &&
-                      typeof deploymentInfo.info.version === "string"
-                        ? deploymentInfo.info.version
-                        : ""
-                    }
-                    uptime={
-                      deploymentMetrics &&
-                      deploymentMetrics.metrics.uptime &&
-                      typeof deploymentMetrics.metrics.uptime === "number"
-                        ? deploymentMetrics.metrics.uptime
-                        : 0
-                    }
-                    memory={
-                      deploymentMetrics &&
-                      deploymentMetrics.metrics.memory &&
-                      typeof deploymentMetrics.metrics.memory === "number"
-                        ? deploymentMetrics.metrics.memory
-                        : 0
-                    }
-                    health={
-                      deploymentHealthStatus &&
-                      typeof deploymentHealthStatus === "string"
-                        ? deploymentHealthStatus
-                        : ""
-                    }
-                    IconFooter1={getIcon("Clock")}
-                    IconFooter2={getIcon("Upload")}
-                    IconFooter3={getIcon("Desktop")}
-                    className="hover:bg-gray-100 transition-colors duration-200"
-                  />
+                  {infoComponent}
                 </Link>
               );
             })()
