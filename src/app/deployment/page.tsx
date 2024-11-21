@@ -224,6 +224,19 @@ export default function DeploymentPage() {
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
+
+    const initialLoad = async () => {
+      loadHealthChecks();
+      loadEntities();
+      loadInfo();
+      loadMetrics();
+      loadJobs();
+      loadValues();
+      //loadCfg();
+    };
+
+    initialLoad();
+
     const interval = setInterval(() => {
       loadHealthChecks();
       loadEntities();

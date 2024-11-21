@@ -177,6 +177,7 @@ function CustomerPage() {
         console.log("cfg", cfg);
       }
     };
+    loadData();
     const interval = setInterval(() => {
       loadData();
     }, autoRefreshInterval);

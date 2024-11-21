@@ -58,6 +58,7 @@ export default function EntitiesPage() {
   };
 
   useEffect(() => {
+    loadValues();
     const interval = setInterval(() => {
       loadValues();
     }, autoRefreshInterval);

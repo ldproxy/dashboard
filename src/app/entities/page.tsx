@@ -79,6 +79,12 @@ export default function EntitiesPage() {
   };
 
   useEffect(() => {
+    const loadData = async () => {
+      await loadEntities();
+    };
+
+    loadData();
+
     const interval = setInterval(() => {
       loadEntities();
     }, autoRefreshInterval);
