@@ -25,6 +25,19 @@ import { Input } from "@/components/shadcn-ui/input";
 import React, { useEffect, useState } from "react";
 import { Separator } from "@radix-ui/react-separator";
 import { Button } from "@/components/shadcn-ui/button";
+import { getCfgs } from "./utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/shadcn-ui/select";
+
+interface Configuration {
+  name: string;
+  url: string;
+}
 
 interface PopUpDialogProps {
   onSubmit: (data: any) => Promise<{ success: boolean }>;
@@ -49,6 +62,9 @@ const profileFormSchema = z.object({
     message:
       "URL darf nur aus Buchstaben, Zahlen, Doppelpunkten und Punkten bestehen.",
   }),
+  cfg: z.string({
+    required_error: "Bitte wählen sie eine Konfiguration.",
+  }),
 });
 
 export type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -57,6 +73,14 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
   const [submitResult, setSubmitResult] = useState<{ success: boolean } | null>(
     null
   );
+  const [configurations, setConfigurations] = useState<Configuration[]>([]);
+
+  useEffect(() => {
+    getCfgs().then((data: any) => {
+      setConfigurations(data);
+      console.log("configurations", data);
+    });
+  }, []);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -133,6 +157,33 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="cfg"
+            render={({ field }) => (
+              <FormItem>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Konfiguration wählen..." />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {configurations.map((cfg, cfgIndex) => (
+                      <SelectItem key={`${cfgIndex}`} value={cfg.name}>
+                        {cfg.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <Button
             style={{ fontWeight: "bold" }}
             type="submit"
