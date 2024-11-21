@@ -48,9 +48,13 @@ export default function HomePage() {
     try {
       if (deployments.length > 0) {
         const promises = deployments.map(async (deployment: any) => {
-          console.log("deployment.baseUrl", deployment.apiUrl);
           const newInfo = await getInfo(deployment.apiUrl);
-          return { name: deployment.name, info: newInfo };
+
+          if (Object.keys(newInfo).length > 0) {
+            return { name: deployment.name, info: newInfo };
+          } else {
+            return { name: deployment.name, info: {} };
+          }
         });
         const results = await Promise.all(promises);
         setInfo(results);
@@ -152,6 +156,8 @@ export default function HomePage() {
           } else if (checks.some((check) => check.state === "OFFLINE")) {
             healthStatus = "OFFLINE";
           }
+        } else {
+          healthStatus = "OFFLINE";
         }
 
         return { name: deployment.name, healthStatus };
@@ -180,12 +186,17 @@ export default function HomePage() {
         >
           {deployments.map((deployment: any, index: number) =>
             (() => {
-              const deploymentInfo = info.find(
-                (i) => i.name === deployment.name
-              );
-              const deploymentMetrics = metrics.find(
-                (m) => m.name === deployment.name
-              );
+              const deploymentInfo =
+                info &&
+                info.find((i) => {
+                  return i.name === deployment.name;
+                });
+
+              const deploymentMetrics =
+                metrics &&
+                metrics.find((m) => {
+                  return m.name === deployment.name;
+                });
               const deploymentHealthStatus =
                 healthStatuses &&
                 healthStatuses.find((h) => h.name === deployment.name)
@@ -212,7 +223,8 @@ export default function HomePage() {
                       typeof deploymentInfo.info.url === "string"
                         ? (deploymentInfo.info.url as string)
                             .replace("https://", "")
-                            .replace("http://", "") +
+                            .replace("http://", "")
+                            .replace(/\/$/, "") +
                           (deployment.name ? ` (${deployment.name})` : "")
                         : "") || ""
                     }

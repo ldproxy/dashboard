@@ -93,11 +93,10 @@ export const getHealthChecks = async (API_URL?: string) => {
   }
   try {
     const response = await fetch(apiUrl + "/health");
-    /*
-    if (!response.ok) {
-      throw new Error(`API call failed with status: ${response.status}`);
+    if (!response.ok && response.status !== 500) {
+      console.error(`API call failed with status: ${response.status}`);
+      return [];
     }
-      */
     const data = await response.json();
     const mappedHealthChecks = Object.keys(data).map((name) => ({
       name,
@@ -117,8 +116,12 @@ export const getHealthChecks = async (API_URL?: string) => {
     }));
     return mappedHealthChecks;
   } catch (error) {
-    console.error("Error:", error);
-    throw error;
+    if (error instanceof TypeError && error.message === "Failed to fetch") {
+      console.error("Network error: Failed to fetch");
+    } else {
+      console.error("Error:", error);
+    }
+    return [];
   }
 };
 
@@ -129,11 +132,33 @@ export const getInfo = async (API_URL?: string) => {
   }
   try {
     const response = await fetch(apiUrl + "/info");
+
+    if (!response.ok && response.status !== 500) {
+      console.error(`API call failed with status: ${response.status}`);
+      return {
+        name: "unknown",
+        version: "unknown",
+        status: "unknown",
+        url: "",
+        env: "unknown",
+      };
+    }
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error("Error:", error);
-    throw error;
+    if (error instanceof TypeError && error.message === "Failed to fetch") {
+      console.error("Network error: Failed to fetch");
+    } else {
+      console.error("Error:", error);
+    }
+
+    return {
+      name: "unknown",
+      version: "unknown",
+      status: "unknown",
+      url: "",
+      env: "unknown",
+    };
   }
 };
 
@@ -144,14 +169,27 @@ export const getMetrics = async (API_URL?: string) => {
   }
   try {
     const response = await fetch(apiUrl + "/metrics");
+    if (!response.ok && response.status !== 500) {
+      console.error(`API call failed with status: ${response.status}`);
+      return { uptime: 0, memory: 0 };
+    }
     const data = await response.json();
     return {
       uptime: data.gauges["jvm.attribute.uptime"].value,
       memory: data.gauges["jvm.memory.total.used"].value,
     };
   } catch (error) {
-    console.error("Error:", error);
-    throw error;
+    if (error instanceof TypeError && error.message === "Failed to fetch") {
+      console.error("Network error: Failed to fetch");
+    } else if (
+      error instanceof TypeError &&
+      error.message.includes("NetworkError")
+    ) {
+      console.error("Network error: Connection refused");
+    } else {
+      console.error("Error:", error);
+    }
+    return { uptime: 0, memory: 0 };
   }
 };
 

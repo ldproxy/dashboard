@@ -38,8 +38,12 @@ export default function CustomersPage({
   const formattedMemory = filesize(memory, { base: 10 });
   const formattedUptime = prettyMs(uptime, { secondsDecimalDigits: 0 });
 
+  const cardClassName = `shadow-lg ${className} ${
+    health === "OFFLINE" ? "opacity-50 pointer-events-none" : ""
+  }`;
+
   return (
-    <Card className={`shadow-lg ${className}`}>
+    <Card className={cardClassName}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle
           className={`text-sm font-semibold ${
