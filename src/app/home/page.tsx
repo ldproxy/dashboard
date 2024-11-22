@@ -13,7 +13,7 @@ import Info from "@/components/dashboard/info";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
 
-type InfoType = { [key: string]: InputInfo };
+type InfoType = { name: string; info: InputInfo }[];
 type MetricsType = { [key: string]: Metrics };
 type HealthChecksType = { [key: string]: Check[] };
 
@@ -21,7 +21,7 @@ export default function HomePage() {
   const [deployments, setDeployments] = useState([]);
   const [healthChecks, setHealthChecks] = useState<HealthChecksType>({});
   const [metrics, setMetrics] = useState<MetricsType[]>([]);
-  const [info, setInfo] = useState<InfoType[]>([]);
+  const [info, setInfo] = useState<InfoType>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [healthStatuses, setHealthStatuses] = useState<
@@ -50,10 +50,10 @@ export default function HomePage() {
         const promises = deployments.map(async (deployment: any) => {
           const newInfo = await getInfo(deployment.apiUrl);
 
-          if (Object.keys(newInfo).length > 0) {
-            return { name: deployment.name, info: newInfo };
+          if (newInfo.length > 0) {
+            return { name: deployment.name, info: newInfo as InputInfo };
           } else {
-            return { name: deployment.name, info: {} };
+            return { name: deployment.name, info: [] as InputInfo };
           }
         });
         const results = await Promise.all(promises);
@@ -216,8 +216,10 @@ export default function HomePage() {
                   key={index}
                   name={
                     (deploymentInfo &&
-                    typeof deploymentInfo.info.url === "string"
-                      ? (deploymentInfo.info.url as string)
+                    Array.isArray(deploymentInfo.info) &&
+                    deploymentInfo.info.length > 0 &&
+                    typeof deploymentInfo.info[0].url === "string"
+                      ? deploymentInfo.info[0].url
                           .replace("https://", "")
                           .replace("http://", "")
                           .replace(/\/$/, "") +
