@@ -14,7 +14,7 @@ import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
 
 type InfoType = { name: string; info: InputInfo }[];
-type MetricsType = { [key: string]: Metrics };
+type MetricsType = { name: string; metrics: Metrics };
 type HealthChecksType = { [key: string]: Check[] };
 
 export default function HomePage() {
@@ -72,7 +72,11 @@ export default function HomePage() {
           return { name: deployment.name, metrics: newMetrics };
         });
         const results = await Promise.all(promises);
-        setMetrics(results);
+        const filteredResults = results.filter(
+          (result): result is { name: string; metrics: Metrics } =>
+            result !== undefined
+        );
+        setMetrics(filteredResults);
       }
     } catch (error) {
       console.error("Error loading metrics:", error);
@@ -226,25 +230,37 @@ export default function HomePage() {
                         (deployment.name ? ` (${deployment.name})` : "")
                       : "") || ""
                   }
-                  version={
-                    deploymentInfo &&
-                    typeof deploymentInfo.info.version === "string"
-                      ? deploymentInfo.info.version
-                      : ""
+                  versions={
+                    deploymentInfo && Array.isArray(deploymentInfo.info)
+                      ? deploymentInfo.info
+                          .filter((item) => typeof item.version === "string")
+                          .map((item) => ({
+                            version: item.version,
+                            apiUrl: item.apiUrl,
+                          }))
+                      : []
                   }
-                  uptime={
+                  uptimes={
                     deploymentMetrics &&
-                    deploymentMetrics.metrics.uptime &&
-                    typeof deploymentMetrics.metrics.uptime === "number"
-                      ? deploymentMetrics.metrics.uptime
-                      : 0
+                    Array.isArray(deploymentMetrics.metrics)
+                      ? deploymentMetrics.metrics
+                          .filter((metric) => typeof metric.uptime === "number")
+                          .map((metric) => ({
+                            uptime: metric.uptime,
+                            apiUrl: metric.apiUrl,
+                          }))
+                      : []
                   }
-                  memory={
+                  memories={
                     deploymentMetrics &&
-                    deploymentMetrics.metrics.memory &&
-                    typeof deploymentMetrics.metrics.memory === "number"
-                      ? deploymentMetrics.metrics.memory
-                      : 0
+                    Array.isArray(deploymentMetrics.metrics)
+                      ? deploymentMetrics.metrics
+                          .filter((metric) => typeof metric.memory === "number")
+                          .map((metric) => ({
+                            memory: metric.memory,
+                            apiUrl: metric.apiUrl,
+                          }))
+                      : []
                   }
                   health={
                     deploymentHealthStatus &&

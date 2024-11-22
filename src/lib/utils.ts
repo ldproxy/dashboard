@@ -96,7 +96,7 @@ function calculateDaysBetweenDates(begin: number, end: number): number {
 export const getHealthChecks = async (API_URL?: string) => {
   let apiUrl: string[] = [];
   if (API_URL) {
-    apiUrl = [API_URL];
+    apiUrl = API_URL;
   } else {
     apiUrl = await GetApiUrl();
   }
@@ -109,7 +109,9 @@ export const getHealthChecks = async (API_URL?: string) => {
       apiUrl.map(async (url) => {
         const response = await fetch(url + "/health");
         if (!response.ok && response.status !== 500) {
-          console.error(`API call failed with status: ${response.status}`);
+          console.error(
+            `API call failed with status: ${url}: ${response.status}`
+          );
           return [];
         }
         const data = await response.json();
@@ -147,7 +149,7 @@ export const getHealthChecks = async (API_URL?: string) => {
 export const getInfo = async (API_URL?: string) => {
   let apiUrls: string[] = [];
   if (API_URL) {
-    apiUrls = [API_URL];
+    apiUrls = API_URL;
   } else {
     apiUrls = await GetApiUrl();
   }
@@ -198,7 +200,7 @@ export const getInfo = async (API_URL?: string) => {
 export const getMetrics = async (API_URL?: string) => {
   let apiUrls: string[] = [];
   if (API_URL) {
-    apiUrls = [API_URL];
+    apiUrls = API_URL;
   } else {
     apiUrls = await GetApiUrl();
   }
@@ -208,17 +210,17 @@ export const getMetrics = async (API_URL?: string) => {
 
   try {
     const metrics = await Promise.all(
-      apiUrls.map(async (apiUrl) => {
-        const response = await fetch(apiUrl + "/metrics");
+      apiUrls.map(async (url) => {
+        const response = await fetch(url + "/metrics");
         if (!response.ok && response.status !== 500) {
           console.error(`API call failed with status: ${response.status}`);
-          return { uptime: 0, memory: 0, apiUrl };
+          return { uptime: 0, memory: 0, apiUrl: url };
         }
         const data = await response.json();
         return {
           uptime: data.gauges["jvm.attribute.uptime"].value,
           memory: data.gauges["jvm.memory.total.used"].value,
-          apiUrl,
+          apiUrl: url,
         };
       })
     );

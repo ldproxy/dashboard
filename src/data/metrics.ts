@@ -6,10 +6,13 @@ export interface InputMetrics {
   };
 }
 
-export interface Metrics {
+export interface MetricsInfo {
   uptime: number;
   memory: number;
+  apiUrl: string;
 }
+
+export type Metrics = MetricsInfo[];
 
 export const metrics = {
   gauges: {
