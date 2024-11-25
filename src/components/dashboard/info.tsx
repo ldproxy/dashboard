@@ -45,7 +45,6 @@ export default function CustomersPage({
     health === "OFFLINE" ? "opacity-50 pointer-events-none" : ""
   }`;
 
-  // Kombinieren Sie die Arrays basierend auf der apiUrl
   const combinedData = versions.map((version, index) => ({
     version: version.version,
     apiUrl: version.apiUrl,

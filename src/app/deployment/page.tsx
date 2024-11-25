@@ -44,19 +44,19 @@ import { getEntityCounts, getStateSummary } from "@/lib/entities";
 import { Deployment } from "@/data/deployments";
 import { match } from "assert";
 
+type InfoType = { name: string; info: InputInfo }[];
+type MetricsType = { name: string; metrics: Metrics };
+type HealthChecksType = { [key: string]: Check[] };
+
 export default function DeploymentPage() {
-  const [healthChecks, setHealthChecks] = useState<Check[]>([]);
   const [tab, setTab] = useState("overview");
   const [entities, setEntities] = useState<Entity[]>([]);
-  const [metrics, setMetrics] = useState<Metrics>({ uptime: -1, memory: -1 });
   const [jobs, setJobs] = useState<Job[]>([]);
-  const [info, setInfo] = useState<InputInfo>({
-    name: "",
-    version: "",
-    url: "",
-    env: "",
-    status: "",
-  });
+  const [healthChecks, setHealthChecks] = useState<HealthChecksType>({});
+  const [metrics, setMetrics] = useState<MetricsType[]>([
+    { name: "", metrics: { uptime: -1, memory: -1 } },
+  ]);
+  const [info, setInfo] = useState<InfoType>([]);
   const [values, setValues] = useState([] as any[]);
   const [tableData, setTableData] = useState([] as any[]);
   const [storeState, setStoreState] = useState(true);
@@ -69,8 +69,23 @@ export default function DeploymentPage() {
   ] as Deployment[]);
   const [deploymentName, setDeploymentName] = useState("");
   const [deploymentId, setDeploymentId] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [healthStatuses, setHealthStatuses] = useState<
+    { name: string; healthStatus: string }[] | null
+  >(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [matchingDeployment, setMatchingDelpoyment] = useState({});
 
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
+
+  useEffect(() => {
+    getDeployments().then((data: any) => setDeployments(data));
+    if (multipleDeployments === "true") {
+      getDeploymentId();
+    }
+    // getDeploymentId nt included to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [multipleDeployments]);
 
   const getDeploymentId = async () => {
     const currentUrl = new URL(window.location.href);
@@ -78,34 +93,134 @@ export default function DeploymentPage() {
     const did = queryParams.get("did");
     if (did) {
       setDeploymentId(did);
+      const matchingDeployment = deployments.find((d) => d.id === did);
+      if (matchingDeployment) {
+        setMatchingDelpoyment(matchingDeployment);
+        setDeploymentName(matchingDeployment.name);
+      }
     }
   };
 
-  useEffect(() => {
-    getDeployments().then((data: any) => setDeployments(data));
-    if (multipleDeployments === "true") {
-      getDeploymentId();
-    }
-  }, [multipleDeployments]);
+  const loadInfo = async () => {
+    try {
+      if (matchingDeployment) {
+        const newInfo = await getInfo();
 
-  useEffect(() => {
-    const currentUrl = new URL(window.location.href);
-
-    if (currentUrl && deployments.length > 0) {
-      const currentDeployment = deployments.find(
-        (deployment) => deployment.url === currentUrl.href
-      );
-
-      if (currentDeployment) {
-        setDeploymentName(currentDeployment.name);
+        if (newInfo.length > 0) {
+          setInfo([
+            { name: matchingDeployment.name, info: newInfo as InputInfo },
+          ]);
+        } else {
+          setInfo([{ name: matchingDeployment.name, info: [] as InputInfo }]);
+        }
       }
+    } catch (error) {
+      console.error("Error loading info:", error);
     }
-    // leaving out apiUrl to avoid indefinite loop
+  };
+
+  const loadMetrics = async () => {
+    try {
+      if (matchingDeployment) {
+        const newMetrics = await getMetrics();
+        setMetrics([{ name: matchingDeployment.name, metrics: newMetrics }]);
+      }
+    } catch (error) {
+      console.error("Error loading metrics:", error);
+    }
+  };
+
+  const loadHealthChecks = async () => {
+    try {
+      if (matchingDeployment) {
+        let healthChecksObj: HealthChecksType = {};
+        const newHealthChecks = await getHealthChecks();
+        healthChecksObj[matchingDeployment.name] = newHealthChecks;
+        setHealthChecks(healthChecksObj);
+        const healthStatuses = await getHealthStatuses(healthChecksObj);
+        setHealthStatuses(healthStatuses);
+      }
+    } catch (error) {
+      console.error("Error loading health checks:", error);
+    }
+  };
+
+  const getHealthStatuses = async (healthChecks: HealthChecksType) => {
+    if (matchingDeployment) {
+      const checks = healthChecks[matchingDeployment.name];
+
+      let healthStatus = "";
+
+      if (checks && checks.length > 0) {
+        if (checks.some((check) => check.state === "UNAVAILABLE")) {
+          healthStatus = "UNHEALTHY";
+        } else if (checks.every((check) => check.state === "AVAILABLE")) {
+          healthStatus = "HEALTHY";
+        } else if (checks.some((check) => check.state === "OFFLINE")) {
+          healthStatus = "OFFLINE";
+        }
+      } else {
+        healthStatus = "OFFLINE";
+      }
+
+      return [{ name: matchingDeployment.name, healthStatus }];
+    } else return null;
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        await Promise.all([
+          loadHealthChecks(),
+          loadInfo(),
+          loadMetrics(),
+          loadEntities(),
+          loadJobs(),
+          loadValues(),
+          //loadCfg(),
+        ]);
+        console.log("loadHealth");
+      } catch (error) {
+        console.error(
+          "Ein Fehler ist beim Laden der Daten aufgetreten:",
+          error
+        );
+      } finally {
+        setIsLoading(false);
+        setIsInitialLoad(false);
+      }
+    };
+    if (isInitialLoad && deployments.length > 0) {
+      loadData();
+    }
+    // not all dependendies to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deployments]);
 
   useEffect(() => {
-    const storeCheck = healthChecks
+    if (!isInitialLoad) {
+      const loadData = async () => {
+        await Promise.all([
+          loadHealthChecks(),
+          loadInfo(),
+          loadMetrics(),
+          loadEntities(),
+          loadJobs(),
+          loadValues(),
+          // loadCfg(),
+        ]);
+      };
+      const interval = setInterval(loadData, 2000);
+      return () => clearInterval(interval);
+    }
+    // not all dependendies to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deployments, pathname]);
+
+  useEffect(() => {
+    const storeCheck = Object.values(healthChecks)
+      .flat()
       .filter(
         (check: Check) =>
           check &&
@@ -141,16 +256,6 @@ export default function DeploymentPage() {
     }*/
   }, [healthChecks]);
 
-  const loadInfo = async () => {
-    try {
-      const newInfo = await getInfo();
-      console.log("newInfo:", newInfo);
-      setInfo(newInfo);
-    } catch (error) {
-      console.error("Error loading info:", error);
-    }
-  };
-
   const loadCfg = async () => {
     try {
       const newCfg = await getDeploymentCfg();
@@ -163,15 +268,6 @@ export default function DeploymentPage() {
       setHasError(true);
 
       console.error("Error loading cfg:", error);
-    }
-  };
-
-  const loadMetrics = async () => {
-    try {
-      const newMetrics = await getMetrics();
-      setMetrics(newMetrics);
-    } catch (error) {
-      console.error("Error loading metrics:", error);
     }
   };
 
@@ -202,15 +298,6 @@ export default function DeploymentPage() {
     }
   };
 
-  const loadHealthChecks = async () => {
-    try {
-      const newHealthChecks = await getHealthChecks();
-      setHealthChecks(newHealthChecks);
-    } catch (error) {
-      console.error("Error loading health checks:", error);
-    }
-  };
-
   const loadValues = async () => {
     try {
       const newValues = await getValues();
@@ -224,29 +311,6 @@ export default function DeploymentPage() {
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
-
-    const initialLoad = async () => {
-      loadHealthChecks();
-      loadEntities();
-      loadInfo();
-      loadMetrics();
-      loadJobs();
-      loadValues();
-      //loadCfg();
-    };
-
-    initialLoad();
-
-    const interval = setInterval(() => {
-      loadHealthChecks();
-      loadEntities();
-      loadInfo();
-      loadMetrics();
-      loadJobs();
-      loadValues();
-      //loadCfg();
-    }, autoRefreshInterval);
-    return () => clearInterval(interval);
   }, [pathname]);
 
   const onTabChange = (tab: string) => {
@@ -257,13 +321,6 @@ export default function DeploymentPage() {
       router.push(`${pathname}#${tab}`);
     }
   };
-
-  const health =
-    healthChecks.length > 0
-      ? healthChecks.some((check) => check.state !== "AVAILABLE")
-        ? "UNHEALTHY"
-        : "HEALTHY"
-      : "";
 
   const totalSources = tableData.length;
   const totalValues = values.length;
@@ -287,11 +344,16 @@ export default function DeploymentPage() {
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-2xl font-semibold tracking-tight">Deployment</h2>
-        {metrics.uptime === -1 && metrics.memory === -1 && (
-          <div className="ml-auto">
-            <ClipLoader color={"#123abc"} loading={true} size={20} />
-          </div>
-        )}
+        {matchingDeployment &&
+          metrics &&
+          metrics.some(
+            (metric) =>
+              metric.metrics.uptime === -1 && metric.metrics.memory === -1
+          ) && (
+            <div className="ml-auto">
+              <ClipLoader color={"#123abc"} loading={true} size={20} />
+            </div>
+          )}
         {/*<div className="flex items-center space-x-2">
           <Button onClick={loadHealthChecks} className="font-bold">
             <ReloadIcon className="mr-2 h-4 w-4" />
@@ -326,21 +388,108 @@ export default function DeploymentPage() {
             className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
             style={{ marginBottom: "10px" }}
           >
-            <Info
-              key="Entities"
-              name={`${info.url
-                .replace("https://", "")
-                .replace("http://", "")}${
-                deploymentName ? ` (${deploymentName})` : ""
-              }`}
-              version={info.version}
-              uptime={metrics.uptime}
-              memory={metrics.memory}
-              health={health}
-              IconFooter1={getIcon("Clock")}
-              IconFooter2={getIcon("Upload")}
-              IconFooter3={getIcon("Desktop")}
-            />
+            {matchingDeployment &&
+              info.length > 0 &&
+              metrics.length > 0 &&
+              healthStatuses &&
+              (() => {
+                const deploymentInfo =
+                  info &&
+                  info.find((i) => {
+                    return i.name === matchingDeployment.name;
+                  });
+
+                const deploymentMetrics =
+                  metrics &&
+                  metrics.find((m) => {
+                    return m.name === matchingDeployment.name;
+                  });
+                const deploymentHealthStatus =
+                  healthStatuses &&
+                  healthStatuses.find((h) => h.name === matchingDeployment.name)
+                    ?.healthStatus;
+
+                console.log(
+                  "deploymentInfoEntity",
+                  deploymentInfo,
+                  "deploymentMetricsEntity",
+                  deploymentMetrics,
+                  "deploymentHealthStatusEntity",
+                  deploymentHealthStatus
+                );
+
+                const infoComponent = (
+                  <Info
+                    key={matchingDeployment.id}
+                    name={
+                      (deploymentInfo &&
+                      Array.isArray(deploymentInfo.info) &&
+                      deploymentInfo.info.length > 0 &&
+                      typeof deploymentInfo.info[0].url === "string"
+                        ? deploymentInfo.info[0].url
+                            .replace("https://", "")
+                            .replace("http://", "")
+                            .replace(/\/$/, "") +
+                          (matchingDeployment.name
+                            ? ` (${matchingDeployment.name})`
+                            : "")
+                        : "") || ""
+                    }
+                    versions={
+                      deploymentInfo && Array.isArray(deploymentInfo.info)
+                        ? deploymentInfo.info
+                            .filter((item) => typeof item.version === "string")
+                            .map((item) => ({
+                              version: item.version,
+                              apiUrl: item.apiUrl,
+                            }))
+                        : []
+                    }
+                    uptimes={
+                      deploymentMetrics &&
+                      Array.isArray(deploymentMetrics.metrics)
+                        ? deploymentMetrics.metrics
+                            .filter(
+                              (metric) => typeof metric.uptime === "number"
+                            )
+                            .map((metric) => ({
+                              uptime: metric.uptime,
+                              apiUrl: metric.apiUrl,
+                            }))
+                        : []
+                    }
+                    memories={
+                      deploymentMetrics &&
+                      Array.isArray(deploymentMetrics.metrics)
+                        ? deploymentMetrics.metrics
+                            .filter(
+                              (metric) => typeof metric.memory === "number"
+                            )
+                            .map((metric) => ({
+                              memory: metric.memory,
+                              apiUrl: metric.apiUrl,
+                            }))
+                        : []
+                    }
+                    health={
+                      deploymentHealthStatus &&
+                      typeof deploymentHealthStatus === "string"
+                        ? deploymentHealthStatus
+                        : ""
+                    }
+                    IconFooter1={getIcon("Clock")}
+                    IconFooter2={getIcon("Upload")}
+                    IconFooter3={getIcon("Desktop")}
+                    className="hover:bg-gray-100 transition-colors duration-200"
+                  />
+                );
+
+                return deploymentHealthStatus === "OFFLINE" ? (
+                  <div key={matchingDeployment.id}>{infoComponent}</div>
+                ) : (
+                  infoComponent
+                );
+              })()}
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Summary
