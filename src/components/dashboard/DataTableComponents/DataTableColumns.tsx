@@ -62,15 +62,31 @@ export const columns: ColumnDef<HealthCheck>[] = [
     },
     cell: ({ row }: { row: Row<HealthCheck> }) => {
       if (row.original) {
-        const badgeColor =
-          row.original.status === "HEALTHY" ||
-          row.original.status === "AVAILABLE"
-            ? "success"
-            : row.original.status === "LIMITED"
-            ? "warning"
-            : "destructive";
+        let badgeColor = "";
+        let textColor = "white";
+
+        switch (row.original.status) {
+          case "HEALTHY":
+          case "AVAILABLE":
+            badgeColor = "#4CAF50";
+            break;
+          case "LIMITED":
+            badgeColor = "#FFDD44";
+            break;
+          default:
+            badgeColor = "#F44336";
+            break;
+        }
+
         return (
-          <Badge className="ml-4" variant={badgeColor}>
+          <Badge
+            className="ml-4"
+            style={{
+              backgroundColor: badgeColor,
+              color: textColor,
+              cursor: "default",
+            }}
+          >
             {row.original.status}
           </Badge>
         );
