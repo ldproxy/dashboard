@@ -14,8 +14,11 @@ export const getEntityCategory = (entity: Entity) => {
   return entity.type === "services" ? "API" : entity.subType.split(/[/]/)[0];
 };
 
-export const asLabel = (entityCategory: string) =>
-  entityCategory[0].toUpperCase() + entityCategory.substring(1) + "s";
+export const asLabel = (entityCategory: string) => {
+  const formattedCategory =
+    entityCategory[0].toUpperCase() + entityCategory.substring(1);
+  return entityCategory === "API" ? formattedCategory + "s" : formattedCategory;
+};
 
 export const getEntityCounts = (entities: Entity[]): HealthCounts =>
   entities.reduce(
