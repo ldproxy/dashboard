@@ -80,33 +80,40 @@ export default function DeploymentPage() {
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 
   useEffect(() => {
-    getDeployments().then((data: any) => setDeployments(data));
-    if (multipleDeployments === "true") {
-      getDeploymentId();
-    }
-    // getDeploymentId nt included to avoid infinite loop
+    getDeployments().then((data: any) => {
+      setDeployments(data);
+      getMatchingDeployment(data);
+    });
+
+    // getDeploymentId not included to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [multipleDeployments]);
 
-  const getDeploymentId = async () => {
+  const getMatchingDeployment = async (data) => {
     const currentUrl = new URL(window.location.href);
     const queryParams = new URLSearchParams(currentUrl.search);
     const did = queryParams.get("did");
+    const baseUrl = currentUrl.origin;
+    const apiUrl = `${baseUrl}/api`;
+    let deployment = {};
     if (did) {
       setDeploymentId(did);
-      const matchingDeployment = deployments.find((d) => d.id === did);
-      if (matchingDeployment) {
-        setMatchingDelpoyment(matchingDeployment);
-        setDeploymentName(matchingDeployment.name);
-      }
+      deployment = data.find((d) => d.id === did);
+    } else {
+      deployment = data.find((deployment: Deployment) =>
+        deployment.apiUrl.includes(apiUrl)
+      );
+    }
+    if (deployment && Object.keys(deployment).length > 0) {
+      setMatchingDelpoyment(deployment);
+      setDeploymentName(deployment.name);
     }
   };
 
   const loadInfo = async () => {
     try {
-      if (matchingDeployment) {
+      if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
         const newInfo = await getInfo();
-
         if (newInfo.length > 0) {
           setInfo([
             { name: matchingDeployment.name, info: newInfo as InputInfo },
@@ -122,7 +129,7 @@ export default function DeploymentPage() {
 
   const loadMetrics = async () => {
     try {
-      if (matchingDeployment) {
+      if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
         const newMetrics = await getMetrics();
         setMetrics([{ name: matchingDeployment.name, metrics: newMetrics }]);
       }
@@ -133,7 +140,7 @@ export default function DeploymentPage() {
 
   const loadHealthChecks = async () => {
     try {
-      if (matchingDeployment) {
+      if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
         let healthChecksObj: HealthChecksType = {};
         const newHealthChecks = await getHealthChecks();
         healthChecksObj[matchingDeployment.name] = newHealthChecks;
@@ -147,7 +154,7 @@ export default function DeploymentPage() {
   };
 
   const getHealthStatuses = async (healthChecks: HealthChecksType) => {
-    if (matchingDeployment) {
+    if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
       const checks = healthChecks[matchingDeployment.name];
 
       let healthStatus = "";
@@ -347,6 +354,7 @@ export default function DeploymentPage() {
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-2xl font-semibold tracking-tight">Deployment</h2>
         {matchingDeployment &&
+          Object.keys(matchingDeployment).length > 0 &&
           metrics &&
           metrics.some(
             (metric) =>
@@ -391,6 +399,7 @@ export default function DeploymentPage() {
             style={{ marginBottom: "10px" }}
           >
             {matchingDeployment &&
+              Object.keys(matchingDeployment).length > 0 &&
               info.length > 0 &&
               metrics.length > 0 &&
               healthStatuses &&

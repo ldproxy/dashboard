@@ -49,7 +49,7 @@ export async function GetApiUrl(): Promise<string[]> {
       );
 
       if (matchingDeployment && matchingDeployment.apiUrl) {
-        return [matchingDeployment.apiUrl];
+        return matchingDeployment.apiUrl;
       }
     }
 
@@ -157,24 +157,23 @@ export const getInfo = async (API_URL?: string) => {
   if (apiUrls.length === 0) {
     return [];
   }
-
   try {
     const info = await Promise.all(
       apiUrls.map(async (apiUrl) => {
         const response = await fetch(apiUrl + "/info");
         if (!response.ok && response.status !== 500) {
-          console.error(`API call failed with status: ${response.status}`);
+          console.error(`API call Info failed with status: ${response.status}`);
           return {
             name: "unknown",
             version: "unknown",
             status: "unknown",
             url: "",
             env: "unknown",
-            apiUrl, // Speichern Sie die verwendete apiUrl als Eigenschaft
+            apiUrl,
           };
         }
         const data = await response.json();
-        return { ...data, apiUrl }; // Fügen Sie die verwendete apiUrl als Eigenschaft hinzu
+        return { ...data, apiUrl };
       })
     );
     return info;
@@ -192,7 +191,7 @@ export const getInfo = async (API_URL?: string) => {
         status: "unknown",
         url: "",
         env: "unknown",
-        apiUrl: "", // Leere URL im Fehlerfall
+        apiUrl: "",
       },
     ];
   }
@@ -250,7 +249,7 @@ export const getJobs = async (API_URL?: string) => {
   }
 
   try {
-    const response = await fetch(API_URL + "/jobs");
+    const response = await fetch(apiUrl + "/jobs");
     const data = await response.json();
     return expandJobs(data.sets);
   } catch (error) {
