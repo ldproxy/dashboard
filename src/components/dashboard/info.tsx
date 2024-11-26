@@ -9,6 +9,7 @@ import {
 import React from "react";
 import { filesize } from "filesize";
 import { GlobeIcon } from "@radix-ui/react-icons";
+
 interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
   versions: { version: string; apiUrl: string }[];
@@ -80,11 +81,17 @@ export default function CustomersPage({
           {name}
         </div>
         <div style={{ width: "100%", marginTop: "-30px" }}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+          <div
+            className={`grid gap-12 ${
+              combinedData.length === 1
+                ? "grid-cols-1 place-items-center"
+                : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+            }`}
+          >
             {combinedData.map((data, index) => (
               <div
                 key={index}
-                className="flex flex-col items-start p-4 "
+                className="flex flex-col items-start p-4"
                 style={{ minWidth: "300px", minHeight: "100px" }}
               >
                 <div
