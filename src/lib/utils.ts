@@ -247,7 +247,6 @@ export const getJobs = async (API_URL?: string) => {
     const apiUrls = await GetApiUrl();
     apiUrl = apiUrls[0];
   }
-
   try {
     const response = await fetch(apiUrl + "/jobs");
     const data = await response.json();
@@ -258,7 +257,7 @@ export const getJobs = async (API_URL?: string) => {
   }
 };
 
-const expandJobs = (jobs: Job[]): Job[] => {
+const expandJobs = (jobs: Job[] = []): Job[] => {
   const allJobs = [...jobs];
 
   for (const followUp of jobs.flatMap(expandJob)) {
@@ -316,11 +315,13 @@ export const getValues = async (API_URL?: string) => {
     const response = await fetch(apiUrl + "/values");
     const data = await response.json();
     return Object.keys(data).flatMap((type) =>
-      data[type].map((value: any) => ({
-        type,
-        uid: `${type}_${value.path}`,
-        ...value,
-      }))
+      Array.isArray(data[type])
+        ? data[type].map((value: any) => ({
+            type,
+            uid: `${type}_${value.path}`,
+            ...value,
+          }))
+        : []
     );
   } catch (error) {
     console.error("Error:", error);
