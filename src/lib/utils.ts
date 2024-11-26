@@ -250,7 +250,7 @@ export const getJobs = async (API_URL?: string) => {
   try {
     const response = await fetch(apiUrl + "/jobs");
     const data = await response.json();
-    return expandJobs(data.sets);
+    return expandJobs(data);
   } catch (error) {
     console.error("Error:", error);
     throw error;
