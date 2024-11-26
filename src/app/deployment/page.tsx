@@ -24,6 +24,7 @@ import {
   getDeployments,
   getJobs,
   sortCards,
+  summarizeStoreCheck,
 } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Check } from "@/data/health";
@@ -180,7 +181,6 @@ export default function DeploymentPage() {
           loadValues(),
           //loadCfg(),
         ]);
-        console.log("loadHealth");
       } catch (error) {
         console.error(
           "Ein Fehler ist beim Laden der Daten aufgetreten:",
@@ -237,7 +237,9 @@ export default function DeploymentPage() {
             checked: dayjs(check.timestamp).format("HH:mm:ss"),
           }
       );
-    setTableData(storeCheck);
+    const summarizedStoreCheck = summarizeStoreCheck(storeCheck);
+
+    setTableData(summarizedStoreCheck);
     /*if (DevDeployment) {
       console.log("storeCheck data:", storeCheck);
     }

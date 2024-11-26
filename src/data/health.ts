@@ -31,6 +31,48 @@ export interface Check {
 }
 
 export const fetchedHealthChecks: { [key: string]: InputCheck } = {
+  "app/crs": {
+    healty: false,
+    state: "LIMITED",
+    duration: 0,
+    timestamp: "2024-02-15T17:56:36.681+01:00",
+  },
+  "entities/services/testi": {
+    healthy: true,
+    state: "AVAILABLE",
+    duration: 0,
+    timestamp: "2024-02-15T17:56:36.681+01:00",
+    capabilities: [
+      {
+        name: "Capability1",
+        healthy: true,
+        state: "AVAILABLE",
+        message: "All systems operational",
+      },
+      {
+        name: "Capability2",
+        healthy: false,
+        state: "UNAVAILABLE",
+        message: "System maintenance",
+      },
+    ],
+    components: [
+      {
+        name: "Component1",
+        healthy: true,
+        state: "AVAILABLE",
+        message: "Component operational",
+        capabilities: ["Capability1"],
+      },
+      {
+        name: "Component2",
+        healthy: false,
+        state: "UNAVAILABLE",
+        message: "Component failure",
+        capabilities: ["Capability2"],
+      },
+    ],
+  },
   "db.bergbau.pool.ConnectivityCheck": {
     healthy: true,
     state: "AVAILABLE",

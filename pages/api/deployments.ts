@@ -3,7 +3,11 @@
 export const deployments = [
   {
     name: "ldproxy 3000",
-    apiUrl: ["http://localhost:3000/api", "http://localhost:7081/api"],
+    apiUrl: [
+      "http://localhost:3000/api",
+      "http://localhost:7081/api",
+      "http://localhost:3000/api",
+    ],
     url: "http://localhost:3000/deployment",
     id: "3",
   },

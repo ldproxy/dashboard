@@ -5,6 +5,7 @@ import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/shadcn-ui/button";
 import { Badge } from "@/components/shadcn-ui/badge";
 import { ChevronRightIcon, ChevronDownIcon } from "@radix-ui/react-icons";
+import { summarizeHealthChecks } from "@/lib/utils";
 
 export type HealthCheck = {
   label: string;

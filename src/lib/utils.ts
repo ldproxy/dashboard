@@ -3,6 +3,7 @@ import { Job } from "@/data/jobs";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Deployment } from "@/data/deployments";
+import dayjs from "dayjs";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -386,3 +387,55 @@ export const sortCards = (cards: any[]) => {
     return b.startedAt - a.startedAt;
   });
 };
+
+export function summarizeStoreCheck(storeCheck: any[]): any[] {
+  const labelCounts: { [label: string]: number } = {};
+  const summarized: { [label: string]: any } = {};
+
+  storeCheck.forEach((check) => {
+    if (!labelCounts[check.label]) {
+      labelCounts[check.label] = 0;
+    }
+    labelCounts[check.label]++;
+  });
+
+  storeCheck.forEach((check) => {
+    if (labelCounts[check.label] > 1) {
+      if (!summarized[check.label]) {
+        summarized[check.label] = { ...check, subRows: [] };
+      }
+
+      const existingCheck = summarized[check.label];
+      existingCheck.subRows.push(check);
+
+      if (check.status === "UNAVAILABLE") {
+        existingCheck.status = "UNAVAILABLE";
+      } else if (
+        check.status === "LIMITED" &&
+        existingCheck.status !== "UNAVAILABLE"
+      ) {
+        existingCheck.status = "LIMITED";
+      } else if (
+        check.status === "AVAILABLE" &&
+        existingCheck.status !== "UNAVAILABLE" &&
+        existingCheck.status !== "LIMITED"
+      ) {
+        existingCheck.status = "AVAILABLE";
+      }
+
+      if (dayjs(check.checked).isAfter(dayjs(existingCheck.checked))) {
+        existingCheck.checked = check.checked;
+      }
+    } else {
+      summarized[check.label] = check;
+    }
+  });
+
+  Object.values(summarized).forEach((item) => {
+    if (item.subRows) {
+      item.subRows = item.subRows.filter((subRow: any) => subRow !== item);
+    }
+  });
+
+  return Object.values(summarized);
+}
