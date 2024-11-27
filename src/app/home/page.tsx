@@ -143,7 +143,7 @@ export default function HomePage() {
     }
     // not all dependendies to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deployments]);
+  }, [deployments, isInitialLoad]);
 
   const getHealthStatuses = async (healthChecks: HealthChecksType) => {
     if (deployments.length > 0) {

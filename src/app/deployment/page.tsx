@@ -198,6 +198,8 @@ export default function DeploymentPage() {
     if (isInitialLoad && deployments.length > 0) {
       loadData();
     }
+    // not all dependendies to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deployments]);
 
   useEffect(() => {
@@ -216,7 +218,9 @@ export default function DeploymentPage() {
       const interval = setInterval(loadData, 2000);
       return () => clearInterval(interval);
     }
-  }, [deployments, pathname]);
+    // not all dependendies to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deployments, pathname, isInitialLoad]);
 
   useEffect(() => {
     const storeCheck = Object.values(healthChecks)
