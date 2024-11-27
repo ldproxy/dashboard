@@ -84,9 +84,6 @@ export default function DeploymentPage() {
       setDeployments(data);
       getMatchingDeployment(data);
     });
-
-    // getDeploymentId not included to avoid infinite loop
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [multipleDeployments]);
 
   const getMatchingDeployment = async (data) => {
@@ -201,8 +198,6 @@ export default function DeploymentPage() {
     if (isInitialLoad && deployments.length > 0) {
       loadData();
     }
-    // not all dependendies to avoid infinite loop
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deployments]);
 
   useEffect(() => {
@@ -221,8 +216,6 @@ export default function DeploymentPage() {
       const interval = setInterval(loadData, 2000);
       return () => clearInterval(interval);
     }
-    // not all dependendies to avoid infinite loop
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deployments, pathname]);
 
   useEffect(() => {
