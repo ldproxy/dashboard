@@ -125,20 +125,24 @@ export default function EntitiesPage() {
 
         <TabsContent value="overview">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {valueTypes.map((valueType) => (
-              <Summary
-                key={valueType}
-                main={valueType}
-                total={valueTypeCounts[valueType]}
-                onClick={() => {
-                  setTab(valueType);
-                }}
-                Icon={getIcon("Code")}
-                route={`${pathname}${
-                  deploymentId !== "" ? `?did=${deploymentId}` : ""
-                }#${valueType}`}
-              />
-            ))}
+            {valueTypes.length > 0 ? (
+              valueTypes.map((valueType) => (
+                <Summary
+                  key={valueType}
+                  main={valueType}
+                  total={valueTypeCounts[valueType]}
+                  onClick={() => {
+                    setTab(valueType);
+                  }}
+                  Icon={getIcon("Code")}
+                  route={`${pathname}${
+                    deploymentId !== "" ? `?did=${deploymentId}` : ""
+                  }#${valueType}`}
+                />
+              ))
+            ) : (
+              <span>Currently No Values</span>
+            )}
           </div>
         </TabsContent>
         {valueTypes.map((valueType) => (

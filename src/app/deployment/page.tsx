@@ -556,29 +556,31 @@ export default function DeploymentPage() {
           </div>
         </TabsContent>
         <TabsContent value="jobs">
-          {sortedJobs.length > 0
-            ? sortedJobs.map((job: Job) => (
-                <>
-                  <div
-                    className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
-                    style={{ marginBottom: "10px" }}
-                  >
-                    <JobInfo
-                      key={job.id}
-                      entity={job.entity}
-                      label={job.label}
-                      tilesets={job.details.tileSets}
-                      percent={job.percent}
-                      startedAt={job.startedAt}
-                      updatedAt={job.updatedAt}
-                      info={`${job.current}/${job.total}`}
-                      id={job.id}
-                    />
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>
-                </>
-              ))
-            : null}
+          {sortedJobs.length > 0 ? (
+            sortedJobs.map((job: Job) => (
+              <>
+                <div
+                  className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
+                  style={{ marginBottom: "10px" }}
+                >
+                  <JobInfo
+                    key={job.id}
+                    entity={job.entity}
+                    label={job.label}
+                    tilesets={job.details.tileSets}
+                    percent={job.percent}
+                    startedAt={job.startedAt}
+                    updatedAt={job.updatedAt}
+                    info={`${job.current}/${job.total}`}
+                    id={job.id}
+                  />
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>
+              </>
+            ))
+          ) : (
+            <span>Currently No Jobs</span>
+          )}
         </TabsContent>
         <TabsContent value="cfg">
           <div
