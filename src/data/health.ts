@@ -5,6 +5,13 @@ export interface InputCheck {
   duration: number;
   message?: string;
   sources?: { label: string; status: string }[];
+  /*
+  capabilities?: {
+    name: string;
+    healthy: boolean;
+    state: string;
+    message?: string;
+  }[]; */
 }
 
 export interface Check {
@@ -32,8 +39,8 @@ export interface Check {
 
 export const fetchedHealthChecks: { [key: string]: InputCheck } = {
   "app/crs": {
-    healty: false,
-    state: "LIMITED",
+    healthy: true,
+    state: "AVAILABLE",
     duration: 0,
     timestamp: "2024-02-15T17:56:36.681+01:00",
   },
@@ -42,6 +49,7 @@ export const fetchedHealthChecks: { [key: string]: InputCheck } = {
     state: "AVAILABLE",
     duration: 0,
     timestamp: "2024-02-15T17:56:36.681+01:00",
+    /*
     capabilities: [
       {
         name: "Capability1",
@@ -51,8 +59,8 @@ export const fetchedHealthChecks: { [key: string]: InputCheck } = {
       },
       {
         name: "Capability2",
-        healthy: false,
-        state: "UNAVAILABLE",
+        healthy: true,
+        state: "AVAILABLE",
         message: "System maintenance",
       },
     ],
@@ -66,12 +74,12 @@ export const fetchedHealthChecks: { [key: string]: InputCheck } = {
       },
       {
         name: "Component2",
-        healthy: false,
-        state: "UNAVAILABLE",
+        healthy: true,
+        state: "AVAILABLE",
         message: "Component failure",
         capabilities: ["Capability2"],
       },
-    ],
+    ], */
   },
   "db.bergbau.pool.ConnectivityCheck": {
     healthy: true,
@@ -106,7 +114,7 @@ export const fetchedHealthChecks: { [key: string]: InputCheck } = {
       },
       {
         label: "S3[s3.ldproxy.net/bplan]",
-        status: "DEFECTIVE",
+        status: "HEALTHY",
       },
     ],
   },

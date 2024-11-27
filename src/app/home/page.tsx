@@ -149,7 +149,6 @@ export default function HomePage() {
     if (deployments.length > 0) {
       return deployments.map((deployment: Deployment) => {
         const checks = healthChecks[deployment.name];
-
         let healthStatus = "";
 
         if (checks && checks.length > 0) {
@@ -157,8 +156,13 @@ export default function HomePage() {
             healthStatus = "UNHEALTHY";
           } else if (checks.every((check) => check.state === "AVAILABLE")) {
             healthStatus = "HEALTHY";
-          } else if (checks.some((check) => check.state === "OFFLINE")) {
+          } else if (checks.every((check) => check.state === "OFFLINE")) {
             healthStatus = "OFFLINE";
+          } else if (
+            checks.some((check) => check.state === "OFFLINE") &&
+            checks.some((check) => check.state === "AVAILABLE")
+          ) {
+            healthStatus = "LIMITED";
           }
         } else {
           healthStatus = "OFFLINE";
@@ -236,7 +240,7 @@ export default function HomePage() {
                           .filter((item) => typeof item.version === "string")
                           .map((item) => ({
                             version: item.version,
-                            apiUrl: item.apiUrl,
+                            apiUrl: item.url,
                           }))
                       : []
                   }

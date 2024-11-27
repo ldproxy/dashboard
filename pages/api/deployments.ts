@@ -20,10 +20,22 @@ export const deployments = [
   },
 
   {
-    name: "ldproxy 7082",
+    name: "Offline",
     apiUrl: ["http://localhost:7082/api"],
     url: "http://localhost:7082/deployment",
     id: "2",
+  },
+  {
+    name: "Healthy",
+    apiUrl: ["http://localhost:3000/api"],
+    url: "http://localhost:3000/deployment",
+    id: "5",
+  },
+  {
+    name: "Limited",
+    apiUrl: ["http://localhost:3000/api", "http://localhost:7082/api"],
+    url: "http://localhost:3000/deployment",
+    id: "6",
   },
 ];
 

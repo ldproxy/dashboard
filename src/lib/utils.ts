@@ -97,7 +97,7 @@ function calculateDaysBetweenDates(begin: number, end: number): number {
 export const getHealthChecks = async (API_URL?: string) => {
   let apiUrl: string[] = [];
   if (API_URL) {
-    apiUrl = API_URL;
+    apiUrl = Array.isArray(API_URL) ? API_URL : [API_URL];
   } else {
     apiUrl = await GetApiUrl();
   }
@@ -108,32 +108,37 @@ export const getHealthChecks = async (API_URL?: string) => {
   try {
     const healthChecks = await Promise.all(
       apiUrl.map(async (url) => {
-        const response = await fetch(url + "/health");
-        if (!response.ok && response.status !== 500) {
-          console.error(
-            `API call failed with status: ${url}: ${response.status}`
-          );
-          return [];
+        try {
+          const response = await fetch(url + "/health");
+          if (!response.ok && response.status !== 500) {
+            console.error(
+              `API call failed with status: ${url}: ${response.status}`
+            );
+            return [{ state: "OFFLINE", url }];
+          }
+          const data = await response.json();
+          const mappedHealthChecks = Object.keys(data).map((name) => ({
+            name,
+            url,
+            ...data[name],
+            capabilities: data[name].capabilities
+              ? Object.keys(data[name].capabilities).map((cap) => ({
+                  name: cap,
+                  ...data[name].capabilities[cap],
+                }))
+              : undefined,
+            components: data[name].components
+              ? Object.keys(data[name].components).map((comp) => ({
+                  name: comp,
+                  ...data[name].components[comp],
+                }))
+              : undefined,
+          }));
+          return mappedHealthChecks;
+        } catch (error) {
+          console.error(`Error fetching health checks from ${url}:`, error);
+          return [{ state: "OFFLINE", url }];
         }
-        const data = await response.json();
-        const mappedHealthChecks = Object.keys(data).map((name) => ({
-          name,
-          url,
-          ...data[name],
-          capabilities: data[name].capabilities
-            ? Object.keys(data[name].capabilities).map((cap) => ({
-                name: cap,
-                ...data[name].capabilities[cap],
-              }))
-            : undefined,
-          components: data[name].components
-            ? Object.keys(data[name].components).map((comp) => ({
-                name: comp,
-                ...data[name].components[comp],
-              }))
-            : undefined,
-        }));
-        return mappedHealthChecks;
       })
     );
     return healthChecks.flat();
@@ -148,19 +153,20 @@ export const getHealthChecks = async (API_URL?: string) => {
 };
 
 export const getInfo = async (API_URL?: string) => {
-  let apiUrls: string[] = [];
+  let apiUrl: string[] = [];
   if (API_URL) {
-    apiUrls = API_URL;
+    apiUrl = Array.isArray(API_URL) ? API_URL : [API_URL];
   } else {
-    apiUrls = await GetApiUrl();
+    apiUrl = await GetApiUrl();
   }
-  if (apiUrls.length === 0) {
+  if (apiUrl.length === 0) {
     return [];
   }
+
   try {
     const info = await Promise.all(
-      apiUrls.map(async (apiUrl) => {
-        const response = await fetch(apiUrl + "/info");
+      apiUrl.map(async (aUrl) => {
+        const response = await fetch(aUrl + "/info");
         if (!response.ok && response.status !== 500) {
           console.error(`API call Info failed with status: ${response.status}`);
           return {
@@ -169,11 +175,11 @@ export const getInfo = async (API_URL?: string) => {
             status: "unknown",
             url: "",
             env: "unknown",
-            apiUrl,
+            aUrl,
           };
         }
         const data = await response.json();
-        return { ...data, apiUrl };
+        return { ...data, aUrl };
       })
     );
     return info;
@@ -191,26 +197,26 @@ export const getInfo = async (API_URL?: string) => {
         status: "unknown",
         url: "",
         env: "unknown",
-        apiUrl: "",
+        aUrl: "",
       },
     ];
   }
 };
 
 export const getMetrics = async (API_URL?: string) => {
-  let apiUrls: string[] = [];
+  let apiUrl: string[] = [];
   if (API_URL) {
-    apiUrls = API_URL;
+    apiUrl = Array.isArray(API_URL) ? API_URL : [API_URL];
   } else {
-    apiUrls = await GetApiUrl();
+    apiUrl = await GetApiUrl();
   }
-  if (apiUrls.length === 0) {
+  if (apiUrl.length === 0) {
     return [];
   }
 
   try {
     const metrics = await Promise.all(
-      apiUrls.map(async (url) => {
+      apiUrl.map(async (url) => {
         const response = await fetch(url + "/metrics");
         if (!response.ok && response.status !== 500) {
           console.error(`API call failed with status: ${response.status}`);

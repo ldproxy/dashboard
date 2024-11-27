@@ -62,6 +62,8 @@ export default function CustomersPage({
               ? "text-success"
               : health === "OFFLINE"
               ? "text-muted-foreground"
+              : health === "LIMITED"
+              ? "text-yellow-500"
               : "text-destructive"
           }`}
           style={{ fontSize: "1.25rem" }}
@@ -196,7 +198,7 @@ export default function CustomersPage({
                     {data.memory}
                   </span>
                 </div>
-                {data.apiUrl.length > 1 && (
+                {data && data.apiUrl && data.apiUrl.length > 1 && (
                   <div
                     style={{
                       display: "flex",
