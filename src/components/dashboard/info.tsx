@@ -10,7 +10,7 @@ import React from "react";
 import { filesize } from "filesize";
 import { GlobeIcon } from "@radix-ui/react-icons";
 
-interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
   versions: { version: string; apiUrl: string }[];
   uptimes: { uptime: number; apiUrl: string }[];

@@ -1,5 +1,5 @@
 import React from "react";
-import { Meta, Story } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react";
 import CustomersPage, {
   SummaryProps,
 } from "../../src/components/dashboard/summary";
@@ -10,7 +10,7 @@ export default {
   component: CustomersPage,
 } as Meta;
 
-const Template: Story<SummaryProps> = (args) => (
+const Template: StoryFn<SummaryProps> = (args) => (
   <div style={{ width: "300px", margin: "0 auto" }}>
     <CustomersPage {...args} />
   </div>
@@ -38,7 +38,7 @@ Unknown.args = {
 
 export const Overview = Template.bind({});
 Overview.args = {
-  total: "2",
+  total: 2,
   main: "Features",
   route: "/entities/details?did=3&id=services_testi",
   Icon: IdCardIcon,

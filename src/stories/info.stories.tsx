@@ -1,5 +1,5 @@
 import React from "react";
-import { Meta, Story } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react";
 import CustomersPage, {
   SummaryProps,
 } from "../../src/components/dashboard/info";
@@ -15,7 +15,7 @@ export default {
   component: CustomersPage,
 } as Meta;
 
-const Template: Story<SummaryProps> = (args) => <CustomersPage {...args} />;
+const Template: StoryFn<SummaryProps> = (args) => <CustomersPage {...args} />;
 
 export const Single = Template.bind({});
 Single.args = {

@@ -4,6 +4,7 @@ export interface InputInfoItem {
   url: string;
   env: string;
   status: string;
+  apiUrl: string;
 }
 
 export type InputInfo = InputInfoItem[];

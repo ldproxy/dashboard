@@ -9,7 +9,7 @@ import { getIcon } from "@/lib/icons";
 import { usePathname } from "next/navigation";
 import { getDeployments } from "@/lib/utils";
 
-interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   sections: SectionProps[];
 }
 

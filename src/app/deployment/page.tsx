@@ -31,7 +31,7 @@ import { Check } from "@/data/health";
 import { getIcon } from "@/lib/icons";
 import { Entity } from "@/data/entities";
 import { InputInfo } from "@/data/info";
-import { Metrics } from "@/data/metrics";
+import { Metrics, MetricsInfo } from "@/data/metrics";
 import { Jobs, Job } from "@/data/jobs";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { DevDeployment, autoRefreshInterval } from "@/data/constants";
@@ -46,7 +46,7 @@ import { Deployment } from "@/data/deployments";
 import { match } from "assert";
 
 type InfoType = { name: string; info: InputInfo }[];
-type MetricsType = { name: string; metrics: Metrics };
+type MetricsType = { name: string; metrics: MetricsInfo[] };
 type HealthChecksType = { [key: string]: Check[] };
 
 export default function DeploymentPage() {
@@ -55,7 +55,7 @@ export default function DeploymentPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [healthChecks, setHealthChecks] = useState<HealthChecksType>({});
   const [metrics, setMetrics] = useState<MetricsType[]>([
-    { name: "", metrics: { uptime: -1, memory: -1 } },
+    { name: "", metrics: [{ uptime: -1, memory: -1, apiUrl: "" }] },
   ]);
   const [info, setInfo] = useState<InfoType>([]);
   const [values, setValues] = useState([] as any[]);
@@ -66,7 +66,7 @@ export default function DeploymentPage() {
   const router = useRouter();
   let pathname = usePathname();
   const [deployments, setDeployments] = useState([
-    { name: "", url: "", apiUrl: "", id: "" },
+    { name: "", url: "", apiUrl: [""], id: "" },
   ] as Deployment[]);
   const [deploymentName, setDeploymentName] = useState("");
   const [deploymentId, setDeploymentId] = useState("");
@@ -86,22 +86,23 @@ export default function DeploymentPage() {
     });
   }, [multipleDeployments]);
 
-  const getMatchingDeployment = async (data) => {
+  const getMatchingDeployment = async (data: Deployment[]) => {
     const currentUrl = new URL(window.location.href);
     const queryParams = new URLSearchParams(currentUrl.search);
     const did = queryParams.get("did");
     const baseUrl = currentUrl.origin;
     const apiUrl = `${baseUrl}/api`;
-    let deployment = {};
+    let deployment: Deployment | {} = {};
     if (did) {
       setDeploymentId(did);
-      deployment = data.find((d) => d.id === did);
+      deployment = data.find((d) => d.id === did) || {};
     } else {
-      deployment = data.find((deployment: Deployment) =>
-        deployment.apiUrl.includes(apiUrl)
-      );
+      deployment =
+        data.find((deployment: Deployment) =>
+          deployment.apiUrl.includes(apiUrl)
+        ) || {};
     }
-    if (deployment && Object.keys(deployment).length > 0) {
+    if ("name" in deployment && Object.keys(deployment).length > 0) {
       setMatchingDelpoyment(deployment);
       setDeploymentName(deployment.name);
     }
@@ -113,10 +114,18 @@ export default function DeploymentPage() {
         const newInfo = await getInfo();
         if (newInfo.length > 0) {
           setInfo([
-            { name: matchingDeployment.name, info: newInfo as InputInfo },
+            {
+              name: (matchingDeployment as Deployment).name,
+              info: newInfo as InputInfo,
+            },
           ]);
         } else {
-          setInfo([{ name: matchingDeployment.name, info: [] as InputInfo }]);
+          setInfo([
+            {
+              name: (matchingDeployment as Deployment).name,
+              info: [] as InputInfo,
+            },
+          ]);
         }
       }
     } catch (error) {
@@ -128,7 +137,12 @@ export default function DeploymentPage() {
     try {
       if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
         const newMetrics = await getMetrics();
-        setMetrics([{ name: matchingDeployment.name, metrics: newMetrics }]);
+        setMetrics([
+          {
+            name: (matchingDeployment as Deployment).name,
+            metrics: newMetrics as MetricsInfo[],
+          },
+        ]);
       }
     } catch (error) {
       console.error("Error loading metrics:", error);
@@ -140,7 +154,8 @@ export default function DeploymentPage() {
       if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
         let healthChecksObj: HealthChecksType = {};
         const newHealthChecks = await getHealthChecks();
-        healthChecksObj[matchingDeployment.name] = newHealthChecks;
+        healthChecksObj[(matchingDeployment as Deployment).name] =
+          newHealthChecks;
         setHealthChecks(healthChecksObj);
         const healthStatuses = await getHealthStatuses(healthChecksObj);
         setHealthStatuses(healthStatuses);
@@ -152,7 +167,7 @@ export default function DeploymentPage() {
 
   const getHealthStatuses = async (healthChecks: HealthChecksType) => {
     if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
-      const checks = healthChecks[matchingDeployment.name];
+      const checks = healthChecks[(matchingDeployment as Deployment).name];
 
       let healthStatus = "";
 
@@ -168,7 +183,7 @@ export default function DeploymentPage() {
         healthStatus = "OFFLINE";
       }
 
-      return [{ name: matchingDeployment.name, healthStatus }];
+      return [{ name: (matchingDeployment as Deployment).name, healthStatus }];
     } else return null;
   };
 
@@ -353,9 +368,8 @@ export default function DeploymentPage() {
         {matchingDeployment &&
           Object.keys(matchingDeployment).length > 0 &&
           metrics &&
-          metrics.some(
-            (metric) =>
-              metric.metrics.uptime === -1 && metric.metrics.memory === -1
+          metrics.some((metric) =>
+            metric.metrics.some((m) => m.uptime === -1 && m.memory === -1)
           ) && (
             <div className="ml-auto">
               <ClipLoader color={"#123abc"} loading={true} size={20} />
@@ -404,18 +418,19 @@ export default function DeploymentPage() {
                 const deploymentInfo =
                   info &&
                   info.find((i) => {
-                    return i.name === matchingDeployment.name;
+                    return i.name === (matchingDeployment as Deployment).name;
                   });
 
                 const deploymentMetrics =
                   metrics &&
                   metrics.find((m) => {
-                    return m.name === matchingDeployment.name;
+                    return m.name === (matchingDeployment as Deployment).name;
                   });
                 const deploymentHealthStatus =
                   healthStatuses &&
-                  healthStatuses.find((h) => h.name === matchingDeployment.name)
-                    ?.healthStatus;
+                  healthStatuses.find(
+                    (h) => h.name === (matchingDeployment as Deployment).name
+                  )?.healthStatus;
 
                 console.log(
                   "deploymentInfoEntity",
@@ -428,7 +443,7 @@ export default function DeploymentPage() {
 
                 const infoComponent = (
                   <Info
-                    key={matchingDeployment.id}
+                    key={(matchingDeployment as Deployment).id}
                     name={
                       (deploymentInfo &&
                       Array.isArray(deploymentInfo.info) &&
@@ -438,8 +453,8 @@ export default function DeploymentPage() {
                             .replace("https://", "")
                             .replace("http://", "")
                             .replace(/\/$/, "") +
-                          (matchingDeployment.name
-                            ? ` (${matchingDeployment.name})`
+                          ((matchingDeployment as Deployment).name
+                            ? ` (${(matchingDeployment as Deployment).name})`
                             : "")
                         : "") || ""
                     }
@@ -493,7 +508,9 @@ export default function DeploymentPage() {
                 );
 
                 return deploymentHealthStatus === "OFFLINE" ? (
-                  <div key={matchingDeployment.id}>{infoComponent}</div>
+                  <div key={(matchingDeployment as Deployment).id}>
+                    {infoComponent}
+                  </div>
                 ) : (
                   infoComponent
                 );

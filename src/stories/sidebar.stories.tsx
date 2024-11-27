@@ -1,5 +1,5 @@
 import React from "react";
-import { Meta, Story } from "@storybook/react";
+import { Meta, StoryFn } from "@storybook/react";
 import { Sidebar, SidebarProps } from "../../src/components/dashboard/sidebar";
 import { PlayIcon, IdCardIcon, CodeIcon } from "@radix-ui/react-icons";
 
@@ -8,7 +8,7 @@ export default {
   component: Sidebar,
 } as Meta;
 
-const Template: Story<SidebarProps> = (args) => <Sidebar {...args} />;
+const Template: StoryFn<SidebarProps> = (args) => <Sidebar {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
