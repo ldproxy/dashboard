@@ -68,7 +68,17 @@ export function Section({ title, entries }: SectionProps) {
     }, [multipleDeployments, pathname]);
 
   if (isHomePage && multipleDeployments === "true") {
-    return;
+    return (
+      <span
+        style={{
+          marginLeft: "40px",
+          fontSize: "0.875rem",
+          color: "#4a4a4a",
+        }}
+      >
+        No Deployment Selected
+      </span>
+    );
   }
 
   return (

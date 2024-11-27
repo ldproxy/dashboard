@@ -55,3 +55,22 @@ Default.args = {
   id: "job-1",
   info: "Processing tiles",
 };
+
+export const Ready = Template.bind({});
+Ready.args = {
+  entity: "verwaltungseinheit",
+  tilesets: {
+    WebMercatorQuad: {
+      progress: {
+        percent: 100,
+      },
+      total: 5,
+    },
+  },
+  label: "Example Job",
+  percent: 100,
+  startedAt: 1620000000,
+  updatedAt: 1620001000,
+  id: "job-1",
+  info: "Processing tiles",
+};
