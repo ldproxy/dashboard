@@ -20,7 +20,9 @@ type HealthChecksType = { [key: string]: Check[] };
 export default function HomePage() {
   const [deployments, setDeployments] = useState([]);
   const [healthChecks, setHealthChecks] = useState<HealthChecksType>({});
-  const [metrics, setMetrics] = useState<MetricsType[]>([]);
+  const [metrics, setMetrics] = useState<MetricsType[]>([
+    { name: "", metrics: [{ uptime: 0, memory: 0, apiUrl: "" }] },
+  ]);
   const [info, setInfo] = useState<InfoType>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -240,7 +242,7 @@ export default function HomePage() {
                           .filter((item) => typeof item.version === "string")
                           .map((item) => ({
                             version: item.version,
-                            apiUrl: item.url,
+                            apiUrl: item.apiUrl,
                           }))
                       : []
                   }

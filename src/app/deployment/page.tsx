@@ -176,8 +176,13 @@ export default function DeploymentPage() {
           healthStatus = "UNHEALTHY";
         } else if (checks.every((check) => check.state === "AVAILABLE")) {
           healthStatus = "HEALTHY";
-        } else if (checks.some((check) => check.state === "OFFLINE")) {
+        } else if (checks.every((check) => check.state === "OFFLINE")) {
           healthStatus = "OFFLINE";
+        } else if (
+          checks.some((check) => check.state === "OFFLINE") &&
+          checks.some((check) => check.state === "AVAILABLE")
+        ) {
+          healthStatus = "LIMITED";
         }
       } else {
         healthStatus = "OFFLINE";

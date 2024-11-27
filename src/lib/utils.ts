@@ -153,43 +153,52 @@ export const getHealthChecks = async (API_URL?: string) => {
 };
 
 export const getInfo = async (API_URL?: string) => {
-  let apiUrl: string[] = [];
+  let apiUrls: string[] = [];
   if (API_URL) {
-    apiUrl = Array.isArray(API_URL) ? API_URL : [API_URL];
+    apiUrls = Array.isArray(API_URL) ? API_URL : [API_URL];
   } else {
-    apiUrl = await GetApiUrl();
+    apiUrls = await GetApiUrl();
   }
-  if (apiUrl.length === 0) {
+  if (apiUrls.length === 0) {
     return [];
   }
 
   try {
     const info = await Promise.all(
-      apiUrl.map(async (aUrl) => {
-        const response = await fetch(aUrl + "/info");
-        if (!response.ok && response.status !== 500) {
-          console.error(`API call Info failed with status: ${response.status}`);
+      apiUrls.map(async (apiUrl) => {
+        try {
+          const response = await fetch(apiUrl + "/info");
+          if (!response.ok && response.status !== 500) {
+            console.error(
+              `API call Info failed with status: ${response.status}`
+            );
+            return {
+              name: "unknown",
+              version: "unknown",
+              status: "unknown",
+              url: "",
+              env: "unknown",
+              apiUrl,
+            };
+          }
+          const data = await response.json();
+          return { ...data, apiUrl };
+        } catch (error) {
+          console.error(`Error fetching info from ${apiUrl}:`, error);
           return {
             name: "unknown",
             version: "unknown",
             status: "unknown",
             url: "",
             env: "unknown",
-            aUrl,
+            apiUrl,
           };
         }
-        const data = await response.json();
-        return { ...data, aUrl };
       })
     );
     return info;
   } catch (error) {
-    if (error instanceof TypeError && error.message === "Failed to fetch") {
-      console.error("Network error: Failed to fetch");
-    } else {
-      console.error("Error:", error);
-    }
-
+    console.error("Error:", error);
     return [
       {
         name: "unknown",
@@ -197,7 +206,7 @@ export const getInfo = async (API_URL?: string) => {
         status: "unknown",
         url: "",
         env: "unknown",
-        aUrl: "",
+        apiUrl: "unknown",
       },
     ];
   }
@@ -217,35 +226,30 @@ export const getMetrics = async (API_URL?: string) => {
   try {
     const metrics = await Promise.all(
       apiUrl.map(async (url) => {
-        const response = await fetch(url + "/metrics");
-        if (!response.ok && response.status !== 500) {
-          console.error(`API call failed with status: ${response.status}`);
+        try {
+          const response = await fetch(url + "/metrics");
+          if (!response.ok && response.status !== 500) {
+            console.error(`API call failed with status: ${response.status}`);
+            return { uptime: 0, memory: 0, apiUrl: url };
+          }
+          const data = await response.json();
+          return {
+            uptime: data.gauges["jvm.attribute.uptime"].value,
+            memory: data.gauges["jvm.memory.total.used"].value,
+            apiUrl: url,
+          };
+        } catch (error) {
+          console.error(`Error fetching metrics from ${url}:`, error);
           return { uptime: 0, memory: 0, apiUrl: url };
         }
-        const data = await response.json();
-        return {
-          uptime: data.gauges["jvm.attribute.uptime"].value,
-          memory: data.gauges["jvm.memory.total.used"].value,
-          apiUrl: url,
-        };
       })
     );
     return metrics;
   } catch (error) {
-    if (error instanceof TypeError && error.message === "Failed to fetch") {
-      console.error("Network error: Failed to fetch");
-    } else if (
-      error instanceof TypeError &&
-      error.message.includes("NetworkError")
-    ) {
-      console.error("Network error: Connection refused");
-    } else {
-      console.error("Error:", error);
-    }
-    return [{ uptime: 0, memory: 0, apiUrl: "" }];
+    console.error("Error:", error);
+    return [{ uptime: 0, memory: 0, apiUrl: "unknown" }];
   }
 };
-
 export const getJobs = async (API_URL?: string) => {
   const apiUrls = [API_URL];
   let apiUrl = apiUrls[0];
