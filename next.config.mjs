@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: process.env.STATIC_EXPORT === "true" ? "export" : undefined,
+  output: process.env.STATIC_EXPORT === "true" ? "export" : "standalone",
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
   images: {
     remotePatterns: [
       {
