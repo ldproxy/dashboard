@@ -4,7 +4,7 @@ import Summary from "@/components/dashboard/summary";
 import Info from "@/components/dashboard/info";
 import JobInfo from "@/components/dashboard/job-info";
 import { Button } from "@/components/shadcn-ui/button";
-import { ReloadIcon } from "@radix-ui/react-icons";
+import { ReloadIcon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import dayjs from "dayjs";
 import {
@@ -25,6 +25,7 @@ import {
   getJobs,
   sortCards,
   summarizeStoreCheck,
+  compareDataAcrossUrls,
 } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Check } from "@/data/health";
@@ -43,11 +44,15 @@ import { usePathname } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { getEntityCounts, getStateSummary } from "@/lib/entities";
 import { Deployment } from "@/data/deployments";
-import { match } from "assert";
 
 type InfoType = { name: string; info: InputInfo }[];
 type MetricsType = { name: string; metrics: MetricsInfo[] };
 type HealthChecksType = { [key: string]: Check[] };
+type NodesDifferent = {
+  entities: boolean;
+  values: boolean;
+  jobs: boolean;
+};
 
 export default function DeploymentPage() {
   const [tab, setTab] = useState("overview");
@@ -60,7 +65,6 @@ export default function DeploymentPage() {
   const [info, setInfo] = useState<InfoType>([]);
   const [values, setValues] = useState([] as any[]);
   const [tableData, setTableData] = useState([] as any[]);
-  const [storeState, setStoreState] = useState(true);
   const [cfg, setCfg] = useState<{}>({});
   const [hasError, setHasError] = useState(false);
   const router = useRouter();
@@ -76,6 +80,11 @@ export default function DeploymentPage() {
   >(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [matchingDeployment, setMatchingDelpoyment] = useState({});
+  const [nodesDifferent, setNodesDifferent] = useState<NodesDifferent>({
+    entities: false,
+    values: false,
+    jobs: false,
+  });
 
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 
@@ -203,6 +212,7 @@ export default function DeploymentPage() {
           loadEntities(),
           loadJobs(),
           loadValues(),
+          checkDifferences(),
           //loadCfg(),
         ]);
       } catch (error) {
@@ -232,6 +242,7 @@ export default function DeploymentPage() {
           loadEntities(),
           loadJobs(),
           loadValues(),
+          checkDifferences(),
           // loadCfg(),
         ]);
       };
@@ -359,7 +370,6 @@ export default function DeploymentPage() {
     console.log("totalSources:", totalSources);
     console.log("Jobs", jobs);
   }
-  // Following variables are only used for the footer of the entities summary
   const totalEntities = entities.length;
 
   const entityCounts = getEntityCounts(entities);
@@ -369,6 +379,35 @@ export default function DeploymentPage() {
   if (jobs.length > 0) {
     sortedJobs = sortCards(jobs);
   }
+
+  const checkDifferences = async () => {
+    const differences = await compareDataAcrossUrls();
+    const newNodesDifferent = { ...nodesDifferent };
+
+    if (differences.entitiesDifferent) {
+      newNodesDifferent.entities = true;
+    }
+    if (differences.valuesDifferent) {
+      newNodesDifferent.values = true;
+    }
+    if (differences.jobsDifferent) {
+      newNodesDifferent.jobs = true;
+    }
+
+    setNodesDifferent(newNodesDifferent);
+  };
+
+  const getWarningMessage = () => {
+    const keys = (
+      Object.keys(nodesDifferent) as Array<keyof NodesDifferent>
+    ).filter((key) => nodesDifferent[key]);
+    if (keys.length > 0) {
+      return `Warning: Differences detected in ${keys.join(
+        ", "
+      )} across different nodes (API URLs). This issue is likely temporary.`;
+    }
+    return null;
+  };
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
@@ -412,6 +451,13 @@ export default function DeploymentPage() {
             </TabsTrigger>*/}
           </TabsList>
         </div>
+
+        {getWarningMessage() && (
+          <div className="flex items-center space-x-2 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+            <ExclamationTriangleIcon className="h-5 w-5" />
+            <span>{getWarningMessage()}</span>
+          </div>
+        )}
 
         <TabsContent value="overview">
           <div

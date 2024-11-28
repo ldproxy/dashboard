@@ -449,3 +449,55 @@ export function summarizeStoreCheck(storeCheck: any[]): any[] {
 
   return Object.values(summarized);
 }
+
+const fetchDataFromAllUrls = async (endpoint: string) => {
+  const apiUrls: string[] = await GetApiUrl();
+
+  if (apiUrls.length === 0) {
+    return [];
+  }
+
+  try {
+    const data = await Promise.all(
+      apiUrls.map(async (url) => {
+        try {
+          const response = await fetch(`${url}/${endpoint}`);
+          if (!response.ok) {
+            console.error(`API call failed with status: ${response.status}`);
+            return null;
+          }
+          return await response.json();
+        } catch (error) {
+          console.error(`Error fetching data from ${url}:`, error);
+          return null;
+        }
+      })
+    );
+    return data.filter((item) => item !== null);
+  } catch (error) {
+    console.error("Error:", error);
+    return [];
+  }
+};
+
+export const compareDataAcrossUrls = async () => {
+  const entitiesData = await fetchDataFromAllUrls("entities");
+  const valuesData = await fetchDataFromAllUrls("values");
+  const jobsData = await fetchDataFromAllUrls("jobs");
+
+  const hasDifferences = (data: any[][]) => {
+    if (data.length <= 1) return false;
+    const [first, ...rest] = data;
+    return rest.some((item) => JSON.stringify(item) !== JSON.stringify(first));
+  };
+
+  const entitiesDifferent = hasDifferences(entitiesData);
+  const valuesDifferent = hasDifferences(valuesData);
+  const jobsDifferent = hasDifferences(jobsData);
+
+  return {
+    entitiesDifferent,
+    valuesDifferent,
+    jobsDifferent,
+  };
+};
