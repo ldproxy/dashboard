@@ -4,24 +4,22 @@ import { useEffect, useState } from "react";
 import { getDeployments, postDeployment } from "../../lib/utils";
 import { getIcon } from "@/lib/icons";
 import Link from "next/link";
-import { GetEntities, getHealthChecks, getInfo, getMetrics } from "@/lib/utils";
+import { getHealthChecks, getInfo, getAvailableNodes } from "@/lib/utils";
 import { Check } from "@/data/health";
 import { InputInfo } from "@/data/info";
-import { Metrics } from "@/data/metrics";
 import { Deployment } from "@/data/deployments";
-import Info from "@/components/dashboard/info";
+import Info from "@/components/dashboard/homeInfo";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
 
 type InfoType = { name: string; info: InputInfo }[];
-type MetricsType = { name: string; metrics: Metrics };
 type HealthChecksType = { [key: string]: Check[] };
 
 export default function HomePage() {
   const [deployments, setDeployments] = useState([]);
   const [healthChecks, setHealthChecks] = useState<HealthChecksType>({});
-  const [metrics, setMetrics] = useState<MetricsType[]>([
-    { name: "", metrics: [{ uptime: 0, memory: 0, apiUrl: "" }] },
+  const [availableNodes, setAvailableNodes] = useState([
+    { name: "", availableUrlsCount: 0 },
   ]);
   const [info, setInfo] = useState<InfoType>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -42,7 +40,6 @@ export default function HomePage() {
   useEffect(() => {
     getDeployments().then((data: any) => {
       setDeployments(data);
-      console.log("deployments", data);
     });
   }, []);
 
@@ -66,25 +63,6 @@ export default function HomePage() {
     }
   };
 
-  const loadMetrics = async () => {
-    try {
-      if (deployments.length > 0) {
-        const promises = deployments.map(async (deployment: any) => {
-          const newMetrics = await getMetrics(deployment.apiUrl);
-          return { name: deployment.name, metrics: newMetrics };
-        });
-        const results = await Promise.all(promises);
-        const filteredResults = results.filter(
-          (result): result is { name: string; metrics: Metrics } =>
-            result !== undefined
-        );
-        setMetrics(filteredResults);
-      }
-    } catch (error) {
-      console.error("Error loading metrics:", error);
-    }
-  };
-
   const loadHealthChecks = async () => {
     try {
       if (deployments.length > 0) {
@@ -100,13 +78,20 @@ export default function HomePage() {
               ":",
               error
             );
-            healthChecksObj[deployment.name] = [{ state: "OFFLINE" }];
+            healthChecksObj[deployment.name] = [
+              { state: "OFFLINE", url: deployment.url },
+            ];
           }
         });
         await Promise.all(promises);
         setHealthChecks(healthChecksObj);
         const healthStatuses = await getHealthStatuses(healthChecksObj);
+        const availableNodes = await getAvailableNodes(
+          healthChecksObj,
+          deployments
+        );
         setHealthStatuses(healthStatuses);
+        setAvailableNodes(availableNodes);
       }
     } catch (error) {
       console.error("Error loading health checks:", error);
@@ -117,7 +102,7 @@ export default function HomePage() {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        await Promise.all([loadHealthChecks(), loadInfo(), loadMetrics()]);
+        await Promise.all([loadHealthChecks(), loadInfo()]);
       } catch (error) {
         console.error(
           "Ein Fehler ist beim Laden der Daten aufgetreten:",
@@ -138,7 +123,7 @@ export default function HomePage() {
   useEffect(() => {
     if (!isInitialLoad) {
       const loadData = async () => {
-        await Promise.all([loadHealthChecks(), loadInfo(), loadMetrics()]);
+        await Promise.all([loadHealthChecks(), loadInfo()]);
       };
       const interval = setInterval(loadData, 2000);
       return () => clearInterval(interval);
@@ -202,21 +187,18 @@ export default function HomePage() {
                   return i.name === deployment.name;
                 });
 
-              const deploymentMetrics =
-                metrics &&
-                metrics.find((m) => {
-                  return m.name === deployment.name;
-                });
               const deploymentHealthStatus =
                 healthStatuses &&
                 healthStatuses.find((h) => h.name === deployment.name)
                   ?.healthStatus;
 
+              const availableNodesCount =
+                availableNodes.find((node) => node.name === deployment.name)
+                  ?.availableUrlsCount || 0;
+
               console.log(
                 "deploymentInfo",
                 deploymentInfo,
-                "deploymentMetrics",
-                deploymentMetrics,
                 "deploymentHealthStatus",
                 deploymentHealthStatus
               );
@@ -224,50 +206,20 @@ export default function HomePage() {
               const infoComponent = (
                 <Info
                   key={index}
-                  name={
-                    (deploymentInfo &&
+                  name={deployment.name ? ` ${deployment.name}` : ""}
+                  url={
+                    deploymentInfo &&
                     Array.isArray(deploymentInfo.info) &&
                     deploymentInfo.info.length > 0 &&
                     typeof deploymentInfo.info[0].url === "string"
                       ? deploymentInfo.info[0].url
                           .replace("https://", "")
                           .replace("http://", "")
-                          .replace(/\/$/, "") +
-                        (deployment.name ? ` (${deployment.name})` : "")
-                      : "") || ""
+                          .replace(/\/$/, "")
+                      : ""
                   }
-                  versions={
-                    deploymentInfo && Array.isArray(deploymentInfo.info)
-                      ? deploymentInfo.info
-                          .filter((item) => typeof item.version === "string")
-                          .map((item) => ({
-                            version: item.version,
-                            apiUrl: item.apiUrl,
-                          }))
-                      : []
-                  }
-                  uptimes={
-                    deploymentMetrics &&
-                    Array.isArray(deploymentMetrics.metrics)
-                      ? deploymentMetrics.metrics
-                          .filter((metric) => typeof metric.uptime === "number")
-                          .map((metric) => ({
-                            uptime: metric.uptime,
-                            apiUrl: metric.apiUrl,
-                          }))
-                      : []
-                  }
-                  memories={
-                    deploymentMetrics &&
-                    Array.isArray(deploymentMetrics.metrics)
-                      ? deploymentMetrics.metrics
-                          .filter((metric) => typeof metric.memory === "number")
-                          .map((metric) => ({
-                            memory: metric.memory,
-                            apiUrl: metric.apiUrl,
-                          }))
-                      : []
-                  }
+                  totalNodes={deployment.apiUrl.length}
+                  availableNodes={availableNodesCount}
                   health={
                     deploymentHealthStatus &&
                     typeof deploymentHealthStatus === "string"

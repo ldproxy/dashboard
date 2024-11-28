@@ -4,6 +4,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Deployment } from "@/data/deployments";
 import dayjs from "dayjs";
+import { HealthChecksType } from "../../src/app/deployment/page";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -500,4 +501,34 @@ export const compareDataAcrossUrls = async () => {
     valuesDifferent,
     jobsDifferent,
   };
+};
+
+export const getAvailableNodes = async (
+  healthChecks: HealthChecksType,
+  deployments: Deployment[]
+) => {
+  if (deployments.length > 0) {
+    const availableNodes = deployments.map((deployment: Deployment) => {
+      const checks = healthChecks[deployment.name];
+      const urlStateMap = new Map<string, boolean>();
+
+      checks.forEach((check) => {
+        if (check.state === "AVAILABLE") {
+          if (!urlStateMap.has(check.url)) {
+            urlStateMap.set(check.url, true);
+          }
+        } else {
+          urlStateMap.set(check.url, false);
+        }
+      });
+
+      const availableUrlsCount = Array.from(urlStateMap.values()).filter(
+        (isAvailable) => isAvailable
+      ).length;
+
+      return { name: deployment.name, availableUrlsCount };
+    });
+    return availableNodes;
+  }
+  return [];
 };

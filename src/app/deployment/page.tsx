@@ -47,7 +47,7 @@ import { Deployment } from "@/data/deployments";
 
 type InfoType = { name: string; info: InputInfo }[];
 type MetricsType = { name: string; metrics: MetricsInfo[] };
-type HealthChecksType = { [key: string]: Check[] };
+export type HealthChecksType = { [key: string]: Check[] };
 type NodesDifferent = {
   entities: boolean;
   values: boolean;
