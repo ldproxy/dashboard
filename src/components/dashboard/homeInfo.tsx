@@ -1,5 +1,4 @@
 import { IconProps } from "@radix-ui/react-icons/dist/types";
-import prettyMs from "pretty-ms";
 import {
   Card,
   CardContent,
@@ -7,8 +6,7 @@ import {
   CardTitle,
 } from "@/components/shadcn-ui/card";
 import React from "react";
-import { filesize } from "filesize";
-import { GlobeIcon } from "@radix-ui/react-icons";
+import { GlobeIcon, ExternalLinkIcon } from "@radix-ui/react-icons";
 
 export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
@@ -38,6 +36,14 @@ export default function CustomersPage({
   const cardClassName = `shadow-lg ${className} ${
     health === "OFFLINE" ? "opacity-50 pointer-events-none" : ""
   }`;
+
+  // Entfernen Sie den Slash am Ende der URL, falls vorhanden
+  const formattedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
+
+  const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    window.open(formattedUrl, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <Card className={cardClassName}>
@@ -73,29 +79,42 @@ export default function CustomersPage({
             className="flex flex-col items-start p-4"
             style={{ minWidth: "300px", minHeight: "100px" }}
           >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: "10px",
-              }}
-            >
-              <GlobeIcon
-                className="h-4 w-4 text-muted-foreground"
-                style={{ marginTop: "2px" }}
-              />
-              <span
+            {formattedUrl && (
+              <div
                 style={{
-                  color: "dimgray",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  marginLeft: "5px",
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom: "10px",
                 }}
               >
-                {url}
-              </span>
-            </div>
+                <GlobeIcon
+                  className="h-4 w-4 text-muted-foreground"
+                  style={{ marginTop: "2px" }}
+                />
+                <a
+                  href={formattedUrl}
+                  onClick={handleLinkClick}
+                  className="text-blue-500 hover:underline relative"
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                    marginLeft: "5px",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  {formattedUrl}
+                  <ExternalLinkIcon
+                    className="h-4 w-4 text-blue-500"
+                    style={{ marginLeft: "5px" }}
+                  />
+                  <span className="absolute left-0 bottom-full mb-1 hidden w-max bg-gray-700 text-white text-xs rounded py-1 px-2 z-10 group-hover:block">
+                    {formattedUrl}
+                  </span>
+                </a>
+              </div>
+            )}
             <div
               style={{
                 display: "flex",

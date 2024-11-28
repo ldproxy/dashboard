@@ -213,9 +213,6 @@ export default function HomePage() {
                     deploymentInfo.info.length > 0 &&
                     typeof deploymentInfo.info[0].url === "string"
                       ? deploymentInfo.info[0].url
-                          .replace("https://", "")
-                          .replace("http://", "")
-                          .replace(/\/$/, "")
                       : ""
                   }
                   totalNodes={deployment.apiUrl.length}
