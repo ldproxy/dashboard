@@ -243,6 +243,7 @@ export default function DeploymentPage() {
   }, [deployments, pathname, isInitialLoad]);
 
   useEffect(() => {
+    console.log("1234", healthChecks);
     const storeCheck = Object.values(healthChecks)
       .flat()
       .filter(
@@ -252,15 +253,19 @@ export default function DeploymentPage() {
           check.name.startsWith("app/") &&
           check.name !== "app/store/values2"
       )
-      .map(
-        (check) =>
-          check &&
-          check.name && {
+      .map((check) => {
+        if (check && check.name) {
+          const urlPart = check.url.match(/\/\/([^\/]+)/)?.[1] || "";
+          return {
             label: check.name.substring(4),
+            url: urlPart,
             status: check.state,
             checked: dayjs(check.timestamp).format("HH:mm:ss"),
-          }
-      );
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
     const summarizedStoreCheck = summarizeStoreCheck(storeCheck);
 
     setTableData(summarizedStoreCheck);

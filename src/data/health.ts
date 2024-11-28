@@ -16,6 +16,7 @@ export interface InputCheck {
 
 export interface Check {
   name?: string;
+  url: string;
   healthy?: boolean;
   state: string;
   timestamp?: string;

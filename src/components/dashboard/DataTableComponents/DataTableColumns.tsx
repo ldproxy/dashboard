@@ -5,7 +5,6 @@ import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/shadcn-ui/button";
 import { Badge } from "@/components/shadcn-ui/badge";
 import { ChevronRightIcon, ChevronDownIcon } from "@radix-ui/react-icons";
-import { summarizeHealthChecks } from "@/lib/utils";
 
 export type HealthCheck = {
   label: string;
@@ -13,6 +12,7 @@ export type HealthCheck = {
   checked: string;
   message: string;
   subRows: HealthCheck[];
+  url: string;
 };
 
 export const columns: ColumnDef<HealthCheck>[] = [
@@ -44,6 +44,9 @@ export const columns: ColumnDef<HealthCheck>[] = [
           </button>
         ) : (
           ""
+        )}
+        {row.depth > 0 && row.original.url && (
+          <span className="ml-2 text-gray-500">({row.original.url})</span>
         )}
       </div>
     ),
