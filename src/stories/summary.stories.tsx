@@ -4,6 +4,7 @@ import CustomersPage, {
   SummaryProps,
 } from "../../src/components/dashboard/summary";
 import { IdCardIcon } from "@radix-ui/react-icons";
+import StoryWrapper from "./StoryWrapper";
 
 export default {
   title: "Components/Summary",
@@ -11,11 +12,12 @@ export default {
 } as Meta;
 
 const Template: StoryFn<SummaryProps> = (args) => (
-  <div style={{ width: "300px", margin: "0 auto" }}>
-    <CustomersPage {...args} />
-  </div>
+  <StoryWrapper>
+    <div style={{ width: "300px", margin: "0 auto" }}>
+      <CustomersPage {...args} />
+    </div>
+  </StoryWrapper>
 );
-
 export const AVAILABLE = Template.bind({});
 AVAILABLE.args = {
   header: "AVAILABLE",

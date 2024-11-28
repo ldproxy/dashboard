@@ -3,14 +3,18 @@ import { Meta, StoryFn } from "@storybook/react";
 import CustomersPage, {
   SummaryProps,
 } from "../../src/components/dashboard/job-info";
+import StoryWrapper from "./StoryWrapper";
 
 export default {
   title: "Components/JobInfo",
   component: CustomersPage,
 } as Meta;
 
-const Template: StoryFn<SummaryProps> = (args) => <CustomersPage {...args} />;
-
+const Template: StoryFn<SummaryProps> = (args) => (
+  <StoryWrapper>
+    <CustomersPage {...args} />
+  </StoryWrapper>
+);
 export const Default = Template.bind({});
 Default.args = {
   entity: "verwaltungseinheit",

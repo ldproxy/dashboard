@@ -9,13 +9,18 @@ import {
   UploadIcon,
   DesktopIcon,
 } from "@radix-ui/react-icons";
+import StoryWrapper from "./StoryWrapper";
 
 export default {
   title: "Components/InfoBox",
   component: CustomersPage,
 } as Meta;
 
-const Template: StoryFn<SummaryProps> = (args) => <CustomersPage {...args} />;
+const Template: StoryFn<SummaryProps> = (args) => (
+  <StoryWrapper>
+    <CustomersPage {...args} />
+  </StoryWrapper>
+);
 
 export const Single = Template.bind({});
 Single.args = {
