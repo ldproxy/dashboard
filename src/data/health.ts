@@ -5,13 +5,12 @@ export interface InputCheck {
   duration: number;
   message?: string;
   sources?: { label: string; status: string }[];
-  /*
   capabilities?: {
     name: string;
     healthy: boolean;
     state: string;
     message?: string;
-  }[]; */
+  }[];
 }
 
 export interface Check {
@@ -34,7 +33,7 @@ export interface Check {
     healthy: boolean;
     state: string;
     message?: string;
-    capabilities: string[];
+    capabilities: [];
   }[];
 }
 
@@ -50,6 +49,9 @@ export const fetchedHealthChecks: { [key: string]: InputCheck } = {
     state: "AVAILABLE",
     duration: 0,
     timestamp: "2024-02-15T17:56:36.681+01:00",
+    capabilities: [
+      { name: "collections", healthy: false, state: "UNAVAILABLE" },
+    ],
     /*
     capabilities: [
       {

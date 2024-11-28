@@ -6,6 +6,7 @@ import {
   getHealthChecks,
   getJobs,
   sortCards,
+  summarizeStoreCheck,
 } from "@/lib/utils";
 import { ReloadIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
@@ -72,16 +73,20 @@ function CustomerPage() {
     if (healthChecks && entity) {
       const myCheck = healthChecks
         .filter(
-          (check) => check.name === `entities/${entity.type}/${entity.id}`
+          (check: Check) =>
+            check.name === `entities/${entity.type}/${entity.id}`
         )
         .flatMap((check) =>
           check.capabilities
             ? check.capabilities.map((cap) => ({
                 ...cap,
                 timestamp: check.timestamp,
+                url: check.url,
                 components: check.components
                   ? check.components
-                      .filter((comp) => comp.capabilities.includes(cap.name))
+                      .filter((comp) =>
+                        (comp.capabilities as string[]).includes(cap.name)
+                      )
                       .map((comp) => ({
                         ...comp,
                         capability: cap.name,
@@ -91,19 +96,25 @@ function CustomerPage() {
               }))
             : []
         )
-        .map((check) => ({
-          label: check.name,
-          status: check.state,
-          message: check.message,
-          checked: dayjs(check.timestamp).format("HH:mm:ss"),
-          subRows: check.components.map((comp) => ({
-            label: comp.name,
-            status: comp.state,
-            message: comp.message,
-            checked: "", //dayjs(check.timestamp).format("HH:mm:ss"),
-          })),
-        }));
-      setTableData(myCheck);
+        .map((check) => {
+          if (check && check.name && check.url) {
+            const urlPart = check.url.match(/\/\/([^\/]+)/)?.[1] || "";
+            return {
+              label: check.name,
+              url: urlPart,
+              status: check.state,
+              message: check.message,
+              checked: dayjs(check.timestamp).format("HH:mm:ss"),
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
+
+      const summarizedStoreCheck = summarizeStoreCheck(myCheck);
+
+      setTableData(summarizedStoreCheck);
+
       if (DevEntities) {
         console.log("myCheck:", myCheck);
       }

@@ -243,7 +243,6 @@ export default function DeploymentPage() {
   }, [deployments, pathname, isInitialLoad]);
 
   useEffect(() => {
-    console.log("1234", healthChecks);
     const storeCheck = Object.values(healthChecks)
       .flat()
       .filter(
