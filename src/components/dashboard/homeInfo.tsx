@@ -30,7 +30,6 @@ export default function CustomersPage({
   Icon,
   IconFooter1,
   IconFooter2,
-  IconFooter3,
   className,
 }: SummaryProps) {
   const cardClassName = `shadow-lg ${className} ${
@@ -136,7 +135,7 @@ export default function CustomersPage({
                   fontWeight: "bold",
                 }}
               >
-                Total Nodes:
+                Total Replicas:
               </span>
               <span
                 style={{
@@ -170,7 +169,7 @@ export default function CustomersPage({
                   fontWeight: "bold",
                 }}
               >
-                Available Nodes:
+                Available Replicas:
               </span>
               <span
                 style={{

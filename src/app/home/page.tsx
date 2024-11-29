@@ -166,7 +166,7 @@ export default function HomePage() {
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
-      <div className="flex items-center justify-between mb-9 mt-8">
+      <div className="flex items-center justify-between space-y-2">
         <h2 className="text-2xl font-semibold tracking-tight">Deployments</h2>
         {isLoading && (
           <div className="ml-auto mr-10">

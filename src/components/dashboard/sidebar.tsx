@@ -69,15 +69,16 @@ export function Section({ title, entries }: SectionProps) {
 
   if (isHomePage && multipleDeployments === "true") {
     return (
-      <span
+      <div
         style={{
-          marginLeft: "40px",
+          marginLeft: "30px",
+          marginTop: "10px",
           fontSize: "0.875rem",
           color: "#4a4a4a",
         }}
       >
         No Deployment Selected
-      </span>
+      </div>
     );
   }
 

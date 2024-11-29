@@ -24,7 +24,7 @@ export const columns: ColumnDef<CombinedData>[] = [
       return (
         <Button variant="ghost">
           <GlobeIcon className="h-4 w-4 inline mr-2" />
-          Instance
+          Replica
         </Button>
       );
     },
