@@ -29,9 +29,9 @@ export const columns: ColumnDef<HealthCheck>[] = [
         </Button>
       );
     },
-    cell: ({ row, getValue }) => (
+    cell: ({ row }) => (
       <div className={`${row.depth === 0 ? "ml-4 flex items-center" : "ml-8"}`}>
-        {getValue<string>()}{" "}
+        {row.depth === 0 ? row.original.label : row.original.url}{" "}
         {row.getCanExpand() ? (
           <button
             {...{
@@ -44,9 +44,6 @@ export const columns: ColumnDef<HealthCheck>[] = [
           </button>
         ) : (
           ""
-        )}
-        {row.depth > 0 && row.original.url && (
-          <span className="ml-2 text-gray-500">({row.original.url})</span>
         )}
       </div>
     ),
