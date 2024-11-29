@@ -1,4 +1,6 @@
 import { IconProps } from "@radix-ui/react-icons/dist/types";
+import { columns } from "@/components/dashboard/DataTableComponents/ColumnsInfoBox";
+import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import prettyMs from "pretty-ms";
 import {
   Card,
@@ -8,7 +10,6 @@ import {
 } from "@/components/shadcn-ui/card";
 import React from "react";
 import { filesize } from "filesize";
-import { GlobeIcon } from "@radix-ui/react-icons";
 
 export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
@@ -55,184 +56,28 @@ export default function CustomersPage({
 
   return (
     <Card className={cardClassName}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle
-          className={`text-sm font-semibold ${
-            health === "ACTIVE" || health === "true" || health === "HEALTHY"
-              ? "text-success"
-              : health === "OFFLINE"
-              ? "text-muted-foreground"
-              : health === "LIMITED"
-              ? "text-yellow-500"
-              : "text-destructive"
-          }`}
-          style={{ fontSize: "1.25rem" }}
-        >
-          {health}
-        </CardTitle>
-        {Icon ? <Icon className="h-4 w-4 text-muted-foreground" /> : null}
-      </CardHeader>
-      <CardContent className="flex justify-between items-center">
-        <div
-          className="text-2xl font-bold break-normal"
-          style={{
-            marginBottom: "3px",
-            width: "65%",
-          }}
-        >
-          {name}
-        </div>
-        <div style={{ width: "100%", marginTop: "-30px" }}>
-          <div
-            className={`grid gap-12 ${
-              combinedData.length === 1
-                ? "grid-cols-1 place-items-center"
-                : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+      <CardHeader className="flex flex-col items-start space-y-2 pb-2  mb-5">
+        <div className="flex flex-row items-center justify-between w-full">
+          <CardTitle
+            className={`text-sm font-semibold mb-2 ${
+              health === "ACTIVE" || health === "true" || health === "HEALTHY"
+                ? "text-success"
+                : health === "OFFLINE"
+                ? "text-muted-foreground"
+                : health === "LIMITED"
+                ? "text-yellow-500"
+                : "text-destructive"
             }`}
+            style={{ fontSize: "1.25rem" }}
           >
-            {combinedData.map((data, index) => (
-              <div
-                key={index}
-                className="flex flex-col items-start p-4"
-                style={{ minWidth: "300px", minHeight: "100px" }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: "10px",
-                  }}
-                >
-                  {IconFooter3 ? (
-                    <IconFooter3
-                      className="h-4 w-4 text-muted-foreground"
-                      style={{ marginRight: "5px", marginTop: "2px" }}
-                    />
-                  ) : null}
-                  <span
-                    style={{
-                      color: "dimgray",
-                      width: "80px",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Version:
-                  </span>
-                  <span
-                    style={{
-                      color: "dimgray",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {data.version}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: "10px",
-                  }}
-                >
-                  {IconFooter1 ? (
-                    <IconFooter1
-                      className="h-4 w-4 text-muted-foreground"
-                      style={{ marginRight: "5px", marginTop: "2px" }}
-                    />
-                  ) : null}
-                  <span
-                    style={{
-                      color: "dimgray",
-                      width: "80px",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Uptime:
-                  </span>
-                  <span
-                    style={{
-                      color: "dimgray",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {data.uptime}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: "10px",
-                  }}
-                >
-                  {IconFooter2 ? (
-                    <IconFooter2
-                      className="h-4 w-4 text-muted-foreground"
-                      style={{ marginRight: "5px", marginTop: "2px" }}
-                    />
-                  ) : null}
-                  <span
-                    style={{
-                      color: "dimgray",
-                      width: "80px",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Memory:
-                  </span>
-                  <span
-                    style={{
-                      color: "dimgray",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {data.memory}
-                  </span>
-                </div>
-                {data && data.apiUrl && data.apiUrl.length > 1 && (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: "dimgray",
-                        width: "50px",
-                        fontSize: "14px",
-                        fontWeight: "bold",
-                        marginRight: "2px",
-                      }}
-                    >
-                      <GlobeIcon className="h-4 w-4 inline" />
-                    </span>
-                    <span
-                      style={{
-                        color: "dimgray",
-                        fontSize: "14px",
-                        fontWeight: "bold",
-                        marginLeft: "-30px",
-                      }}
-                    >
-                      {data.apiUrl}
-                    </span>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+            {health}
+          </CardTitle>
+          {Icon ? <Icon className="h-4 w-4 text-muted-foreground" /> : null}
         </div>
+        <div className="text-2xl font-bold break-normal">{name}</div>
+      </CardHeader>
+      <CardContent className="w-full">
+        <DataTable columns={columns} data={combinedData} />
       </CardContent>
     </Card>
   );
