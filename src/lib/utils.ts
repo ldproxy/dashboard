@@ -484,7 +484,6 @@ const fetchDataFromAllUrls = async (endpoint: string) => {
 export const compareDataAcrossUrls = async () => {
   const entitiesData = await fetchDataFromAllUrls("entities");
   const valuesData = await fetchDataFromAllUrls("values");
-  const jobsData = await fetchDataFromAllUrls("jobs");
 
   const hasDifferences = (data: any[][]) => {
     if (data.length <= 1) return false;
@@ -494,12 +493,10 @@ export const compareDataAcrossUrls = async () => {
 
   const entitiesDifferent = hasDifferences(entitiesData);
   const valuesDifferent = hasDifferences(valuesData);
-  const jobsDifferent = hasDifferences(jobsData);
 
   return {
     entitiesDifferent,
     valuesDifferent,
-    jobsDifferent,
   };
 };
 

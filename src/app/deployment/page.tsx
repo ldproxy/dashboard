@@ -48,10 +48,9 @@ import { Deployment } from "@/data/deployments";
 type InfoType = { name: string; info: InputInfo }[];
 type MetricsType = { name: string; metrics: MetricsInfo[] };
 export type HealthChecksType = { [key: string]: Check[] };
-type NodesDifferent = {
+export type NodesDifferent = {
   entities: boolean;
   values: boolean;
-  jobs: boolean;
 };
 
 export default function DeploymentPage() {
@@ -83,7 +82,6 @@ export default function DeploymentPage() {
   const [nodesDifferent, setNodesDifferent] = useState<NodesDifferent>({
     entities: false,
     values: false,
-    jobs: false,
   });
 
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
@@ -390,9 +388,6 @@ export default function DeploymentPage() {
     if (differences.valuesDifferent) {
       newNodesDifferent.values = true;
     }
-    if (differences.jobsDifferent) {
-      newNodesDifferent.jobs = true;
-    }
 
     setNodesDifferent(newNodesDifferent);
   };
@@ -403,8 +398,8 @@ export default function DeploymentPage() {
     ).filter((key) => nodesDifferent[key]);
     if (keys.length > 0) {
       return `Warning: Differences detected in ${keys.join(
-        ", "
-      )} across different nodes (API URLs). This issue is likely temporary.`;
+        " and "
+      )} across different replicas. This issue is likely temporary.`;
     }
     return null;
   };
