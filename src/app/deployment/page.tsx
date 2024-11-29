@@ -495,18 +495,10 @@ export default function DeploymentPage() {
                   <Info
                     key={(matchingDeployment as Deployment).id}
                     name={
-                      (deploymentInfo &&
-                      Array.isArray(deploymentInfo.info) &&
-                      deploymentInfo.info.length > 0 &&
-                      typeof deploymentInfo.info[0].url === "string"
-                        ? deploymentInfo.info[0].url
-                            .replace("https://", "")
-                            .replace("http://", "")
-                            .replace(/\/$/, "") +
-                          ((matchingDeployment as Deployment).name
-                            ? ` (${(matchingDeployment as Deployment).name})`
-                            : "")
-                        : "") || ""
+                      matchingDeployment &&
+                      (matchingDeployment as Deployment).name
+                        ? ` ${(matchingDeployment as Deployment).name}`
+                        : ""
                     }
                     versions={
                       deploymentInfo && Array.isArray(deploymentInfo.info)
@@ -548,6 +540,14 @@ export default function DeploymentPage() {
                       deploymentHealthStatus &&
                       typeof deploymentHealthStatus === "string"
                         ? deploymentHealthStatus
+                        : ""
+                    }
+                    infoUrl={
+                      deploymentInfo &&
+                      Array.isArray(deploymentInfo.info) &&
+                      deploymentInfo.info.length > 0 &&
+                      typeof deploymentInfo.info[0].url === "string"
+                        ? deploymentInfo.info[0].url
                         : ""
                     }
                     IconFooter1={getIcon("Clock")}

@@ -36,7 +36,6 @@ export default function CustomersPage({
     health === "OFFLINE" ? "opacity-50 pointer-events-none" : ""
   }`;
 
-  // Entfernen Sie den Slash am Ende der URL, falls vorhanden
   const formattedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
 
   const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
