@@ -70,49 +70,53 @@ export default function CustomersPage({
             width: "65%",
           }}
         >
-          {name}
+          <div style={{ marginBottom: "5px" }}>{name}</div>
+          {formattedUrl && (
+            <div className="text-2xl font-bold break-normal">
+              <a
+                href={formattedUrl}
+                onClick={handleLinkClick}
+                className="text-blue-500 hover:underline relative"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                {formattedUrl}
+                <ExternalLinkIcon
+                  className="h-4 w-4 text-blue-500"
+                  style={{ marginLeft: "5px" }}
+                />
+                <span className="absolute left-0 bottom-full mb-1 hidden w-max bg-gray-700 text-white text-xs rounded py-1 px-2 z-10 group-hover:block">
+                  {formattedUrl}
+                </span>
+              </a>
+            </div>
+          )}
         </div>
         <div style={{ width: "100%", marginTop: "-30px" }}>
           <div
             className="flex flex-col items-start p-4"
             style={{ minWidth: "300px", minHeight: "100px" }}
           >
-            {formattedUrl && (
-              <div
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: "10px",
+              }}
+            >
+              <span
                 style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: "10px",
+                  fontSize: "1.5rem",
+                  fontWeight: "bold",
+                  marginTop: "-20px",
                 }}
               >
-                <GlobeIcon
-                  className="h-4 w-4 text-muted-foreground"
-                  style={{ marginTop: "2px" }}
-                />
-                <a
-                  href={formattedUrl}
-                  onClick={handleLinkClick}
-                  className="text-blue-500 hover:underline relative"
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    marginLeft: "5px",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  {formattedUrl}
-                  <ExternalLinkIcon
-                    className="h-4 w-4 text-blue-500"
-                    style={{ marginLeft: "5px" }}
-                  />
-                  <span className="absolute left-0 bottom-full mb-1 hidden w-max bg-gray-700 text-white text-xs rounded py-1 px-2 z-10 group-hover:block">
-                    {formattedUrl}
-                  </span>
-                </a>
-              </div>
-            )}
+                Replicas:
+              </span>
+            </div>
             <div
               style={{
                 display: "flex",
@@ -134,7 +138,7 @@ export default function CustomersPage({
                   fontWeight: "bold",
                 }}
               >
-                Total Replicas:
+                Total:
               </span>
               <span
                 style={{
@@ -168,7 +172,7 @@ export default function CustomersPage({
                   fontWeight: "bold",
                 }}
               >
-                Available Replicas:
+                Available:
               </span>
               <span
                 style={{
