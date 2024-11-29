@@ -31,9 +31,6 @@ export default function CustomersPage({
   memories = [],
   health,
   Icon,
-  IconFooter1,
-  IconFooter2,
-  IconFooter3,
   className,
 }: SummaryProps) {
   const formattedMemories = memories.map((memory) =>

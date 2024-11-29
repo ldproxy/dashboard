@@ -44,4 +44,5 @@ Overview.args = {
   main: "Features",
   route: "/entities/details?did=3&id=services_testi",
   Icon: IdCardIcon,
+  footer: "2 available 1 limited 2 unavailable",
 };

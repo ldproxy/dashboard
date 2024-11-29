@@ -53,9 +53,6 @@ Multi2.args = {
     { memory: 1024 * 1024 * 1024, apiUrl: "http://localhost:7081/api" },
   ],
   health: "UNHEALTHY",
-  IconFooter1: ClockIcon,
-  IconFooter2: UploadIcon,
-  IconFooter3: DesktopIcon,
   className: "hover:bg-gray-100 transition-colors duration-200",
 };
 
@@ -78,9 +75,6 @@ Multi3.args = {
     { memory: 1024 * 1024 * 1024, apiUrl: "http://localhost:7081/api" },
   ],
   health: "UNHEALTHY",
-  IconFooter1: ClockIcon,
-  IconFooter2: UploadIcon,
-  IconFooter3: DesktopIcon,
   className: "hover:bg-gray-100 transition-colors duration-200",
 };
 
@@ -106,8 +100,5 @@ Multi4.args = {
     { memory: 1024 * 1024 * 1024, apiUrl: "http://localhost:7081/api" },
   ],
   health: "UNHEALTHY",
-  IconFooter1: ClockIcon,
-  IconFooter2: UploadIcon,
-  IconFooter3: DesktopIcon,
   className: "hover:bg-gray-100 transition-colors duration-200",
 };
