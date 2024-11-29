@@ -223,9 +223,8 @@ export default function HomePage() {
                       ? deploymentHealthStatus
                       : ""
                   }
-                  IconFooter1={getIcon("Clock")}
-                  IconFooter2={getIcon("Upload")}
-                  IconFooter3={getIcon("Desktop")}
+                  IconFooter1={getIcon("InfoCircled")}
+                  IconFooter2={getIcon("CheckCircled")}
                   className="hover:bg-gray-100 transition-colors duration-200"
                 />
               );

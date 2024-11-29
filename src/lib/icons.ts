@@ -8,6 +8,8 @@ import {
   ClockIcon,
   DesktopIcon,
   HomeIcon,
+  InfoCircledIcon,
+  CheckCircledIcon,
 } from "@radix-ui/react-icons";
 import { IconProps } from "@radix-ui/react-icons/dist/types";
 
@@ -20,6 +22,8 @@ export const icons = {
   Clock: "Clock",
   Desktop: "Desktop",
   Home: "Home",
+  InfoCircled: "InfoCircled",
+  CheckCircled: "CheckCircled",
 };
 
 export const getIcon = (
@@ -42,6 +46,10 @@ export const getIcon = (
       return DesktopIcon;
     case icons.Home:
       return HomeIcon;
+    case icons.InfoCircled:
+      return InfoCircledIcon;
+    case icons.CheckCircled:
+      return CheckCircledIcon;
     default:
       return undefined;
   }
