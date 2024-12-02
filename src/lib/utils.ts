@@ -503,29 +503,42 @@ export const compareDataAcrossUrls = async () => {
 export const getAvailableNodes = async (
   healthChecks: HealthChecksType,
   deployments: Deployment[]
-) => {
-  if (deployments.length > 0) {
-    const availableNodes = deployments.map((deployment: Deployment) => {
-      const checks = healthChecks[deployment.name];
-      const urlStateMap = new Map<string, boolean>();
+): Promise<{ name: string; availableUrlsCount: number }[]> => {
+  return deployments.map((deployment: Deployment) => {
+    const uniqueUrls = new Set<string>();
+    const checks = healthChecks[deployment.name];
 
-      checks.forEach((check) => {
-        if (check.state === "AVAILABLE") {
-          if (!urlStateMap.has(check.url)) {
-            urlStateMap.set(check.url, true);
-          }
-        } else {
-          urlStateMap.set(check.url, false);
-        }
-      });
-
-      const availableUrlsCount = Array.from(urlStateMap.values()).filter(
-        (isAvailable) => isAvailable
-      ).length;
-
-      return { name: deployment.name, availableUrlsCount };
+    checks.forEach((check) => {
+      if (check.state !== "OFFLINE") {
+        uniqueUrls.add(check.url);
+      }
     });
-    return availableNodes;
-  }
-  return [];
+
+    return { name: deployment.name, availableUrlsCount: uniqueUrls.size };
+  });
+};
+
+export const getAvailableNodesCount = (
+  healthChecks: HealthChecksType,
+  deployments: Deployment[]
+): { name: string; availableUrlsCount: number }[] => {
+  return deployments.map((deployment: Deployment) => {
+    const checks = healthChecks[deployment.name];
+    const urlStateMap = new Map<string, boolean>();
+
+    checks.forEach((check) => {
+      if (!urlStateMap.has(check.url)) {
+        urlStateMap.set(check.url, check.state === "AVAILABLE");
+      } else if (check.state !== "AVAILABLE") {
+        urlStateMap.set(check.url, false);
+      }
+    });
+
+    const availableUrlsCount = Array.from(urlStateMap.values()).filter(
+      (isAvailable) => isAvailable
+    ).length;
+
+    console.log("availableUrlsCount", deployment.name, availableUrlsCount);
+    return { name: deployment.name, availableUrlsCount };
+  });
 };

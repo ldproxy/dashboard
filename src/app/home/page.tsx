@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import { getDeployments, postDeployment } from "../../lib/utils";
 import { getIcon } from "@/lib/icons";
 import Link from "next/link";
-import { getHealthChecks, getInfo, getAvailableNodes } from "@/lib/utils";
+import {
+  getHealthChecks,
+  getInfo,
+  getAvailableNodes,
+  getAvailableNodesCount,
+} from "@/lib/utils";
 import { Check } from "@/data/health";
 import { InputInfo } from "@/data/info";
 import { Deployment } from "@/data/deployments";
@@ -26,6 +31,9 @@ export default function HomePage() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [healthStatuses, setHealthStatuses] = useState<
     { name: string; healthStatus: string }[] | null
+  >(null);
+  const [healthyNodes, setHealthyNodes] = useState<
+    { name: string; availableUrlsCount: number }[] | null
   >(null);
 
   const router = useRouter();
@@ -90,8 +98,13 @@ export default function HomePage() {
           healthChecksObj,
           deployments
         );
+        const healthyNodes = await getAvailableNodesCount(
+          healthChecksObj,
+          deployments
+        );
         setHealthStatuses(healthStatuses);
         setAvailableNodes(availableNodes);
+        setHealthyNodes(healthyNodes);
       }
     } catch (error) {
       console.error("Error loading health checks:", error);
@@ -139,9 +152,7 @@ export default function HomePage() {
         let healthStatus = "";
 
         if (checks && checks.length > 0) {
-          if (checks.some((check) => check.state === "UNAVAILABLE")) {
-            healthStatus = "UNHEALTHY";
-          } else if (checks.every((check) => check.state === "AVAILABLE")) {
+          if (checks.every((check) => check.state === "AVAILABLE")) {
             healthStatus = "HEALTHY";
           } else if (checks.every((check) => check.state === "OFFLINE")) {
             healthStatus = "OFFLINE";
@@ -150,6 +161,8 @@ export default function HomePage() {
             checks.some((check) => check.state === "AVAILABLE")
           ) {
             healthStatus = "LIMITED";
+          } else {
+            healthStatus = "AVAILABLE";
           }
         } else {
           healthStatus = "OFFLINE";
@@ -196,6 +209,12 @@ export default function HomePage() {
                 availableNodes.find((node) => node.name === deployment.name)
                   ?.availableUrlsCount || 0;
 
+              const healthyNodesCount =
+                (healthyNodes &&
+                  healthyNodes.find((node) => node.name === deployment.name)
+                    ?.availableUrlsCount) ||
+                0;
+
               console.log(
                 "deploymentInfo",
                 deploymentInfo,
@@ -217,7 +236,8 @@ export default function HomePage() {
                   }
                   totalNodes={deployment.apiUrl.length}
                   availableNodes={availableNodesCount}
-                  health={
+                  HealthyNodes={healthyNodesCount}
+                  healthStatus={
                     deploymentHealthStatus &&
                     typeof deploymentHealthStatus === "string"
                       ? deploymentHealthStatus
@@ -225,6 +245,7 @@ export default function HomePage() {
                   }
                   IconFooter1={getIcon("InfoCircled")}
                   IconFooter2={getIcon("CheckCircled")}
+                  IconFooter3={getIcon("QuestionMark")}
                   className="hover:bg-gray-100 transition-colors duration-200"
                 />
               );

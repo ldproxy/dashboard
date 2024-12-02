@@ -6,14 +6,15 @@ import {
   CardTitle,
 } from "@/components/shadcn-ui/card";
 import React from "react";
-import { GlobeIcon, ExternalLinkIcon } from "@radix-ui/react-icons";
+import { ExternalLinkIcon } from "@radix-ui/react-icons";
 
 export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
   url: string;
   totalNodes: number;
   availableNodes: number;
-  health: string;
+  healthStatus: string;
+  HealthyNodes: number;
   Icon?: React.FunctionComponent<IconProps>;
   IconFooter1?: React.FunctionComponent<IconProps>;
   IconFooter2?: React.FunctionComponent<IconProps>;
@@ -26,14 +27,16 @@ export default function CustomersPage({
   url,
   totalNodes,
   availableNodes,
-  health,
+  healthStatus,
+  HealthyNodes,
   Icon,
   IconFooter1,
   IconFooter2,
+  IconFooter3,
   className,
 }: SummaryProps) {
   const cardClassName = `shadow-lg ${className} ${
-    health === "OFFLINE" ? "opacity-50 pointer-events-none" : ""
+    healthStatus === "OFFLINE" ? "opacity-50 pointer-events-none" : ""
   }`;
 
   const formattedUrl = url.endsWith("/") ? url.slice(0, -1) : url;
@@ -48,17 +51,19 @@ export default function CustomersPage({
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle
           className={`text-sm font-semibold ${
-            health === "ACTIVE" || health === "true" || health === "HEALTHY"
+            healthStatus === "ACTIVE" ||
+            healthStatus === "true" ||
+            healthStatus === "HEALTHY"
               ? "text-success"
-              : health === "OFFLINE"
+              : healthStatus === "OFFLINE"
               ? "text-muted-foreground"
-              : health === "LIMITED"
+              : healthStatus === "LIMITED" || healthStatus === "AVAILABLE"
               ? "text-yellow-500"
               : "text-destructive"
           }`}
           style={{ fontSize: "1.25rem" }}
         >
-          {health}
+          {healthStatus}
         </CardTitle>
         {Icon ? <Icon className="h-4 w-4 text-muted-foreground" /> : null}
       </CardHeader>
@@ -104,7 +109,7 @@ export default function CustomersPage({
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
-                marginBottom: "10px",
+                marginBottom: "20px",
               }}
             >
               <span
@@ -161,6 +166,40 @@ export default function CustomersPage({
             >
               {IconFooter2 ? (
                 <IconFooter2
+                  className="h-4 w-4 text-muted-foreground"
+                  style={{ marginRight: "5px", marginTop: "2px" }}
+                />
+              ) : null}
+              <span
+                style={{
+                  color: "dimgray",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                }}
+              >
+                Healthy:
+              </span>
+              <span
+                style={{
+                  color: "dimgray",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  marginLeft: "5px",
+                }}
+              >
+                {HealthyNodes}
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: "10px",
+              }}
+            >
+              {IconFooter3 ? (
+                <IconFooter3
                   className="h-4 w-4 text-muted-foreground"
                   style={{ marginRight: "5px", marginTop: "2px" }}
                 />
