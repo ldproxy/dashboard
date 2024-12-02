@@ -83,7 +83,7 @@ export default function CustomersPage({
                 onClick={handleLinkClick}
                 className="text-blue-500 hover:underline relative"
                 style={{
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
                 }}
               >
