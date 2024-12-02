@@ -163,54 +163,13 @@ export const getInfo = async (API_URL?: string) => {
   if (apiUrls.length === 0) {
     return [];
   }
-
-  try {
-    const info = await Promise.all(
-      apiUrls.map(async (apiUrl) => {
-        try {
-          const response = await fetch(apiUrl + "/info");
-          if (!response.ok && response.status !== 500) {
-            console.error(
-              `API call Info failed with status: ${response.status}`
-            );
-            return {
-              name: "unknown",
-              version: "unknown",
-              status: "unknown",
-              url: "",
-              env: "unknown",
-              apiUrl,
-            };
-          }
-          const data = await response.json();
-          return { ...data, apiUrl };
-        } catch (error) {
-          console.error(`Error fetching info from ${apiUrl}:`, error);
-          return {
-            name: "unknown",
-            version: "unknown",
-            status: "unknown",
-            url: "",
-            env: "unknown",
-            apiUrl,
-          };
-        }
-      })
-    );
-    return info;
-  } catch (error) {
-    console.error("Error:", error);
-    return [
-      {
-        name: "unknown",
-        version: "unknown",
-        status: "unknown",
-        url: "",
-        env: "unknown",
-        apiUrl: "unknown",
-      },
-    ];
+  const response = await fetch(`/api/fetchInfo?apiUrls=${apiUrls.join(",")}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch info");
   }
+  const data = await response.json();
+
+  return data;
 };
 
 export const getMetrics = async (API_URL?: string) => {

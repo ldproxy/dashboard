@@ -24,8 +24,10 @@ Healthy.args = {
   url: "http://localhost:3000/",
   totalNodes: 3,
   availableNodes: 3,
-  health: "HEALTHY",
+  HealthyNodes: 3,
+  healthStatus: "HEALTHY",
   IconFooter1: getIcon("InfoCircled"),
   IconFooter2: getIcon("CheckCircled"),
+  IconFooter3: getIcon("QuestionMark"),
   className: "hover:bg-gray-100 transition-colors duration-200",
 };

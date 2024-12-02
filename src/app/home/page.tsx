@@ -57,7 +57,7 @@ export default function HomePage() {
         const promises = deployments.map(async (deployment: any) => {
           const newInfo = await getInfo(deployment.apiUrl);
 
-          if (newInfo.length > 0) {
+          if (newInfo && newInfo.length > 0) {
             return { name: deployment.name, info: newInfo as InputInfo };
           } else {
             return { name: deployment.name, info: [] as InputInfo };
