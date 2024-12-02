@@ -1,5 +1,4 @@
 "use client";
-import { Job } from "@/data/jobs";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Deployment } from "@/data/deployments";
@@ -70,23 +69,14 @@ export const GetEntities = async (API_URL?: string) => {
     const apiUrls = await GetApiUrl();
     apiUrl = apiUrls[0];
   }
-  try {
-    const response = await fetch(apiUrl + "/entities");
-    const data = await response.json();
-    const newMappedEntities = Object.keys(data)
-      .flatMap((type) =>
-        data[type].map((entity: any) => ({
-          type,
-          uid: `${type}_${entity.id}`,
-          ...entity,
-        }))
-      )
-      .filter((entity: any) => entity.status !== "DISABLED");
-    return newMappedEntities;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
+
+  const response = await fetch(`/api/fetchEntities?apiUrl=${apiUrl}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch Entities");
   }
+  const data = await response.json();
+
+  return data;
 };
 
 function calculateDaysBetweenDates(begin: number, end: number): number {
@@ -96,61 +86,22 @@ function calculateDaysBetweenDates(begin: number, end: number): number {
 }
 
 export const getHealthChecks = async (API_URL?: string) => {
-  let apiUrl: string[] = [];
+  let apiUrls: string[] = [];
   if (API_URL) {
-    apiUrl = Array.isArray(API_URL) ? API_URL : [API_URL];
+    apiUrls = Array.isArray(API_URL) ? API_URL : [API_URL];
   } else {
-    apiUrl = await GetApiUrl();
+    apiUrls = await GetApiUrl();
   }
-  if (apiUrl.length === 0) {
+  if (apiUrls.length === 0) {
     return [];
   }
+  const response = await fetch(`/api/fetchHealth?apiUrls=${apiUrls.join(",")}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch health");
+  }
+  const data = await response.json();
 
-  try {
-    const healthChecks = await Promise.all(
-      apiUrl.map(async (url) => {
-        try {
-          const response = await fetch(url + "/health");
-          if (!response.ok && response.status !== 500) {
-            console.error(
-              `API call failed with status: ${url}: ${response.status}`
-            );
-            return [{ state: "OFFLINE", url }];
-          }
-          const data = await response.json();
-          const mappedHealthChecks = Object.keys(data).map((name) => ({
-            name,
-            url,
-            ...data[name],
-            capabilities: data[name].capabilities
-              ? Object.keys(data[name].capabilities).map((cap) => ({
-                  name: cap,
-                  ...data[name].capabilities[cap],
-                }))
-              : undefined,
-            components: data[name].components
-              ? Object.keys(data[name].components).map((comp) => ({
-                  name: comp,
-                  ...data[name].components[comp],
-                }))
-              : undefined,
-          }));
-          return mappedHealthChecks;
-        } catch (error) {
-          console.error(`Error fetching health checks from ${url}:`, error);
-          return [{ state: "OFFLINE", url }];
-        }
-      })
-    );
-    return healthChecks.flat();
-  } catch (error) {
-    if (error instanceof TypeError && error.message === "Failed to fetch") {
-      console.error("Network error: Failed to fetch");
-    } else {
-      console.error("Error:", error);
-    }
-    return [];
-  }
+  return data;
 };
 
 export const getInfo = async (API_URL?: string) => {
@@ -173,43 +124,26 @@ export const getInfo = async (API_URL?: string) => {
 };
 
 export const getMetrics = async (API_URL?: string) => {
-  let apiUrl: string[] = [];
+  let apiUrls: string[] = [];
   if (API_URL) {
-    apiUrl = Array.isArray(API_URL) ? API_URL : [API_URL];
+    apiUrls = Array.isArray(API_URL) ? API_URL : [API_URL];
   } else {
-    apiUrl = await GetApiUrl();
+    apiUrls = await GetApiUrl();
   }
-  if (apiUrl.length === 0) {
+  if (apiUrls.length === 0) {
     return [];
   }
-
-  try {
-    const metrics = await Promise.all(
-      apiUrl.map(async (url) => {
-        try {
-          const response = await fetch(url + "/metrics");
-          if (!response.ok && response.status !== 500) {
-            console.error(`API call failed with status: ${response.status}`);
-            return { uptime: 0, memory: 0, apiUrl: url };
-          }
-          const data = await response.json();
-          return {
-            uptime: data.gauges["jvm.attribute.uptime"].value,
-            memory: data.gauges["jvm.memory.total.used"].value,
-            apiUrl: url,
-          };
-        } catch (error) {
-          console.error(`Error fetching metrics from ${url}:`, error);
-          return { uptime: 0, memory: 0, apiUrl: url };
-        }
-      })
-    );
-    return metrics;
-  } catch (error) {
-    console.error("Error:", error);
-    return [{ uptime: 0, memory: 0, apiUrl: "unknown" }];
+  const response = await fetch(
+    `/api/fetchMetrics?apiUrls=${apiUrls.join(",")}`
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch metrics");
   }
+  const data = await response.json();
+
+  return data;
 };
+
 export const getJobs = async (API_URL?: string) => {
   const apiUrls = [API_URL];
   let apiUrl = apiUrls[0];
@@ -217,33 +151,13 @@ export const getJobs = async (API_URL?: string) => {
     const apiUrls = await GetApiUrl();
     apiUrl = apiUrls[0];
   }
-  try {
-    const response = await fetch(apiUrl + "/jobs");
-    const data = await response.json();
-    return expandJobs(data.sets);
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
+  const response = await fetch(`/api/fetchJobs?apiUrl=${apiUrl}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch Jobs");
   }
-};
+  const data = await response.json();
 
-const expandJobs = (jobs: Job[] = []): Job[] => {
-  const allJobs = [...jobs];
-
-  for (const followUp of jobs.flatMap(expandJob)) {
-    if (!allJobs.some((job) => job.id === followUp.id)) {
-      allJobs.push(followUp);
-    }
-  }
-
-  return allJobs;
-};
-const expandJob = (job: Job): Job[] => {
-  if (job.followUps.length > 0) {
-    return [job, ...job.followUps.flatMap(expandJob)];
-  }
-
-  return [job];
+  return data;
 };
 
 export const getDeployments = async () => {
@@ -281,22 +195,13 @@ export const getValues = async (API_URL?: string) => {
     const apiUrls = await GetApiUrl();
     apiUrl = apiUrls[0];
   }
-  try {
-    const response = await fetch(apiUrl + "/values");
-    const data = await response.json();
-    return Object.keys(data).flatMap((type) =>
-      Array.isArray(data[type])
-        ? data[type].map((value: any) => ({
-            type,
-            uid: `${type}_${value.path}`,
-            ...value,
-          }))
-        : []
-    );
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
+  const response = await fetch(`/api/fetchValues?apiUrl=${apiUrl}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch Values");
   }
+  const data = await response.json();
+
+  return data;
 };
 
 export const getCfg = async (param: string) => {
@@ -417,27 +322,15 @@ const fetchDataFromAllUrls = async (endpoint: string) => {
     return [];
   }
 
-  try {
-    const data = await Promise.all(
-      apiUrls.map(async (url) => {
-        try {
-          const response = await fetch(`${url}/${endpoint}`);
-          if (!response.ok) {
-            console.error(`API call failed with status: ${response.status}`);
-            return null;
-          }
-          return await response.json();
-        } catch (error) {
-          console.error(`Error fetching data from ${url}:`, error);
-          return null;
-        }
-      })
-    );
-    return data.filter((item) => item !== null);
-  } catch (error) {
-    console.error("Error:", error);
-    return [];
+  const response = await fetch(
+    `/api/fetchFromAllUrls?apiUrls=${apiUrls.join(",")}&endpoint=${endpoint}`
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch data");
   }
+  const data = await response.json();
+
+  return data;
 };
 
 export const compareDataAcrossUrls = async () => {
