@@ -30,7 +30,32 @@ BaseHealth.args = {
       status: "AVAILABLE",
       checked: "12:36:14",
       message: "",
-      subRows: [],
+      subRows: [
+        {
+          label: "crs",
+          url: "localhost:3000",
+          status: "AVAILABLE",
+          checked: "17:56:36",
+          message: "",
+          subRows: [],
+        },
+        {
+          label: "crs",
+          url: "localhost:7081",
+          status: "AVAILABLE",
+          checked: "10:36:54",
+          message: "",
+          subRows: [],
+        },
+        {
+          label: "crs",
+          url: "localhost:3000",
+          status: "AVAILABLE",
+          checked: "17:56:36",
+          message: "",
+          subRows: [],
+        },
+      ],
     },
     {
       label: "store/resources",
