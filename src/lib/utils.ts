@@ -248,21 +248,6 @@ export const deleteConfig = async (name: string) => {
 };
 
 export const getValues = async (API_URL?: string) => {
-  let apiUrl = API_URL;
-  if (!apiUrl) {
-    apiUrl = await GetApiUrl();
-  }
-  try {
-    const response = await fetch(apiUrl + "/values");
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-};
-
-export const getValues = async (API_URL?: string) => {
   const apiUrls = [API_URL];
   let apiUrl = apiUrls[0];
   if (!apiUrl) {
@@ -297,20 +282,6 @@ export const getCfg = async (param: string) => {
 export const getDeploymentCfg = async () => {
   try {
     const response = await fetch(API_URL2 + "/cfg/global/deployment");
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-};
-
-export const getCfgs = async () => {
-  try {
-    const response = await fetch(API_URL2 + "/cfg");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

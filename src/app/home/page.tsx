@@ -16,6 +16,10 @@ import { Deployment } from "@/data/deployments";
 import Info from "@/components/dashboard/homeInfo";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
+import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
+import { buttonVariants } from "@/components/shadcn-ui/button";
+import { PlusCircledIcon } from "@radix-ui/react-icons";
+import { PopUpDialog } from "@/lib/cfgPopUp";
 
 type InfoType = { name: string; info: InputInfo }[];
 type HealthChecksType = { [key: string]: Check[] };
@@ -35,14 +39,33 @@ export default function HomePage() {
   const [healthyNodes, setHealthyNodes] = useState<
     { name: string; availableUrlsCount: number }[] | null
   >(null);
+  const [popUp, setPopUp] = useState<boolean>(false);
+
+  const createDeployment = async (data: any) => {
+    try {
+      await postDeployment({
+        name: data.name,
+        apiUrl: [`http://${data.url}/api`],
+        url: `http://${data.url}/deployment`,
+        id: data.id,
+      });
+      const deploymentsData = await getDeployments();
+      setDeployments(deploymentsData);
+      return { success: true };
+    } catch (error) {
+      console.error("Fehler beim Erstellen des Deployments", error);
+      return { success: false };
+    }
+  };
 
   const router = useRouter();
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
   console.log("multipleDeployments", multipleDeployments);
   useEffect(() => {
     if (multipleDeployments === "single") {
-    if (multipleDeployments === "single") {
-      router.replace("/404");
+      if (multipleDeployments === "single") {
+        router.replace("/404");
+      }
     }
   }, [multipleDeployments, router]);
 

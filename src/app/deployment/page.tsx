@@ -140,6 +140,15 @@ export default function DeploymentPage() {
     }
   };
 
+  const getDeploymentId = async () => {
+    const currentUrl = new URL(window.location.href);
+    const queryParams = new URLSearchParams(currentUrl.search);
+    const did = queryParams.get("did");
+    if (did) {
+      setDeploymentId(did);
+    }
+  };
+
   useEffect(() => {
     getDeployments().then((data: any) => setDeployments(data));
     if (multipleDeployments === "multi" || multipleDeployments === "saas") {
