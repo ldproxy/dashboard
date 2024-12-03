@@ -324,9 +324,9 @@ export default function DeploymentPage() {
       const newEntities = await GetEntities();
       const healthChecks = await getHealthChecks();
 
-      newEntities.forEach((entity) => {
+      newEntities.forEach((entity: any) => {
         const hc = healthChecks.find(
-          (check) => check.name === `entities/${entity.type}/${entity.id}`
+          (check: any) => check.name === `entities/${entity.type}/${entity.id}`
         );
         entity.status = hc && hc.state ? hc.state : "UNKNOWN";
       });

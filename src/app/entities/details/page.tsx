@@ -163,7 +163,7 @@ function CustomerPage() {
       }
       setEntities(newEntities);
 
-      const myEntity = newEntities.find((e) => e.uid === id);
+      const myEntity = newEntities.find((e: any) => e.uid === id);
       setEntity(myEntity);
 
       if (DevEntities) {
