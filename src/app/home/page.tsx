@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
 import { buttonVariants } from "@/components/shadcn-ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
-import { PopUpDialog } from "@/lib/cfgPopUp";
+import { PopUpDialog } from "@/lib/PopUp";
 
 type InfoType = { name: string; info: InputInfo }[];
 type HealthChecksType = { [key: string]: Check[] };
