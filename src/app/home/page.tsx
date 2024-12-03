@@ -48,6 +48,7 @@ export default function HomePage() {
         apiUrl: [`http://${data.url}/api`],
         url: `http://${data.url}/deployment`,
         id: data.id,
+        cfg: data.cfg,
       });
       const deploymentsData = await getDeployments();
       setDeployments(deploymentsData);

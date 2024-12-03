@@ -3,6 +3,7 @@ export interface Deployment {
   apiUrl: [string];
   url: string;
   id: string;
+  cfg: string;
 }
 
 export const deployments = [
