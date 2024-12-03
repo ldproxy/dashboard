@@ -9,7 +9,7 @@ import {
 } from "@/components/shadcn-ui/card";
 import { FooterSummary } from "./FooterSummary";
 
-interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   header?: string;
   main: string | React.ReactElement;
   total?: number;

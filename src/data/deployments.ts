@@ -1,6 +1,6 @@
 export interface Deployment {
   name: string;
-  apiUrl: string;
+  apiUrl: [string];
   url: string;
   id: string;
 }

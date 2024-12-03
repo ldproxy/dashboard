@@ -10,7 +10,7 @@ import { usePathname } from "next/navigation";
 import { getDeployments } from "@/lib/utils";
 import { set } from "react-hook-form";
 
-interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   sections: SectionProps[];
 }
 
@@ -84,7 +84,21 @@ export function Section({ title, entries, global }: SectionProps) {
       );
     }, [multipleDeployments, pathname]);
 
-  console.log("didPara", hasDidQueryParam);
+  if (isHomePage && multipleDeployments === "true") {
+    return (
+      <div
+        style={{
+          marginLeft: "30px",
+          marginTop: "10px",
+          fontSize: "0.875rem",
+          color: "#4a4a4a",
+        }}
+      >
+        No Deployment Selected
+      </div>
+    );
+  }
+
   if (
     (isHomePage &&
       (multipleDeployments === "multi" || multipleDeployments === "saas")) ||
@@ -120,53 +134,53 @@ export function Section({ title, entries, global }: SectionProps) {
         </div>
       </div>
     );
-  } else {
-    return (
-      <div className="px-3 py-2">
-        <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
-          {deploymentName}
-        </h2>
-        <div className="space-y-1">
-          {entries.map(({ title, selected, route, icon }) =>
-            route ? (
-              <NavButton key={title} title={title} route={route} icon={icon} />
-            ) : (
-              <Button
-                key={title}
-                variant={selected ? "secondary" : "ghost"}
-                className="w-full justify-start"
-              >
-                {(() => {
-                  const Icon = icon ? getIcon(icon) : null;
-                  return Icon ? <Icon className="mr-2 h-4 w-4" /> : null;
-                })()}
-                {title}
-              </Button>
-            )
-          )}
-        </div>
-        <div className="space-y-1 mt-24">
-          {global.map(({ title, selected, route, icon }) =>
-            route ? (
-              <NavButton key={title} title={title} route={route} icon={icon} />
-            ) : (
-              <Button
-                key={title}
-                variant={selected ? "secondary" : "ghost"}
-                className="w-full justify-start"
-              >
-                {(() => {
-                  const Icon = icon ? getIcon(icon) : null;
-                  return Icon ? <Icon className="mr-2 h-4 w-4" /> : null;
-                })()}
-                {title}
-              </Button>
-            )
-          )}
-        </div>
-      </div>
-    );
   }
+
+  return (
+    <div className="px-3 py-2">
+      <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+        {deploymentName}
+      </h2>
+      <div className="space-y-1">
+        {entries.map(({ title, selected, route, icon }) =>
+          route ? (
+            <NavButton key={title} title={title} route={route} icon={icon} />
+          ) : (
+            <Button
+              key={title}
+              variant={selected ? "secondary" : "ghost"}
+              className="w-full justify-start"
+            >
+              {(() => {
+                const Icon = icon ? getIcon(icon) : null;
+                return Icon ? <Icon className="mr-2 h-4 w-4" /> : null;
+              })()}
+              {title}
+            </Button>
+          )
+        )}
+      </div>
+      <div className="space-y-1 mt-24">
+        {global.map(({ title, selected, route, icon }) =>
+          route ? (
+            <NavButton key={title} title={title} route={route} icon={icon} />
+          ) : (
+            <Button
+              key={title}
+              variant={selected ? "secondary" : "ghost"}
+              className="w-full justify-start"
+            >
+              {(() => {
+                const Icon = icon ? getIcon(icon) : null;
+                return Icon ? <Icon className="mr-2 h-4 w-4" /> : null;
+              })()}
+              {title}
+            </Button>
+          )
+        )}
+      </div>
+    </div>
+  );
 }
 
 export function Sidebar({ className, sections }: SidebarProps) {

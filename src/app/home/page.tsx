@@ -4,39 +4,43 @@ import { useEffect, useState } from "react";
 import { getDeployments, postDeployment } from "../../lib/utils";
 import { getIcon } from "@/lib/icons";
 import Link from "next/link";
-import { GetEntities, getHealthChecks, getInfo, getMetrics } from "@/lib/utils";
+import {
+  getHealthChecks,
+  getInfo,
+  getAvailableNodes,
+  getAvailableNodesCount,
+} from "@/lib/utils";
 import { Check } from "@/data/health";
 import { InputInfo } from "@/data/info";
-import { Metrics } from "@/data/metrics";
 import { Deployment } from "@/data/deployments";
-import Info from "@/components/dashboard/info";
+import Info from "@/components/dashboard/homeInfo";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
-import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
-import { PopUpDialog } from "@/lib/PopUp";
-import { buttonVariants } from "@/components/shadcn-ui/button";
-import { PlusCircledIcon } from "@radix-ui/react-icons";
 
-type InfoType = { [key: string]: InputInfo };
-type MetricsType = { [key: string]: Metrics };
+type InfoType = { name: string; info: InputInfo }[];
 type HealthChecksType = { [key: string]: Check[] };
 
 export default function HomePage() {
   const [deployments, setDeployments] = useState([]);
   const [healthChecks, setHealthChecks] = useState<HealthChecksType>({});
-  const [metrics, setMetrics] = useState<MetricsType[]>([]);
-  const [info, setInfo] = useState<InfoType[]>([]);
+  const [availableNodes, setAvailableNodes] = useState([
+    { name: "", availableUrlsCount: 0 },
+  ]);
+  const [info, setInfo] = useState<InfoType>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [healthStatuses, setHealthStatuses] = useState<
     { name: string; healthStatus: string }[] | null
   >(null);
-  const [popUp, setPopUp] = useState<boolean>(false);
+  const [healthyNodes, setHealthyNodes] = useState<
+    { name: string; availableUrlsCount: number }[] | null
+  >(null);
 
   const router = useRouter();
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
   console.log("multipleDeployments", multipleDeployments);
   useEffect(() => {
+    if (multipleDeployments === "single") {
     if (multipleDeployments === "single") {
       router.replace("/404");
     }
@@ -45,55 +49,26 @@ export default function HomePage() {
   useEffect(() => {
     getDeployments().then((data: any) => {
       setDeployments(data);
-      console.log("deployments", data);
     });
   }, []);
-
-  const createDeployment = async (data: any) => {
-    try {
-      await postDeployment({
-        name: data.name,
-        apiUrl: `http://${data.url}/api`,
-        url: `http://${data.url}/deployment`,
-        id: data.id,
-      });
-      const deploymentsData = await getDeployments();
-      setDeployments(deploymentsData);
-      return { success: true };
-    } catch (error) {
-      console.error("Fehler beim Erstellen des Deployments", error);
-      return { success: false };
-    }
-  };
 
   const loadInfo = async () => {
     try {
       if (deployments.length > 0) {
         const promises = deployments.map(async (deployment: any) => {
-          console.log("deployment.baseUrl", deployment.apiUrl);
           const newInfo = await getInfo(deployment.apiUrl);
-          return { name: deployment.name, info: newInfo };
+
+          if (newInfo && newInfo.length > 0) {
+            return { name: deployment.name, info: newInfo as InputInfo };
+          } else {
+            return { name: deployment.name, info: [] as InputInfo };
+          }
         });
         const results = await Promise.all(promises);
         setInfo(results);
       }
     } catch (error) {
       console.error("Error loading info:", error);
-    }
-  };
-
-  const loadMetrics = async () => {
-    try {
-      if (deployments.length > 0) {
-        const promises = deployments.map(async (deployment: any) => {
-          const newMetrics = await getMetrics(deployment.apiUrl);
-          return { name: deployment.name, metrics: newMetrics };
-        });
-        const results = await Promise.all(promises);
-        setMetrics(results);
-      }
-    } catch (error) {
-      console.error("Error loading metrics:", error);
     }
   };
 
@@ -112,13 +87,25 @@ export default function HomePage() {
               ":",
               error
             );
-            healthChecksObj[deployment.name] = [{ state: "OFFLINE" }];
+            healthChecksObj[deployment.name] = [
+              { state: "OFFLINE", url: deployment.url },
+            ];
           }
         });
         await Promise.all(promises);
         setHealthChecks(healthChecksObj);
         const healthStatuses = await getHealthStatuses(healthChecksObj);
+        const availableNodes = await getAvailableNodes(
+          healthChecksObj,
+          deployments
+        );
+        const healthyNodes = await getAvailableNodesCount(
+          healthChecksObj,
+          deployments
+        );
         setHealthStatuses(healthStatuses);
+        setAvailableNodes(availableNodes);
+        setHealthyNodes(healthyNodes);
       }
     } catch (error) {
       console.error("Error loading health checks:", error);
@@ -129,7 +116,7 @@ export default function HomePage() {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        await Promise.all([loadHealthChecks(), loadInfo(), loadMetrics()]);
+        await Promise.all([loadHealthChecks(), loadInfo()]);
       } catch (error) {
         console.error(
           "Ein Fehler ist beim Laden der Daten aufgetreten:",
@@ -150,30 +137,36 @@ export default function HomePage() {
   useEffect(() => {
     if (!isInitialLoad) {
       const loadData = async () => {
-        await Promise.all([loadHealthChecks(), loadInfo(), loadMetrics()]);
+        await Promise.all([loadHealthChecks(), loadInfo()]);
       };
       const interval = setInterval(loadData, 2000);
       return () => clearInterval(interval);
     }
     // not all dependendies to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deployments]);
+  }, [deployments, isInitialLoad]);
 
   const getHealthStatuses = async (healthChecks: HealthChecksType) => {
     if (deployments.length > 0) {
       return deployments.map((deployment: Deployment) => {
         const checks = healthChecks[deployment.name];
-
         let healthStatus = "";
 
         if (checks && checks.length > 0) {
-          if (checks.some((check) => check.state === "UNAVAILABLE")) {
-            healthStatus = "UNHEALTHY";
-          } else if (checks.every((check) => check.state === "AVAILABLE")) {
+          if (checks.every((check) => check.state === "AVAILABLE")) {
             healthStatus = "HEALTHY";
-          } else if (checks.some((check) => check.state === "OFFLINE")) {
+          } else if (checks.every((check) => check.state === "OFFLINE")) {
             healthStatus = "OFFLINE";
+          } else if (
+            checks.some((check) => check.state === "OFFLINE") &&
+            checks.some((check) => check.state === "AVAILABLE")
+          ) {
+            healthStatus = "LIMITED";
+          } else {
+            healthStatus = "AVAILABLE";
           }
+        } else {
+          healthStatus = "OFFLINE";
         }
 
         return { name: deployment.name, healthStatus };
@@ -187,7 +180,7 @@ export default function HomePage() {
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
-      <div className="flex items-center justify-between mb-9 mt-8">
+      <div className="flex items-center justify-between space-y-2">
         <h2 className="text-2xl font-semibold tracking-tight">Deployments</h2>
         {isLoading && (
           <div className="ml-auto mr-10">
@@ -217,73 +210,70 @@ export default function HomePage() {
         >
           {deployments.map((deployment: any, index: number) =>
             (() => {
-              const deploymentInfo = info.find(
-                (i) => i.name === deployment.name
-              );
-              const deploymentMetrics = metrics.find(
-                (m) => m.name === deployment.name
-              );
+              const deploymentInfo =
+                info &&
+                info.find((i) => {
+                  return i.name === deployment.name;
+                });
+
               const deploymentHealthStatus =
                 healthStatuses &&
                 healthStatuses.find((h) => h.name === deployment.name)
                   ?.healthStatus;
 
+              const availableNodesCount =
+                availableNodes.find((node) => node.name === deployment.name)
+                  ?.availableUrlsCount || 0;
+
+              const healthyNodesCount =
+                (healthyNodes &&
+                  healthyNodes.find((node) => node.name === deployment.name)
+                    ?.availableUrlsCount) ||
+                0;
+
               console.log(
                 "deploymentInfo",
                 deploymentInfo,
-                "deploymentMetrics",
-                deploymentMetrics,
                 "deploymentHealthStatus",
                 deploymentHealthStatus
               );
 
-              return (
+              const infoComponent = (
+                <Info
+                  key={index}
+                  name={deployment.name ? ` ${deployment.name}` : ""}
+                  url={
+                    deploymentInfo &&
+                    Array.isArray(deploymentInfo.info) &&
+                    deploymentInfo.info.length > 0 &&
+                    typeof deploymentInfo.info[0].url === "string"
+                      ? deploymentInfo.info[0].url
+                      : ""
+                  }
+                  totalNodes={deployment.apiUrl.length}
+                  availableNodes={availableNodesCount}
+                  HealthyNodes={healthyNodesCount}
+                  healthStatus={
+                    deploymentHealthStatus &&
+                    typeof deploymentHealthStatus === "string"
+                      ? deploymentHealthStatus
+                      : ""
+                  }
+                  IconFooter1={getIcon("InfoCircled")}
+                  IconFooter2={getIcon("CheckCircled")}
+                  IconFooter3={getIcon("QuestionMark")}
+                  className="hover:bg-gray-100 transition-colors duration-200"
+                />
+              );
+
+              return deploymentHealthStatus === "OFFLINE" ? (
+                <div key={index}>{infoComponent}</div>
+              ) : (
                 <Link
                   href={`${deploymentUrl}?did=${deployment.id}`}
                   key={index}
                 >
-                  <Info
-                    key={index}
-                    name={
-                      (deploymentInfo &&
-                      typeof deploymentInfo.info.url === "string"
-                        ? (deploymentInfo.info.url as string)
-                            .replace("https://", "")
-                            .replace("http://", "") +
-                          (deployment.name ? ` (${deployment.name})` : "")
-                        : "") || ""
-                    }
-                    version={
-                      deploymentInfo &&
-                      typeof deploymentInfo.info.version === "string"
-                        ? deploymentInfo.info.version
-                        : ""
-                    }
-                    uptime={
-                      deploymentMetrics &&
-                      deploymentMetrics.metrics.uptime &&
-                      typeof deploymentMetrics.metrics.uptime === "number"
-                        ? deploymentMetrics.metrics.uptime
-                        : 0
-                    }
-                    memory={
-                      deploymentMetrics &&
-                      deploymentMetrics.metrics.memory &&
-                      typeof deploymentMetrics.metrics.memory === "number"
-                        ? deploymentMetrics.metrics.memory
-                        : 0
-                    }
-                    health={
-                      deploymentHealthStatus &&
-                      typeof deploymentHealthStatus === "string"
-                        ? deploymentHealthStatus
-                        : ""
-                    }
-                    IconFooter1={getIcon("Clock")}
-                    IconFooter2={getIcon("Upload")}
-                    IconFooter3={getIcon("Desktop")}
-                    className="hover:bg-gray-100 transition-colors duration-200"
-                  />
+                  {infoComponent}
                 </Link>
               );
             })()

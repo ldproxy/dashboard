@@ -1,9 +1,6 @@
 "use client";
 
 import Summary from "@/components/dashboard/summary";
-import { Button } from "@/components/shadcn-ui/button";
-import { ReloadIcon } from "@radix-ui/react-icons";
-import Link from "next/link";
 import {
   Tabs,
   TabsList,
@@ -12,7 +9,11 @@ import {
 } from "@/components/shadcn-ui/tabs";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { GetEntities, getHealthChecks } from "@/lib/utils";
+import {
+  GetEntities,
+  getHealthChecks,
+  compareDataAcrossUrls,
+} from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Entity } from "@/data/entities";
 import { autoRefreshInterval, DevEntities } from "@/data/constants";
@@ -23,6 +24,7 @@ import {
   getEntityCategoryCounts,
   getStateSummary,
 } from "@/lib/entities";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 
 export default function EntitiesPage() {
   const [entities, setEntities] = useState<Entity[]>([]);
@@ -30,6 +32,9 @@ export default function EntitiesPage() {
   const router = useRouter();
   let pathname = usePathname();
   const [deploymentId, setDeploymentId] = useState("");
+  const [nodesDifferent, setNodesDifferent] = useState({
+    entities: false,
+  });
 
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 
@@ -65,9 +70,9 @@ export default function EntitiesPage() {
       const newEntities = await GetEntities();
       const healthChecks = await getHealthChecks();
 
-      newEntities.forEach((entity) => {
+      newEntities.forEach((entity: any) => {
         const hc = healthChecks.find(
-          (check) => check.name === `entities/${entity.type}/${entity.id}`
+          (check: any) => check.name === `entities/${entity.type}/${entity.id}`
         );
         entity.status = hc && hc.state ? hc.state : "UNKNOWN";
       });
@@ -79,8 +84,15 @@ export default function EntitiesPage() {
   };
 
   useEffect(() => {
+    const loadData = async () => {
+      await loadEntities();
+    };
+
+    loadData();
+    checkDifferences();
+
     const interval = setInterval(() => {
-      loadEntities();
+      loadEntities(), checkDifferences();
     }, autoRefreshInterval);
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
@@ -98,6 +110,24 @@ export default function EntitiesPage() {
     } else {
       router.push(`${pathname}#${tab}`);
     }
+  };
+
+  const checkDifferences = async () => {
+    const differences = await compareDataAcrossUrls();
+    const newNodesDifferent = { ...nodesDifferent };
+
+    if (differences.entitiesDifferent) {
+      newNodesDifferent.entities = true;
+    }
+
+    setNodesDifferent(newNodesDifferent);
+  };
+
+  const getWarningMessage = () => {
+    if (nodesDifferent.entities) {
+      return `Warning: Differences detected in entities across different replicas. This issue is likely temporary.`;
+    }
+    return null;
   };
 
   if (DevEntities) {
@@ -135,6 +165,13 @@ export default function EntitiesPage() {
             ))}
           </TabsList>
         </div>
+
+        {getWarningMessage() && (
+          <div className="flex items-center space-x-2 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+            <ExclamationTriangleIcon className="h-5 w-5" />
+            <span>{getWarningMessage()}</span>
+          </div>
+        )}
 
         <TabsContent value="overview">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

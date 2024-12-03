@@ -11,7 +11,7 @@ import prettyMs from "pretty-ms";
 import { Progress } from "@/components/dashboard/Progress";
 import { TileSets } from "@/data/jobs";
 
-interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   entity: string;
   tilesets: TileSets;
   label: string;

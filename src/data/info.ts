@@ -1,10 +1,13 @@
-export interface InputInfo {
+export interface InputInfoItem {
   name: string;
   version: string;
   url: string;
   env: string;
   status: string;
+  apiUrl: string;
 }
+
+export type InputInfo = InputInfoItem[];
 
 export const info = {
   name: "demo.ldproxy.net",

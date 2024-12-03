@@ -8,6 +8,9 @@ import {
   ClockIcon,
   DesktopIcon,
   HomeIcon,
+  InfoCircledIcon,
+  CheckCircledIcon,
+  QuestionMarkCircledIcon,
   ReaderIcon,
   TrashIcon,
   Pencil1Icon,
@@ -24,6 +27,9 @@ export const icons = {
   Clock: "Clock",
   Desktop: "Desktop",
   Home: "Home",
+  InfoCircled: "InfoCircled",
+  CheckCircled: "CheckCircled",
+  QuestionMark: "QuestionMark",
   Reader: "Reader",
   Trash: "Trash",
   Pencil1: "Pencil1",
@@ -50,6 +56,12 @@ export const getIcon = (
       return DesktopIcon;
     case icons.Home:
       return HomeIcon;
+    case icons.InfoCircled:
+      return InfoCircledIcon;
+    case icons.CheckCircled:
+      return CheckCircledIcon;
+    case icons.QuestionMark:
+      return QuestionMarkCircledIcon;
     case icons.Reader:
       return ReaderIcon;
     case icons.Trash:

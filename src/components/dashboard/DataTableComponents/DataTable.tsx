@@ -36,7 +36,7 @@ import {
 } from "@/components/shadcn-ui/table";
 import { HealthCheck } from "./DataTableColumns";
 
-interface DataTableProps<HealthCheck, TValue> {
+export interface DataTableProps<HealthCheck, TValue> {
   columns: ColumnDef<HealthCheck, TValue>[];
   data: HealthCheck[];
 }

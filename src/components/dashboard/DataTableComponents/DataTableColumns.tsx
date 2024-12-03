@@ -12,6 +12,7 @@ export type HealthCheck = {
   checked: string;
   message: string;
   subRows: HealthCheck[];
+  url: string;
 };
 
 export const columns: ColumnDef<HealthCheck>[] = [
@@ -28,9 +29,9 @@ export const columns: ColumnDef<HealthCheck>[] = [
         </Button>
       );
     },
-    cell: ({ row, getValue }) => (
+    cell: ({ row }) => (
       <div className={`${row.depth === 0 ? "ml-4 flex items-center" : "ml-8"}`}>
-        {getValue<string>()}{" "}
+        {row.depth === 0 ? row.original.label : row.original.url}{" "}
         {row.getCanExpand() ? (
           <button
             {...{
@@ -62,15 +63,31 @@ export const columns: ColumnDef<HealthCheck>[] = [
     },
     cell: ({ row }: { row: Row<HealthCheck> }) => {
       if (row.original) {
-        const badgeColor =
-          row.original.status === "HEALTHY" ||
-          row.original.status === "AVAILABLE"
-            ? "success"
-            : row.original.status === "LIMITED"
-            ? "warning"
-            : "destructive";
+        let badgeColor = "";
+        let textColor = "white";
+
+        switch (row.original.status) {
+          case "HEALTHY":
+          case "AVAILABLE":
+            badgeColor = "#4CAF50";
+            break;
+          case "LIMITED":
+            badgeColor = "#FFDD44";
+            break;
+          default:
+            badgeColor = "#F44336";
+            break;
+        }
+
         return (
-          <Badge className="ml-4" variant={badgeColor}>
+          <Badge
+            className="ml-4"
+            style={{
+              backgroundColor: badgeColor,
+              color: textColor,
+              cursor: "default",
+            }}
+          >
             {row.original.status}
           </Badge>
         );

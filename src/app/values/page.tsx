@@ -1,15 +1,14 @@
 "use client";
 
 import Summary from "@/components/dashboard/summary";
-import { Button } from "@/components/shadcn-ui/button";
-import { ReloadIcon } from "@radix-ui/react-icons";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import {
   Tabs,
   TabsList,
   TabsTrigger,
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
-import { getValues } from "@/lib/utils";
+import { getValues, compareDataAcrossUrls } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { InputValue } from "@/data/values";
 import { getIcon } from "@/lib/icons";
@@ -31,6 +30,9 @@ export default function EntitiesPage() {
   const router = useRouter();
   let pathname = usePathname();
   const [deploymentId, setDeploymentId] = useState("");
+  const [nodesDifferent, setNodesDifferent] = useState({
+    values: false,
+  });
 
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 
@@ -58,8 +60,11 @@ export default function EntitiesPage() {
   };
 
   useEffect(() => {
+    loadValues();
+    checkDifferences();
     const interval = setInterval(() => {
       loadValues();
+      checkDifferences();
     }, autoRefreshInterval);
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
@@ -92,6 +97,24 @@ export default function EntitiesPage() {
     return counts;
   }, {} as { [key: string]: number });
 
+  const checkDifferences = async () => {
+    const differences = await compareDataAcrossUrls();
+    const newNodesDifferent = { ...nodesDifferent };
+
+    if (differences.entitiesDifferent) {
+      newNodesDifferent.values = true;
+    }
+
+    setNodesDifferent(newNodesDifferent);
+  };
+
+  const getWarningMessage = () => {
+    if (nodesDifferent.values) {
+      return `Warning: Differences detected in values across different replicas. This issue is likely temporary.`;
+    }
+    return null;
+  };
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between space-y-2">
@@ -122,22 +145,33 @@ export default function EntitiesPage() {
           </TabsList>
         </div>
 
+        {getWarningMessage() && (
+          <div className="flex items-center space-x-2 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+            <ExclamationTriangleIcon className="h-5 w-5" />
+            <span>{getWarningMessage()}</span>
+          </div>
+        )}
+
         <TabsContent value="overview">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {valueTypes.map((valueType) => (
-              <Summary
-                key={valueType}
-                main={valueType}
-                total={valueTypeCounts[valueType]}
-                onClick={() => {
-                  setTab(valueType);
-                }}
-                Icon={getIcon("Code")}
-                route={`${pathname}${
-                  deploymentId !== "" ? `?did=${deploymentId}` : ""
-                }#${valueType}`}
-              />
-            ))}
+            {valueTypes.length > 0 ? (
+              valueTypes.map((valueType) => (
+                <Summary
+                  key={valueType}
+                  main={valueType}
+                  total={valueTypeCounts[valueType]}
+                  onClick={() => {
+                    setTab(valueType);
+                  }}
+                  Icon={getIcon("Code")}
+                  route={`${pathname}${
+                    deploymentId !== "" ? `?did=${deploymentId}` : ""
+                  }#${valueType}`}
+                />
+              ))
+            ) : (
+              <span>Currently No Values</span>
+            )}
           </div>
         </TabsContent>
         {valueTypes.map((valueType) => (

@@ -50,6 +50,7 @@ function CustomerPage() {
   };
 
   useEffect(() => {
+    loadCfg();
     const interval = setInterval(() => {
       loadCfg();
     }, autoRefreshInterval);
