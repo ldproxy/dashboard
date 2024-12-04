@@ -105,7 +105,6 @@ export default function HomePage() {
               name={cfg.name}
               cfgUrl={cfg.url}
               setConfigurations={setConfigurations}
-              className="additional-class"
             />
           ))}
         </div>
