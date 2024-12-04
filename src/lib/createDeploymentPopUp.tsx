@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/shadcn-ui/select";
+import { DevDeployment } from "@/data/constants";
 
 interface Configuration {
   name: string;
@@ -78,7 +79,9 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
   useEffect(() => {
     getCfgs().then((data: any) => {
       setConfigurations(data);
-      console.log("configurations", data);
+      if (DevDeployment) {
+        console.log("configurations", data);
+      }
     });
   }, []);
 

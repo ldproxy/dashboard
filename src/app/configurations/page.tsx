@@ -10,6 +10,7 @@ import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
 import { PopUpDialog } from "@/lib/createCfgPopUp";
 import { buttonVariants } from "@/components/shadcn-ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
+import { DevCfg } from "@/data/constants";
 
 interface Entity {
   title: string;
@@ -34,12 +35,16 @@ export default function HomePage() {
 
   const router = useRouter();
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
-  console.log("multipleDeployments", multipleDeployments);
+  if (DevCfg) {
+    console.log("multipleDeployments", multipleDeployments);
+  }
 
   useEffect(() => {
     getCfgs().then((data: any) => {
       setConfigurations(data);
-      console.log("configurations", data);
+      if (DevCfg) {
+        console.log("configurations", data);
+      }
       setIsLoading(false);
     });
   }, []);

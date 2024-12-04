@@ -463,7 +463,6 @@ export const getAvailableNodesCount = (
       (isAvailable) => isAvailable
     ).length;
 
-    console.log("availableUrlsCount", deployment.name, availableUrlsCount);
     return { name: deployment.name, availableUrlsCount };
   });
 };

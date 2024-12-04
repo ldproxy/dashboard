@@ -11,6 +11,7 @@ import { usePathname } from "next/navigation";
 
 import "./globals.css";
 import { icons } from "@/lib/icons";
+import { Dev } from "@/data/constants";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -27,7 +28,9 @@ export default function RootLayout({
     const getDeploymentId = () => {
       let did;
       if (searchParams) {
-        console.log("params", searchParams.get("did"));
+        if (Dev) {
+          console.log("params", searchParams.get("did"));
+        }
         did = searchParams.get("did");
       }
       if (did && typeof did === "string") {

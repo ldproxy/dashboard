@@ -20,6 +20,7 @@ import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
 import { buttonVariants } from "@/components/shadcn-ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { PopUpDialog } from "@/lib/createDeploymentPopUp";
+import { DevHome } from "@/data/constants";
 
 type InfoType = { name: string; info: InputInfo }[];
 type HealthChecksType = { [key: string]: Check[] };
@@ -61,7 +62,9 @@ export default function HomePage() {
 
   const router = useRouter();
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
-  console.log("multipleDeployments", multipleDeployments);
+  if (DevHome) {
+    console.log("multipleDeployments", multipleDeployments);
+  }
   useEffect(() => {
     if (multipleDeployments === "single") {
       if (multipleDeployments === "single") {
@@ -255,12 +258,14 @@ export default function HomePage() {
                     ?.availableUrlsCount) ||
                 0;
 
-              console.log(
-                "deploymentInfo",
-                deploymentInfo,
-                "deploymentHealthStatus",
-                deploymentHealthStatus
-              );
+              if (DevHome) {
+                console.log(
+                  "deploymentInfo",
+                  deploymentInfo,
+                  "deploymentHealthStatus",
+                  deploymentHealthStatus
+                );
+              }
 
               const infoComponent = (
                 <Info

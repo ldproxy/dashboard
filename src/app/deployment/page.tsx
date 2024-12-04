@@ -512,14 +512,16 @@ export default function DeploymentPage() {
                     (h) => h.name === (matchingDeployment as Deployment).name
                   )?.healthStatus;
 
-                console.log(
-                  "deploymentInfoEntity",
-                  deploymentInfo,
-                  "deploymentMetricsEntity",
-                  deploymentMetrics,
-                  "deploymentHealthStatusEntity",
-                  deploymentHealthStatus
-                );
+                if (DevDeployment) {
+                  console.log(
+                    "deploymentInfoEntity",
+                    deploymentInfo,
+                    "deploymentMetricsEntity",
+                    deploymentMetrics,
+                    "deploymentHealthStatusEntity",
+                    deploymentHealthStatus
+                  );
+                }
 
                 const infoComponent = (
                   <Info

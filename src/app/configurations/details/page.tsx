@@ -6,6 +6,7 @@ import { ClipLoader } from "react-spinners";
 import { useRouter, useSearchParams } from "next/navigation";
 import InfoCfg from "@/components/dashboard/infoCfg";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
+import { DevCfg } from "@/data/constants";
 
 interface Entity {
   title: string;
@@ -38,12 +39,15 @@ export default function HomePage() {
 
   const router = useRouter();
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
-  console.log("multipleDeployments", multipleDeployments);
-
+  if (DevCfg) {
+    console.log("multipleDeployments", multipleDeployments);
+  }
   useEffect(() => {
     getCfgs().then((data: any) => {
       setConfigurations(data);
-      console.log("configurations", data);
+      if (DevCfg) {
+        console.log("configurations", data);
+      }
       setIsLoading(false);
     });
   }, []);
