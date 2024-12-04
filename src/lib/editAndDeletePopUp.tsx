@@ -28,9 +28,11 @@ import { Button } from "@/components/shadcn-ui/button";
 import { updateCfg } from "./utils";
 
 interface PopUpDialogProps {
-  name: string;
-  cfgUrl: string;
-  handleEdit: (data: any) => Promise<{ success: boolean }>;
+  name?: string;
+  cfgUrl?: string;
+  handleEdit?: (data: any) => Promise<{ success: boolean }>;
+  onSubmit?: () => Promise<{ success: boolean }>;
+  setPopUp?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const profileFormSchema = z.object({
@@ -60,10 +62,12 @@ const profileFormSchema = z.object({
 
 export type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
-export const EditPopUpDialog: React.FC<PopUpDialogProps> = ({
+export const EditAndDeletePopUpDialog: React.FC<PopUpDialogProps> = ({
   handleEdit,
   name,
   cfgUrl,
+  onSubmit,
+  setPopUp,
 }) => {
   const [submitResult, setSubmitResult] = useState<{ success: boolean } | null>(
     null
@@ -79,14 +83,16 @@ export const EditPopUpDialog: React.FC<PopUpDialogProps> = ({
   });
 
   const handleSubmit = async (data: ProfileFormValues) => {
-    try {
-      const result = await handleEdit(data);
-      if (result) {
-        setSubmitResult(result);
-        form.reset();
+    if (handleEdit) {
+      try {
+        const result = await handleEdit(data);
+        if (result) {
+          setSubmitResult(result);
+          form.reset();
+        }
+      } catch (error) {
+        console.error("Fehler beim Absenden des Formulars", error);
       }
-    } catch (error) {
-      console.error("Fehler beim Absenden des Formulars", error);
     }
   };
 
@@ -96,6 +102,41 @@ export const EditPopUpDialog: React.FC<PopUpDialogProps> = ({
       url: cfgUrl,
     });
   }, [name, cfgUrl, form]);
+
+  if (onSubmit && setPopUp) {
+    return (
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle style={{ margin: "20px" }}>
+            Wollen Sie die Konfiguration wirklich löschen?
+          </DialogTitle>
+        </DialogHeader>
+        <DialogFooter className="flex justify-center">
+          <div className="flex justify-center w-full">
+            <Button
+              onClick={onSubmit}
+              style={{
+                fontWeight: "bold",
+                marginRight: "10px",
+                width: "100px",
+              }}
+            >
+              Ja
+            </Button>
+            <Button
+              onClick={() => {
+                setPopUp(false);
+              }}
+              variant="secondary"
+              style={{ fontWeight: "bold", width: "100px" }}
+            >
+              Nein
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    );
+  }
 
   return (
     <DialogContent>

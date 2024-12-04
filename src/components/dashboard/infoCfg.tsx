@@ -10,8 +10,7 @@ import { getIcon } from "@/lib/icons";
 import { IconProps } from "@radix-ui/react-icons/dist/types";
 import { deleteConfig, getCfgs, updateCfg } from "../../lib/utils";
 import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
-import { PopUpDialog } from "@/lib/deletePopUp";
-import { EditPopUpDialog } from "@/lib/editPopUp";
+import { EditAndDeletePopUpDialog } from "@/lib/editAndDeletePopUp";
 import { ExternalLink } from "lucide-react";
 
 interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -138,7 +137,7 @@ export default function InfoCfg({
             <DialogTrigger asChild>
               <IconPencil className="absolute right-40 top-1/2 transform -translate-y-1/2 h-8 w-8 text-blue-500 cursor-pointer" />
             </DialogTrigger>
-            <EditPopUpDialog
+            <EditAndDeletePopUpDialog
               handleEdit={handleEdit}
               name={name}
               cfgUrl={cfgUrl}
@@ -148,7 +147,10 @@ export default function InfoCfg({
             <DialogTrigger asChild>
               <Icon className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 text-red-500 cursor-pointer mr-20" />
             </DialogTrigger>
-            <PopUpDialog onSubmit={deleteCfg} setPopUp={setPopUp} />
+            <EditAndDeletePopUpDialog
+              onSubmit={deleteCfg}
+              setPopUp={setPopUp}
+            />
           </Dialog>
         </>
       )}

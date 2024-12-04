@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import InfoCfg from "@/components/dashboard/infoCfg";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
-import { PopUpDialog } from "@/lib/cfgPopUp";
+import { PopUpDialog } from "@/lib/createCfgPopUp";
 import { buttonVariants } from "@/components/shadcn-ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 

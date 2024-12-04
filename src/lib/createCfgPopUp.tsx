@@ -25,21 +25,8 @@ import { Input } from "@/components/shadcn-ui/input";
 import React, { useEffect, useState } from "react";
 import { Separator } from "@radix-ui/react-separator";
 import { Button } from "@/components/shadcn-ui/button";
-import { getCfgs } from "./utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/shadcn-ui/select";
 
-interface Configuration {
-  name: string;
-  url: string;
-}
-
-interface PopUpDialogProps {
+export interface PopUpDialogProps {
   onSubmit: (data: any) => Promise<{ success: boolean }>;
 }
 
@@ -50,21 +37,22 @@ const profileFormSchema = z.object({
       message: "Name muss min. 1 Zeichen lang sein.",
     })
     .max(30, {
-      message: "Username darf max. 30 Zeichen lang sein.",
+      message: "Name darf max. 30 Zeichen lang sein.",
     })
     .refine((value) => !/[äöüÄÖÜ]/.test(value), {
-      message: "Username darf keine Umlaute enthalten.",
+      message: "Name darf keine Umlaute enthalten.",
     }),
-  id: z.string().refine((value) => /^\d+$/.test(value), {
-    message: "Id muss eine Zahl sein.",
-  }),
-  url: z.string().refine((value) => /^[a-zA-Z0-9:.]+$/.test(value), {
-    message:
-      "URL darf nur aus Buchstaben, Zahlen, Doppelpunkten und Punkten bestehen.",
-  }),
-  cfg: z.string({
-    required_error: "Bitte wählen sie eine Konfiguration.",
-  }),
+  url: z
+    .string()
+    .min(1, {
+      message: "Url muss min. 1 Zeichen lang sein.",
+    })
+    .max(50, {
+      message: "Url darf max. 50 Zeichen lang sein.",
+    })
+    .refine((value) => !/[äöüÄÖÜ]/.test(value), {
+      message: "Name darf keine Umlaute enthalten.",
+    }),
 });
 
 export type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -73,21 +61,12 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
   const [submitResult, setSubmitResult] = useState<{ success: boolean } | null>(
     null
   );
-  const [configurations, setConfigurations] = useState<Configuration[]>([]);
-
-  useEffect(() => {
-    getCfgs().then((data: any) => {
-      setConfigurations(data);
-      console.log("configurations", data);
-    });
-  }, []);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     mode: "onChange",
     defaultValues: {
       name: "",
-      id: "",
       url: "",
     },
   });
@@ -108,7 +87,7 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
     <DialogContent>
       <DialogHeader>
         <div style={{ marginBottom: "15px" }}>
-          <DialogTitle>Deployment hinzufügen</DialogTitle>
+          <DialogTitle>Konfiguration hinzufügen</DialogTitle>
         </div>
         <Separator />
       </DialogHeader>
@@ -118,32 +97,6 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
           className="space-y-8"
           style={{ marginBottom: "25px" }}
         >
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ID</FormLabel>
-                <FormControl>
-                  <Input placeholder="ID" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <FormField
             control={form.control}
             name="url"
@@ -159,31 +112,17 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
           />
           <FormField
             control={form.control}
-            name="cfg"
+            name="name"
             render={({ field }) => (
               <FormItem>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Konfiguration wählen..." />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {configurations.map((cfg, cfgIndex) => (
-                      <SelectItem key={`${cfgIndex}`} value={cfg.name}>
-                        {cfg.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Name" {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
           <Button
             style={{ fontWeight: "bold" }}
             type="submit"
@@ -197,7 +136,7 @@ export const PopUpDialog: React.FC<PopUpDialogProps> = ({ onSubmit }) => {
         <div style={{ color: "red" }}>Ein Fehler ist aufgetreten.</div>
       ) : submitResult && submitResult.success ? (
         <div style={{ color: "green" }}>
-          Deployment wurde erfolgreich hinzugefügt.
+          Konfiguration wurde erfolgreich hinzugefügt.
         </div>
       ) : (
         ""
