@@ -13,7 +13,7 @@ import {
 import { Check } from "@/data/health";
 import { InputInfo } from "@/data/info";
 import { Deployment } from "@/data/deployments";
-import Info from "@/components/dashboard/homeInfo";
+import Info from "@/components/dashboard/infoBox";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";

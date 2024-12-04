@@ -1,7 +1,7 @@
 "use client";
 import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import Summary from "@/components/dashboard/summary";
-import Info from "@/components/dashboard/info";
+import Info from "@/components/dashboard/infoBox";
 import JobInfo from "@/components/dashboard/job-info";
 import { Button } from "@/components/shadcn-ui/button";
 import { ReloadIcon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
@@ -566,13 +566,13 @@ export default function DeploymentPage() {
                             }))
                         : []
                     }
-                    health={
+                    healthStatus={
                       deploymentHealthStatus &&
                       typeof deploymentHealthStatus === "string"
                         ? deploymentHealthStatus
                         : ""
                     }
-                    infoUrl={
+                    url={
                       deploymentInfo &&
                       Array.isArray(deploymentInfo.info) &&
                       deploymentInfo.info.length > 0 &&

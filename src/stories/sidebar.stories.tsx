@@ -3,6 +3,7 @@ import { Meta, StoryFn } from "@storybook/react";
 import { Sidebar, SidebarProps } from "../../src/components/dashboard/sidebar";
 import { PlayIcon, IdCardIcon, CodeIcon } from "@radix-ui/react-icons";
 import StoryWrapper from "./StoryWrapper";
+import { icons } from "@/lib/icons";
 
 export default {
   title: "Components/Sidebar",
@@ -25,6 +26,16 @@ Default.args = {
         { title: "Entities", icon: "Id", route: "/entities?did=3" },
         { title: "Values", icon: "Code", route: "/values?did=3" },
       ],
+      global:
+        process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS === "saas"
+          ? [
+              {
+                title: "Configurations",
+                icon: icons.Reader,
+                route: 1 ? `/configurations?did=1` : "/configurations",
+              },
+            ]
+          : [],
     },
   ],
 };
