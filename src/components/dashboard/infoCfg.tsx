@@ -13,7 +13,7 @@ import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
 import { EditAndDeletePopUpDialog } from "@/lib/editAndDeletePopUp";
 import { ExternalLink } from "lucide-react";
 
-interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
   cfgUrl?: string;
   title?: string;
