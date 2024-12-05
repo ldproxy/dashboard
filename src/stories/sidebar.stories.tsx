@@ -1,6 +1,6 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import { Sidebar, SidebarProps } from "../../src/components/dashboard/sidebar";
+import { Sidebar, SidebarProps } from "../components/dashboard/Sidebar";
 import { PlayIcon, IdCardIcon, CodeIcon } from "@radix-ui/react-icons";
 import StoryWrapper from "./StoryWrapper";
 import { icons } from "@/lib/icons";

@@ -2,8 +2,8 @@
 
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import InfoCfg from "../components/dashboard/infoCfg";
-import { SummaryProps } from "@/components/dashboard/infoCfg";
+import InfoCfg from "../components/dashboard/InfoCfg";
+import { SummaryProps } from "@/components/dashboard/InfoCfg";
 import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
 import { Button } from "@/components/shadcn-ui/button";
 import StoryWrapper from "./StoryWrapper";

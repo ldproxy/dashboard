@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/shadcn-ui/button";
 
 import React, { useEffect, useState } from "react";
-import { NavButton } from "./nav-button";
+import { NavButton } from "./Navbutton";
 import { getIcon } from "@/lib/icons";
 import { usePathname } from "next/navigation";
 import { getDeployments } from "@/lib/utils";

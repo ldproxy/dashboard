@@ -25,7 +25,7 @@ import { Input } from "@/components/shadcn-ui/input";
 import React, { useEffect, useState } from "react";
 import { Separator } from "@radix-ui/react-separator";
 import { Button } from "@/components/shadcn-ui/button";
-import { updateCfg } from "./utils";
+import { updateCfg } from "../../lib/utils";
 
 interface PopUpDialogProps {
   name?: string;

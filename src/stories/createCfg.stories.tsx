@@ -2,7 +2,10 @@
 
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import { PopUpDialog, PopUpDialogProps } from "../lib/createCfgPopUp";
+import {
+  PopUpDialog,
+  PopUpDialogProps,
+} from "../components/dashboard/CreateCfgPopUp";
 import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
 import { Button } from "@/components/shadcn-ui/button";
 import StoryWrapper from "./StoryWrapper";

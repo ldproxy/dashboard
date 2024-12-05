@@ -25,7 +25,7 @@ import { Input } from "@/components/shadcn-ui/input";
 import React, { useEffect, useState } from "react";
 import { Separator } from "@radix-ui/react-separator";
 import { Button } from "@/components/shadcn-ui/button";
-import { getCfgs } from "./utils";
+import { getCfgs } from "../../lib/utils";
 import {
   Select,
   SelectContent,

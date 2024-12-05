@@ -18,7 +18,7 @@ import { columns } from "@/components/dashboard/DataTableComponents/DataTableCol
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ClipLoader } from "react-spinners";
-import JobInfo from "@/components/dashboard/job-info";
+import JobInfo from "@/components/dashboard/Jobinfo";
 import { Jobs, Job } from "@/data/jobs";
 
 import {

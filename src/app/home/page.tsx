@@ -13,13 +13,13 @@ import {
 import { Check } from "@/data/health";
 import { InputInfo } from "@/data/info";
 import { Deployment } from "@/data/deployments";
-import Info from "@/components/dashboard/infoBox";
+import Info from "@/components/dashboard/InfoBox";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
 import { buttonVariants } from "@/components/shadcn-ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
-import { PopUpDialog } from "@/lib/createDeploymentPopUp";
+import { PopUpDialog } from "@/components/dashboard/CreateDeploymentPopUp";
 import { DevHome } from "@/data/constants";
 
 type InfoType = { name: string; info: InputInfo }[];

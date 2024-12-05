@@ -1,8 +1,6 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import CustomersPage, {
-  SummaryProps,
-} from "../../src/components/dashboard/job-info";
+import CustomersPage, { SummaryProps } from "../components/dashboard/Jobinfo";
 import StoryWrapper from "./StoryWrapper";
 
 export default {

@@ -1,8 +1,6 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import CustomersPage, {
-  SummaryProps,
-} from "../../src/components/dashboard/infoBox";
+import CustomersPage, { SummaryProps } from "../components/dashboard/InfoBox";
 import {
   GlobeIcon,
   ClockIcon,

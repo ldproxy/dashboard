@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/shadcn-ui/theme";
-import { Sidebar } from "@/components/dashboard/sidebar";
+import { Sidebar } from "@/components/dashboard/Sidebar";
 import { DashboardIcon } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";

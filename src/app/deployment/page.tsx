@@ -1,8 +1,8 @@
 "use client";
 import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
-import Summary from "@/components/dashboard/summary";
-import Info from "@/components/dashboard/infoBox";
-import JobInfo from "@/components/dashboard/job-info";
+import Summary from "@/components/dashboard/Summary";
+import Info from "@/components/dashboard/InfoBox";
+import JobInfo from "@/components/dashboard/Jobinfo";
 import { Button } from "@/components/shadcn-ui/button";
 import { ReloadIcon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import Link from "next/link";

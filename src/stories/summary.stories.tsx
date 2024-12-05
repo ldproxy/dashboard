@@ -1,8 +1,6 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import CustomersPage, {
-  SummaryProps,
-} from "../../src/components/dashboard/summary";
+import CustomersPage, { SummaryProps } from "../components/dashboard/Summary";
 import { IdCardIcon } from "@radix-ui/react-icons";
 import StoryWrapper from "./StoryWrapper";
 
