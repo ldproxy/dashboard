@@ -99,7 +99,9 @@ function CustomerPage() {
           if (check && check.name && check.url) {
             const urlPart = check.url.match(/\/\/([^\/]+)/)?.[1] || "";
             return {
-              label: check.name,
+              name: check.name,
+              label: check.label || "",
+              description: check.description || "",
               url: urlPart,
               status: check.state,
               message: check.message,
