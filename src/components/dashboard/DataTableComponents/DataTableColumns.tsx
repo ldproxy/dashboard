@@ -46,7 +46,7 @@ export const columns: ColumnDef<HealthCheck>[] = [
         {row.depth === 0
           ? row.original.label || row.original.name || row.original.url
           : row.original.url}{" "}
-        {row.original.description && (
+        {row.depth === 0 && row.original.description && (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
