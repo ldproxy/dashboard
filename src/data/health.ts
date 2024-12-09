@@ -61,8 +61,8 @@ export const fetchedHealthChecks: { [key: string]: InputCheck } = {
     timestamp: "2024-02-15T17:56:36.681+01:00",
     capabilities: [
       {
-        label: "COLLECTIONS",
-        description: "COLLECTIONS",
+        label: "Label",
+        description: "Beschreibung",
         name: "collectionss",
         healthy: false,
         state: "UNAVAILABLE",
