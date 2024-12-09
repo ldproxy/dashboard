@@ -1,6 +1,6 @@
 "use client";
 import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
-import Summary from "@/components/dashboard/summary";
+import Summary from "@/components/dashboard/Summary";
 import Info from "@/components/dashboard/info";
 import JobInfo from "@/components/dashboard/job-info";
 import { Button } from "@/components/shadcn-ui/button";
@@ -265,7 +265,9 @@ export default function DeploymentPage() {
         if (check && check.name) {
           const urlPart = check.url.match(/\/\/([^\/]+)/)?.[1] || "";
           return {
-            label: check.name.substring(4),
+            name: check.name.substring(4),
+            label: check.label || "",
+            description: check.description || "",
             url: urlPart,
             status: check.state,
             checked: dayjs(check.timestamp).format("HH:mm:ss"),

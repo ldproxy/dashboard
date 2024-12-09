@@ -4,10 +4,22 @@ import { ColumnDef, Row } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/shadcn-ui/button";
 import { Badge } from "@/components/shadcn-ui/badge";
-import { ChevronRightIcon, ChevronDownIcon } from "@radix-ui/react-icons";
+import {
+  ChevronRightIcon,
+  ChevronDownIcon,
+  QuestionMarkCircledIcon,
+} from "@radix-ui/react-icons";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/shadcn-ui/tooltip";
 
 export type HealthCheck = {
-  label: string;
+  name: string;
+  label?: string;
+  description?: string;
   status: string;
   checked: string;
   message: string;
@@ -31,7 +43,19 @@ export const columns: ColumnDef<HealthCheck>[] = [
     },
     cell: ({ row }) => (
       <div className={`${row.depth === 0 ? "ml-4 flex items-center" : "ml-8"}`}>
-        {row.depth === 0 ? row.original.label : row.original.url}{" "}
+        {row.depth === 0
+          ? row.original.label || row.original.name || row.original.url
+          : row.original.url}{" "}
+        {row.original.description && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <QuestionMarkCircledIcon className="ml-2 h-4 w-4 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent>{row.original.description}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
         {row.getCanExpand() ? (
           <button
             {...{

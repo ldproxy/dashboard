@@ -264,23 +264,23 @@ export const sortCards = (cards: any[]) => {
 };
 
 export function summarizeStoreCheck(storeCheck: any[]): any[] {
-  const labelCounts: { [label: string]: number } = {};
-  const summarized: { [label: string]: any } = {};
+  const nameCounts: { [name: string]: number } = {};
+  const summarized: { [name: string]: any } = {};
 
   storeCheck.forEach((check) => {
-    if (!labelCounts[check.label]) {
-      labelCounts[check.label] = 0;
+    if (!nameCounts[check.name]) {
+      nameCounts[check.name] = 0;
     }
-    labelCounts[check.label]++;
+    nameCounts[check.name]++;
   });
 
   storeCheck.forEach((check) => {
-    if (labelCounts[check.label] > 1) {
-      if (!summarized[check.label]) {
-        summarized[check.label] = { ...check, subRows: [] };
+    if (nameCounts[check.name] > 1) {
+      if (!summarized[check.name]) {
+        summarized[check.name] = { ...check, subRows: [] };
       }
 
-      const existingCheck = summarized[check.label];
+      const existingCheck = summarized[check.name];
       existingCheck.subRows.push(check);
 
       if (check.status === "UNAVAILABLE") {
@@ -302,7 +302,7 @@ export function summarizeStoreCheck(storeCheck: any[]): any[] {
         existingCheck.checked = check.checked;
       }
     } else {
-      summarized[check.label] = check;
+      summarized[check.name] = check;
     }
   });
 
