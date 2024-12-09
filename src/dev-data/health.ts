@@ -1,4 +1,6 @@
 export interface InputCheck {
+  label?: string;
+  description?: string;
   healthy: boolean;
   timestamp: string;
   state: string;
@@ -6,6 +8,8 @@ export interface InputCheck {
   message?: string;
   sources?: { label: string; status: string }[];
   capabilities?: {
+    label: string;
+    description: string;
     name: string;
     healthy: boolean;
     state: string;
@@ -14,6 +18,8 @@ export interface InputCheck {
 }
 
 export interface Check {
+  label?: string;
+  description?: string;
   name?: string;
   url: string;
   healthy?: boolean;
@@ -23,6 +29,8 @@ export interface Check {
   message?: string;
   sources?: { label: string; status: string }[];
   capabilities?: {
+    label?: string;
+    description?: string;
     name: string;
     healthy: boolean;
     state: string;
@@ -51,9 +59,39 @@ export const fromDev = (): { [key: string]: InputCheck } => {
       duration: 0,
       timestamp: "2024-02-15T17:56:36.681+01:00",
       capabilities: [
-        { name: "collections", healthy: false, state: "UNAVAILABLE" },
+        {
+          label: "COLLECTIONS",
+          description: "COLLECTIONS",
+          name: "collections",
+          healthy: false,
+          state: "UNAVAILABLE",
+        },
       ],
       /*
+export const fetchedHealthChecks: { [key: string]: InputCheck } = {
+  "app/crs": {
+    label: "crsLabel",
+    description: "Beschreibung",
+    healthy: true,
+    state: "AVAILABLE",
+    duration: 0,
+    timestamp: "2024-02-15T17:56:36.681+01:00",
+  },
+  "entities/services/testi": {
+    healthy: true,
+    state: "AVAILABLE",
+    duration: 0,
+    timestamp: "2024-02-15T17:56:36.681+01:00",
+    capabilities: [
+      {
+        label: "COLLECTIONS",
+        description: "COLLECTIONS",
+        name: "collectionss",
+        healthy: false,
+        state: "UNAVAILABLE",
+      },
+    ],
+    /*
     capabilities: [
       {
         name: "Capability1",

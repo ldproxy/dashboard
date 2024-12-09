@@ -78,6 +78,58 @@ export const sortCards = (cards: any[]) => {
   });
 };
 
+export function summarizeStoreCheck(storeCheck: any[]): any[] {
+  const nameCounts: { [name: string]: number } = {};
+  const summarized: { [name: string]: any } = {};
+
+  storeCheck.forEach((check) => {
+    if (!nameCounts[check.name]) {
+      nameCounts[check.name] = 0;
+    }
+    nameCounts[check.name]++;
+  });
+
+  storeCheck.forEach((check) => {
+    if (nameCounts[check.name] > 1) {
+      if (!summarized[check.name]) {
+        summarized[check.name] = { ...check, subRows: [] };
+      }
+
+      const existingCheck = summarized[check.name];
+      existingCheck.subRows.push(check);
+
+      if (check.status === "UNAVAILABLE") {
+        existingCheck.status = "UNAVAILABLE";
+      } else if (
+        check.status === "LIMITED" &&
+        existingCheck.status !== "UNAVAILABLE"
+      ) {
+        existingCheck.status = "LIMITED";
+      } else if (
+        check.status === "AVAILABLE" &&
+        existingCheck.status !== "UNAVAILABLE" &&
+        existingCheck.status !== "LIMITED"
+      ) {
+        existingCheck.status = "AVAILABLE";
+      }
+
+      if (dayjs(check.checked).isAfter(dayjs(existingCheck.checked))) {
+        existingCheck.checked = check.checked;
+      }
+    } else {
+      summarized[check.name] = check;
+    }
+  });
+
+  Object.values(summarized).forEach((item) => {
+    if (item.subRows) {
+      item.subRows = item.subRows.filter((subRow: any) => subRow !== item);
+    }
+  });
+
+  return Object.values(summarized);
+}
+
 const fetchDataFromAllUrls = async (endpoint: string) => {
   const apiUrls: string[] = await getApiUrl();
 
