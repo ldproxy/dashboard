@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Job } from "@/data/jobs";
+import { expandJobs, expandJob } from "@/lib/jobs";
 
 const fetchJobs = async (apiUrl: string) => {
   try {
@@ -10,25 +10,6 @@ const fetchJobs = async (apiUrl: string) => {
     console.error("Error:", error);
     throw error;
   }
-};
-
-const expandJobs = (jobs: Job[] = []): Job[] => {
-  const allJobs = [...jobs];
-
-  for (const followUp of jobs.flatMap(expandJob)) {
-    if (!allJobs.some((job) => job.id === followUp.id)) {
-      allJobs.push(followUp);
-    }
-  }
-
-  return allJobs;
-};
-const expandJob = (job: Job): Job[] => {
-  if (job.followUps.length > 0) {
-    return [job, ...job.followUps.flatMap(expandJob)];
-  }
-
-  return [job];
 };
 
 export default async function handler(

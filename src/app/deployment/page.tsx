@@ -168,7 +168,7 @@ export default function DeploymentPage() {
         setDeploymentName(currentDeployment.name);
       }
     }
-  });
+  }, [deployments]);
 
   const loadMetrics = async () => {
     try {

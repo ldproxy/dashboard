@@ -63,7 +63,7 @@ export default function HomePage() {
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isLoading, configurations]);
+  }, [isLoading, configurations, filteredConfigurations.length]);
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">

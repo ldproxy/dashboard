@@ -101,6 +101,8 @@ export default function EntitiesPage() {
       getDeploymentId();
     }
     return () => clearInterval(interval);
+    // did not include function checkDifferences() to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [multipleDeployments, pathname]);
 
   const onTabChange = (tab: string) => {
