@@ -97,27 +97,28 @@ export default function InfoCfg({
 
   return (
     <div className={`relative shadow-lg`}>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-semibold text-blue-700 flex items-center">
-            {cfgUrl ? (
-              <Link
-                href={cfgUrl}
-                target="_blank"
-                className="flex items-center relative group"
-              >
-                {cfgUrl}
-                <ExternalLink className="ml-2 h-4 w-4 text-blue-500 cursor-pointer" />
-                <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <Link href={route}>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-semibold text-blue-700 flex items-center">
+              {cfgUrl ? (
+                <Link
+                  href={cfgUrl}
+                  target="_blank"
+                  className="flex items-center relative group"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   {cfgUrl}
-                </span>
-              </Link>
-            ) : (
-              title
-            )}
-          </CardTitle>
-        </CardHeader>
-        <Link href={route}>
+                  <ExternalLink className="ml-2 h-4 w-4 text-blue-500 cursor-pointer" />
+                  <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {cfgUrl}
+                  </span>
+                </Link>
+              ) : (
+                title
+              )}
+            </CardTitle>
+          </CardHeader>
           <CardContent className="flex justify-center items-center">
             <div
               className="text-2xl font-bold break-normal"
@@ -129,8 +130,8 @@ export default function InfoCfg({
               {name}
             </div>
           </CardContent>
-        </Link>
-      </Card>
+        </Card>
+      </Link>
       {cfgUrl && (
         <>
           <Dialog open={popUpEdit} onOpenChange={(open) => setPopUpEdit(open)}>
