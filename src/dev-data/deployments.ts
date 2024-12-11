@@ -2,6 +2,8 @@ export type Deployment = {
   id: string;
   name: string;
   apiUrl: string[];
+  url?: string;
+  cfg?: string;
 };
 
 export const fromDev = (): Deployment[] => {

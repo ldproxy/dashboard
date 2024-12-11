@@ -19,7 +19,7 @@ import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable"
 import { useRouter, useSearchParams } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import JobInfo from "@/components/dashboard/Jobinfo";
-import { Jobs, Job } from "@/dev-data/jobs";
+import { Job } from "@/dev-data/jobs";
 
 import {
   Tabs,
