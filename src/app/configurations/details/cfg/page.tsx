@@ -5,7 +5,7 @@ import Prism from "prismjs";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getCfgs } from "../../../../lib/utils";
+import { getCfgs } from "@/lib/cfg";
 import { ClipLoader } from "react-spinners";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { DevCfg } from "@/dev-data/constants";

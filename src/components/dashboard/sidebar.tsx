@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 import { NavButton } from "./Navbutton";
 import { getIcon } from "@/lib/icons";
 import { usePathname } from "next/navigation";
-import { getDeployments } from "@/lib/utils";
+import { getDeployments } from "@/lib/deployments";
 import { set } from "react-hook-form";
 
 export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {

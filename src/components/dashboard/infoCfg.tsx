@@ -8,10 +8,11 @@ import {
 import Link from "next/link";
 import { getIcon } from "@/lib/icons";
 import { IconProps } from "@radix-ui/react-icons/dist/types";
-import { deleteConfig, getCfgs, updateCfg } from "../../lib/utils";
+import { getCfgs } from "@/lib/cfg";
 import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
 import { EditAndDeletePopUpDialog } from "./EditAndDeletePopUp";
 import { ExternalLink } from "lucide-react";
+import { deleteConfig, updateCfg } from "../../lib/cfg";
 
 export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;

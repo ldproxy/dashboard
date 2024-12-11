@@ -9,11 +9,7 @@ import {
 } from "@/components/shadcn-ui/tabs";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import {
-  GetEntities,
-  getHealthChecks,
-  compareDataAcrossUrls,
-} from "@/lib/utils";
+import { compareDataAcrossUrls } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Entity } from "@/dev-data/entities";
 import { autoRefreshInterval, DevEntities } from "@/dev-data/constants";
@@ -25,6 +21,8 @@ import {
   getStateSummary,
 } from "@/lib/entities";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import { getEntities } from "@/lib/entities";
+import { getHealthChecks } from "@/lib/health";
 
 export default function EntitiesPage() {
   const [entities, setEntities] = useState<Entity[]>([]);
@@ -67,7 +65,7 @@ export default function EntitiesPage() {
 
   const loadEntities = async () => {
     try {
-      const newEntities = await GetEntities();
+      const newEntities = await getEntities();
       const healthChecks = await getHealthChecks();
 
       newEntities.forEach((entity: any) => {

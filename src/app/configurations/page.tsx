@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { deleteConfig, getCfgs, postCfg } from "../../lib/utils";
+import { getCfgs } from "../../lib/cfg";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
 import InfoCfg from "@/components/dashboard/InfoCfg";
@@ -11,6 +11,7 @@ import { PopUpDialog } from "@/components/dashboard/CreateCfgPopUp";
 import { buttonVariants } from "@/components/shadcn-ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { DevCfg } from "@/dev-data/constants";
+import { postCfg, deleteConfig } from "@/lib/cfg";
 
 interface Entity {
   title: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getCfgs } from "../../../lib/utils";
+import { getCfgs } from "@/lib/cfg";
 import { ClipLoader } from "react-spinners";
 import { useRouter, useSearchParams } from "next/navigation";
 import InfoCfg from "@/components/dashboard/InfoCfg";

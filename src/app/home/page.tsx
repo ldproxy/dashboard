@@ -1,15 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getDeployments, postDeployment } from "../../lib/utils";
+import { getDeployments, postDeployment } from "@/lib/deployments";
 import { getIcon } from "@/lib/icons";
 import Link from "next/link";
-import {
-  getHealthChecks,
-  getInfo,
-  getAvailableNodes,
-  getAvailableNodesCount,
-} from "@/lib/utils";
+import { getAvailableNodes, getAvailableNodesCount } from "@/lib/utils";
 import { Check } from "@/dev-data/health";
 import { InputInfo } from "@/dev-data/info";
 import { Deployment } from "@/dev-data/deployments";
@@ -21,6 +16,8 @@ import { buttonVariants } from "@/components/shadcn-ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { PopUpDialog } from "@/components/dashboard/CreateDeploymentPopUp";
 import { DevHome } from "@/dev-data/constants";
+import { getHealthChecks } from "@/lib/health";
+import { getInfo } from "@/lib/info";
 
 type InfoType = { name: string; info: InputInfo }[];
 type HealthChecksType = { [key: string]: Check[] };

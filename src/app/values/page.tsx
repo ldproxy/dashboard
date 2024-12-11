@@ -8,7 +8,7 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
-import { getValues, compareDataAcrossUrls } from "@/lib/utils";
+import { compareDataAcrossUrls } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { InputValue } from "@/dev-data/values";
 import { getIcon } from "@/lib/icons";
@@ -17,6 +17,7 @@ import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable"
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { autoRefreshInterval } from "@/dev-data/constants";
+import { getValues } from "@/lib/values";
 
 interface TableDataItem {
   label: string;

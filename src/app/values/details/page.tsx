@@ -1,9 +1,10 @@
 "use client";
 import { Button } from "@/components/shadcn-ui/button";
-import { GetEntities, getValuesCfg, getHealthChecks } from "@/lib/utils";
+import { getValuesCfg } from "@/lib/cfgValues";
 import { ReloadIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { getHealthChecks } from "@/lib/health";
 
 import Prism from "prismjs";
 import "prismjs/components/prism-json";

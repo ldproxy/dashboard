@@ -14,19 +14,7 @@ import {
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
 import { Badge } from "@/components/shadcn-ui/badge";
-import {
-  GetEntities,
-  getHealthChecks,
-  getInfo,
-  getMetrics,
-  getValues,
-  getDeploymentCfg,
-  getDeployments,
-  getJobs,
-  sortCards,
-  summarizeStoreCheck,
-  compareDataAcrossUrls,
-} from "@/lib/utils";
+import { sortCards, compareDataAcrossUrls } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Check } from "@/dev-data/health";
 import { getIcon } from "@/lib/icons";
@@ -44,6 +32,14 @@ import { usePathname } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { getEntityCounts, getStateSummary } from "@/lib/entities";
 import { Deployment } from "@/dev-data/deployments";
+import { getEntities } from "@/lib/entities";
+import { getHealthChecks, summarizeStoreCheck } from "@/lib/health";
+import { getInfo } from "@/lib/info";
+import { getMetrics } from "@/lib/metrics";
+import { getJobs } from "@/lib/jobs";
+import { getDeployments } from "@/lib/deployments";
+import { getValues } from "@/lib/values";
+import { getDeploymentCfg } from "@/lib/cfg";
 
 type InfoType = { name: string; info: InputInfo }[];
 type MetricsType = { name: string; metrics: MetricsInfo[] };
@@ -351,7 +347,7 @@ export default function DeploymentPage() {
 
   const loadEntities = async () => {
     try {
-      const newEntities = await GetEntities();
+      const newEntities = await getEntities();
       const healthChecks = await getHealthChecks();
 
       newEntities.forEach((entity: any) => {

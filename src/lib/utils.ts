@@ -2,14 +2,12 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Deployment } from "@/dev-data/deployments";
-import dayjs from "dayjs";
 import { HealthChecksType } from "../../src/app/deployment/page";
+import { getDeployments } from "@/lib/deployments";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-
-const multipleDeployments = process.env.MULTIPLE_DEPLOYMENTS;
 
 /*
 const currentUrl = new URL(window.location.href);
@@ -19,9 +17,8 @@ const API_URL = apiUrl;
 */
 
 // const API_URL = "http://localhost:7081/api";
-const API_URL2 = "/api";
 
-export async function GetApiUrl(): Promise<string[]> {
+export async function getApiUrl(): Promise<string[]> {
   let apiUrl: string[] = [];
 
   const deployments = await getDeployments();
@@ -62,266 +59,11 @@ export async function GetApiUrl(): Promise<string[]> {
   return apiUrl;
 }
 
-export const GetEntities = async (API_URL?: string) => {
-  const apiUrls = [API_URL];
-  let apiUrl = apiUrls[0];
-  if (!apiUrl) {
-    const apiUrls = await GetApiUrl();
-    apiUrl = apiUrls[0];
-  }
-
-  const response = await fetch(`/api/fetchEntities?apiUrl=${apiUrl}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch Entities");
-  }
-  const data = await response.json();
-
-  return data;
-};
-
 function calculateDaysBetweenDates(begin: number, end: number): number {
   const oneDay = 1000 * 60 * 60 * 24;
   const diff = end - begin;
   return Math.floor(diff / oneDay);
 }
-
-export const getHealthChecks = async (API_URL?: string) => {
-  let apiUrls: string[] = [];
-  if (API_URL) {
-    apiUrls = Array.isArray(API_URL) ? API_URL : [API_URL];
-  } else {
-    apiUrls = await GetApiUrl();
-  }
-  if (apiUrls.length === 0) {
-    return [];
-  }
-  const response = await fetch(`/api/fetchHealth?apiUrls=${apiUrls.join(",")}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch health");
-  }
-  const data = await response.json();
-
-  return data;
-};
-
-export const getInfo = async (API_URL?: string) => {
-  let apiUrls: string[] = [];
-  if (API_URL) {
-    apiUrls = Array.isArray(API_URL) ? API_URL : [API_URL];
-  } else {
-    apiUrls = await GetApiUrl();
-  }
-  if (apiUrls.length === 0) {
-    return [];
-  }
-  const response = await fetch(`/api/fetchInfo?apiUrls=${apiUrls.join(",")}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch info");
-  }
-  const data = await response.json();
-
-  return data;
-};
-
-export const getMetrics = async (API_URL?: string) => {
-  let apiUrls: string[] = [];
-  if (API_URL) {
-    apiUrls = Array.isArray(API_URL) ? API_URL : [API_URL];
-  } else {
-    apiUrls = await GetApiUrl();
-  }
-  if (apiUrls.length === 0) {
-    return [];
-  }
-  const response = await fetch(
-    `/api/fetchMetrics?apiUrls=${apiUrls.join(",")}`
-  );
-  if (!response.ok) {
-    throw new Error("Failed to fetch metrics");
-  }
-  const data = await response.json();
-
-  return data;
-};
-
-export const getJobs = async (API_URL?: string) => {
-  const apiUrls = [API_URL];
-  let apiUrl = apiUrls[0];
-  if (!apiUrl) {
-    const apiUrls = await GetApiUrl();
-    apiUrl = apiUrls[0];
-  }
-  const response = await fetch(`/api/fetchJobs?apiUrl=${apiUrl}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch Jobs");
-  }
-  const data = await response.json();
-
-  return data;
-};
-
-export const getDeployments = async () => {
-  try {
-    const response = await fetch("/api/deployments");
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-};
-
-export const postDeployment = async (deployment: Deployment) => {
-  try {
-    const response = await fetch("/api/deployments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(deployment),
-    });
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-};
-
-export const postCfg = async (cfg: any) => {
-  try {
-    const response = await fetch("/api/cfg", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(cfg),
-    });
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-};
-
-export const updateCfg = async (
-  oldName: string,
-  newName: string,
-  oldUrl: string,
-  newUrl: string
-) => {
-  try {
-    const response = await fetch("/api/cfg", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ oldName, newName, oldUrl, newUrl }),
-    });
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-};
-
-export const deleteConfig = async (name: string) => {
-  try {
-    const response = await fetch("/api/cfg", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name }),
-    });
-    if (!response.ok) {
-      throw new Error(`Error: ${response.statusText}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-};
-
-export const getValues = async (API_URL?: string) => {
-  const apiUrls = [API_URL];
-  let apiUrl = apiUrls[0];
-  if (!apiUrl) {
-    const apiUrls = await GetApiUrl();
-    apiUrl = apiUrls[0];
-  }
-  const response = await fetch(`/api/fetchValues?apiUrl=${apiUrl}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch Values");
-  }
-  const data = await response.json();
-
-  return data;
-};
-
-export const getCfg = async (param: string) => {
-  try {
-    const formattedParam = param.replace(/_/g, "/");
-
-    const response = await fetch(`${API_URL2}/cfg/entities/${formattedParam}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-};
-
-export const getDeploymentCfg = async () => {
-  try {
-    const response = await fetch(API_URL2 + "/cfg/global/deployment");
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-};
-
-export const getCfgs = async () => {
-  try {
-    const response = await fetch(API_URL2 + "/cfg");
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-};
-
-export const getValuesCfg = async (param: string) => {
-  try {
-    const formattedParam = param.replace(/_/g, "/");
-
-    const response = await fetch(`${API_URL2}/cfg/values/${formattedParam}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error:", error);
-    throw error;
-  }
-};
 
 export const sortCards = (cards: any[]) => {
   if (cards.length === 0) return [];
@@ -336,60 +78,8 @@ export const sortCards = (cards: any[]) => {
   });
 };
 
-export function summarizeStoreCheck(storeCheck: any[]): any[] {
-  const labelCounts: { [label: string]: number } = {};
-  const summarized: { [label: string]: any } = {};
-
-  storeCheck.forEach((check) => {
-    if (!labelCounts[check.label]) {
-      labelCounts[check.label] = 0;
-    }
-    labelCounts[check.label]++;
-  });
-
-  storeCheck.forEach((check) => {
-    if (labelCounts[check.label] > 1) {
-      if (!summarized[check.label]) {
-        summarized[check.label] = { ...check, subRows: [] };
-      }
-
-      const existingCheck = summarized[check.label];
-      existingCheck.subRows.push(check);
-
-      if (check.status === "UNAVAILABLE") {
-        existingCheck.status = "UNAVAILABLE";
-      } else if (
-        check.status === "LIMITED" &&
-        existingCheck.status !== "UNAVAILABLE"
-      ) {
-        existingCheck.status = "LIMITED";
-      } else if (
-        check.status === "AVAILABLE" &&
-        existingCheck.status !== "UNAVAILABLE" &&
-        existingCheck.status !== "LIMITED"
-      ) {
-        existingCheck.status = "AVAILABLE";
-      }
-
-      if (dayjs(check.checked).isAfter(dayjs(existingCheck.checked))) {
-        existingCheck.checked = check.checked;
-      }
-    } else {
-      summarized[check.label] = check;
-    }
-  });
-
-  Object.values(summarized).forEach((item) => {
-    if (item.subRows) {
-      item.subRows = item.subRows.filter((subRow: any) => subRow !== item);
-    }
-  });
-
-  return Object.values(summarized);
-}
-
 const fetchDataFromAllUrls = async (endpoint: string) => {
-  const apiUrls: string[] = await GetApiUrl();
+  const apiUrls: string[] = await getApiUrl();
 
   if (apiUrls.length === 0) {
     return [];

@@ -1,13 +1,6 @@
 "use client";
 import { Button } from "@/components/shadcn-ui/button";
-import {
-  GetEntities,
-  getCfg,
-  getHealthChecks,
-  getJobs,
-  sortCards,
-  summarizeStoreCheck,
-} from "@/lib/utils";
+import { sortCards } from "@/lib/utils";
 import { ReloadIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -20,6 +13,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import JobInfo from "@/components/dashboard/Jobinfo";
 import { Job } from "@/dev-data/jobs";
+import { getEntities } from "@/lib/entities";
+import { getHealthChecks, summarizeStoreCheck } from "@/lib/health";
+import { getJobs } from "@/lib/jobs";
+import { getCfg } from "@/lib/cfg";
 
 import {
   Tabs,
@@ -157,7 +154,7 @@ function CustomerPage() {
 
   const loadEntities = async () => {
     try {
-      const newEntities = await GetEntities();
+      const newEntities = await getEntities();
       if (!newEntities) {
         return notFound();
       }
