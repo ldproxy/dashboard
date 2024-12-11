@@ -1,4 +1,4 @@
-import { metrics } from "../../src/data/metrics";
+import { metrics } from "../../src/dev-data/metrics";
 
 export default function handler(req: any, res: any) {
   if (req.method === "GET") {

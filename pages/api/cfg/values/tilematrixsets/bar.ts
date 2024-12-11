@@ -1,4 +1,4 @@
-import { tilematrixsets_bar } from "../../../../../src/data/cfgValues";
+import { tilematrixsets_bar } from "../../../../../src/dev-data/cfgValues";
 
 export default function handler(req: any, res: any) {
   if (req.method === "GET") {

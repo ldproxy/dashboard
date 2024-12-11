@@ -15,8 +15,8 @@ import {
   compareDataAcrossUrls,
 } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { Entity } from "@/data/entities";
-import { autoRefreshInterval, DevEntities } from "@/data/constants";
+import { Entity } from "@/dev-data/entities";
+import { autoRefreshInterval, DevEntities } from "@/dev-data/constants";
 import { getIcon } from "@/lib/icons";
 import {
   asLabel,

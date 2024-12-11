@@ -10,7 +10,7 @@ import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import { ClipLoader } from "react-spinners";
 import { Suspense } from "react";
-import { autoRefreshInterval } from "@/data/constants";
+import { autoRefreshInterval } from "@/dev-data/constants";
 
 const SuspenseWrapper = () => (
   <Suspense fallback={<div>Loading...</div>}>

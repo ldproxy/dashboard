@@ -1,44 +1,4 @@
-export const cfgs = [
-  {
-    name: "demo",
-    url: "https://github.com/ldproxy/dashboard",
-    entities: [
-      {
-        title: "vineyards",
-        content: {
-          id: "vineyards",
-          enabled: true,
-          providerType: "FEATURE",
-          providerSubType: "SQL",
-        },
-      },
-      {
-        title: "daraa",
-        content: {
-          id: "daraa",
-          enabled: true,
-          providerType: "FEATURE",
-          providerSubType: "SQL",
-        },
-      },
-    ],
-  },
-  {
-    name: "demo2",
-    url: "https://github.com/ldproxy/dashboard2",
-    entities: [
-      {
-        title: "vineyards2",
-        content: {
-          id: "vineyards",
-          enabled: true,
-          providerType: "FEATURE",
-          providerSubType: "SQL",
-        },
-      },
-    ],
-  },
-];
+import { cfgs } from "../dev-data/cfg";
 
 export const addConfiguration = (
   configurations: any,

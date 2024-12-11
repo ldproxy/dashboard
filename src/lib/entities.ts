@@ -1,4 +1,4 @@
-import { Entity } from "@/data/entities";
+import { Entity } from "@/dev-data/entities";
 
 export type CategoryHealthCounts = {
   [key: string]: HealthCounts;

@@ -1,4 +1,4 @@
-import { codelists_foo } from "../../../../../src/data/cfgValues";
+import { codelists_foo } from "../../../../../src/dev-data/cfgValues";
 
 export default function handler(req: any, res: any) {
   if (req.method === "GET") {

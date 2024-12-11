@@ -10,7 +10,7 @@ import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
 import { PopUpDialog } from "@/components/dashboard/CreateCfgPopUp";
 import { buttonVariants } from "@/components/shadcn-ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
-import { DevCfg } from "@/data/constants";
+import { DevCfg } from "@/dev-data/constants";
 
 interface Entity {
   title: string;

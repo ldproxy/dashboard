@@ -33,7 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/shadcn-ui/select";
-import { DevDeployment } from "@/data/constants";
+import { DevDeployment } from "@/dev-data/constants";
 
 interface Configuration {
   name: string;

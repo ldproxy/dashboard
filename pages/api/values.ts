@@ -1,4 +1,4 @@
-import { values } from "../../src/data/values";
+import { values } from "../../src/dev-data/values";
 
 export default function handler(req: any, res: any) {
   if (req.method === "GET") {

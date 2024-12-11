@@ -28,14 +28,14 @@ import {
   compareDataAcrossUrls,
 } from "@/lib/utils";
 import { useState, useEffect } from "react";
-import { Check } from "@/data/health";
+import { Check } from "@/dev-data/health";
 import { getIcon } from "@/lib/icons";
-import { Entity } from "@/data/entities";
-import { InputInfo } from "@/data/info";
-import { Metrics, MetricsInfo } from "@/data/metrics";
-import { Jobs, Job } from "@/data/jobs";
+import { Entity } from "@/dev-data/entities";
+import { InputInfo } from "@/dev-data/info";
+import { Metrics, MetricsInfo } from "@/dev-data/metrics";
+import { Jobs, Job } from "@/dev-data/jobs";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
-import { DevDeployment, autoRefreshInterval } from "@/data/constants";
+import { DevDeployment, autoRefreshInterval } from "@/dev-data/constants";
 import Prism from "prismjs";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
@@ -43,7 +43,7 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { getEntityCounts, getStateSummary } from "@/lib/entities";
-import { Deployment } from "@/data/deployments";
+import { Deployment } from "@/dev-data/deployments";
 
 type InfoType = { name: string; info: InputInfo }[];
 type MetricsType = { name: string; metrics: MetricsInfo[] };

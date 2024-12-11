@@ -1,7 +1,7 @@
 "use client";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Deployment } from "@/data/deployments";
+import { Deployment } from "@/dev-data/deployments";
 import dayjs from "dayjs";
 import { HealthChecksType } from "../../src/app/deployment/page";
 

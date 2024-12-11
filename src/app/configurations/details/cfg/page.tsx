@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getCfgs } from "../../../../lib/utils";
 import { ClipLoader } from "react-spinners";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
-import { DevCfg } from "@/data/constants";
+import { DevCfg } from "@/dev-data/constants";
 
 interface Entity {
   title: string;

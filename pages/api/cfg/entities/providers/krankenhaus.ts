@@ -1,4 +1,4 @@
-import { providers_krankenhaus } from "../../../../../src/data/cfg";
+import { providers_krankenhaus } from "../../../../../src/dev-data/cfg";
 
 export default function handler(req: any, res: any) {
   if (req.method === "GET") {

@@ -10,13 +10,13 @@ import {
 } from "@/components/shadcn-ui/tabs";
 import { getValues, compareDataAcrossUrls } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { InputValue } from "@/data/values";
+import { InputValue } from "@/dev-data/values";
 import { getIcon } from "@/lib/icons";
 import { columns } from "@/components/dashboard/DataTableComponents/ColumnsValues";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { autoRefreshInterval } from "@/data/constants";
+import { autoRefreshInterval } from "@/dev-data/constants";
 
 interface TableDataItem {
   label: string;

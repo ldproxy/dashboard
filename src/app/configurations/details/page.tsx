@@ -6,7 +6,7 @@ import { ClipLoader } from "react-spinners";
 import { useRouter, useSearchParams } from "next/navigation";
 import InfoCfg from "@/components/dashboard/InfoCfg";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
-import { DevCfg } from "@/data/constants";
+import { DevCfg } from "@/dev-data/constants";
 
 interface Entity {
   title: string;

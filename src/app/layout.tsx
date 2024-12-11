@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
 
 import "./globals.css";
 import { icons } from "@/lib/icons";
-import { Dev } from "@/data/constants";
+import { Dev } from "@/dev-data/constants";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 

@@ -1,4 +1,4 @@
-import { Job } from "@/data/jobs";
+import { Job } from "@/dev-data/jobs";
 
 export const expandJobs = (jobs: Job[] = []): Job[] => {
   const allJobs = [...jobs];

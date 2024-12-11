@@ -1,4 +1,4 @@
-import { appCfg } from "../../../../src/data/cfg";
+import { appCfg } from "../../../../src/dev-data/cfg";
 
 export default function handler(req: any, res: any) {
   if (req.method === "GET") {

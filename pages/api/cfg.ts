@@ -1,9 +1,9 @@
-// import { cfgs } from "../../src/data/cfgs";
+import { cfgs } from "../../src/dev-data/cfg";
+
 import {
   addConfiguration,
   deleteConfiguration,
   updateConfiguration,
-  cfgs,
 } from "../../src/lib/cfg";
 
 export default function handler(req: any, res: any) {

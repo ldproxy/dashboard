@@ -11,15 +11,15 @@ import {
 import { ReloadIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Entity } from "@/data/entities";
-import { Check } from "@/data/health";
-import { autoRefreshInterval, DevEntities } from "@/data/constants";
+import { Entity } from "@/dev-data/entities";
+import { Check } from "@/dev-data/health";
+import { autoRefreshInterval, DevEntities } from "@/dev-data/constants";
 import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import JobInfo from "@/components/dashboard/Jobinfo";
-import { Jobs, Job } from "@/data/jobs";
+import { Jobs, Job } from "@/dev-data/jobs";
 
 import {
   Tabs,

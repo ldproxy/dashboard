@@ -1,4 +1,4 @@
-import { Jobs } from "../../src/data/jobs";
+import { Jobs } from "../../src/dev-data/jobs";
 
 export default function handler(req: any, res: any) {
   if (req.method === "GET") {
