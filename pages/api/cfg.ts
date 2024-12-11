@@ -1,4 +1,4 @@
-import { cfgs } from "../../src/dev-data/cfg";
+import { cfgs } from "../../src/lib/cfg";
 
 import {
   addConfiguration,

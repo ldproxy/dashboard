@@ -1,4 +1,4 @@
-import { fetchedHealthChecks } from "../../src/dev-data/health";
+import { fetchedHealthChecks } from "../../src/lib/health";
 
 export default function handler(req: any, res: any) {
   if (req.method === "GET") {

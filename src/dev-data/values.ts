@@ -12,15 +12,17 @@ export interface InputValueWithId {
 
 export type InputValue = InputValueWithPath | InputValueWithId;
 
-export const values: InputValue[] = [
-  {
-    path: "foo",
-    status: "HEALTHY",
-    type: "codelists",
-  },
-  {
-    id: "bar",
-    status: "ACTIVE",
-    type: "tile-matrix-sets",
-  },
-];
+export const fromDev = (): InputValue[] => {
+  return [
+    {
+      path: "foo",
+      status: "HEALTHY",
+      type: "codelists",
+    },
+    {
+      id: "bar",
+      status: "ACTIVE",
+      type: "tile-matrix-sets",
+    },
+  ];
+};

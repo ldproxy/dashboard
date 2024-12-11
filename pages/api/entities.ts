@@ -1,4 +1,4 @@
-import { fetchedEntities } from "../../src/dev-data/entities";
+import { fetchedEntities } from "../../src/lib/entities";
 
 export default function handler(req: any, res: any) {
   if (req.method === "GET") {

@@ -9,10 +9,12 @@ export interface InputInfoItem {
 
 export type InputInfo = InputInfoItem[];
 
-export const info = {
-  name: "demo.ldproxy.net",
-  version: "3.6.2",
-  status: "HEALTHY",
-  url: "foo",
-  env: "DEV",
+export const fromDev = () => {
+  return {
+    name: "demo.ldproxy.net",
+    version: "3.6.2",
+    status: "HEALTHY",
+    url: "foo",
+    env: "DEV",
+  };
 };

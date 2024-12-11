@@ -1,4 +1,9 @@
-import { Job } from "@/dev-data/jobs";
+import { Job, fromDev } from "@/dev-data/jobs";
+
+export const fetchedJobs =
+  process.env.DEPLOYMENTS || process.env.NODE_ENV !== "development"
+    ? {}
+    : fromDev();
 
 export const expandJobs = (jobs: Job[] = []): Job[] => {
   const allJobs = [...jobs];

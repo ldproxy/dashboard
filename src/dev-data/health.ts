@@ -37,22 +37,23 @@ export interface Check {
   }[];
 }
 
-export const fetchedHealthChecks: { [key: string]: InputCheck } = {
-  "app/crs": {
-    healthy: true,
-    state: "AVAILABLE",
-    duration: 0,
-    timestamp: "2024-02-15T17:56:36.681+01:00",
-  },
-  "entities/services/testi": {
-    healthy: true,
-    state: "AVAILABLE",
-    duration: 0,
-    timestamp: "2024-02-15T17:56:36.681+01:00",
-    capabilities: [
-      { name: "collections", healthy: false, state: "UNAVAILABLE" },
-    ],
-    /*
+export const fromDev = (): { [key: string]: InputCheck } => {
+  return {
+    "app/crs": {
+      healthy: true,
+      state: "AVAILABLE",
+      duration: 0,
+      timestamp: "2024-02-15T17:56:36.681+01:00",
+    },
+    "entities/services/testi": {
+      healthy: true,
+      state: "AVAILABLE",
+      duration: 0,
+      timestamp: "2024-02-15T17:56:36.681+01:00",
+      capabilities: [
+        { name: "collections", healthy: false, state: "UNAVAILABLE" },
+      ],
+      /*
     capabilities: [
       {
         name: "Capability1",
@@ -83,42 +84,43 @@ export const fetchedHealthChecks: { [key: string]: InputCheck } = {
         capabilities: ["Capability2"],
       },
     ], */
-  },
-  "db.bergbau.pool.ConnectivityCheck": {
-    healthy: true,
-    state: "AVAILABLE",
-    duration: 0,
-    timestamp: "2024-02-15T17:56:36.681+01:00",
-  },
-  "db.krankenhaus.pool.ConnectivityCheck": {
-    healthy: true,
-    state: "AVAILABLE",
+    },
+    "db.bergbau.pool.ConnectivityCheck": {
+      healthy: true,
+      state: "AVAILABLE",
+      duration: 0,
+      timestamp: "2024-02-15T17:56:36.681+01:00",
+    },
+    "db.krankenhaus.pool.ConnectivityCheck": {
+      healthy: true,
+      state: "AVAILABLE",
 
-    duration: 5,
-    timestamp: "2024-02-15T17:56:36.687+01:00",
-  },
-  deadlocks: {
-    healthy: true,
-    state: "AVAILABLE",
+      duration: 5,
+      timestamp: "2024-02-15T17:56:36.687+01:00",
+    },
+    deadlocks: {
+      healthy: true,
+      state: "AVAILABLE",
 
-    duration: 0,
-    timestamp: "2024-02-15T17:56:36.687+01:00",
-  },
-  store: {
-    healthy: true,
-    duration: 0,
-    state: "AVAILABLE",
+      duration: 0,
+      timestamp: "2024-02-15T17:56:36.687+01:00",
+    },
+    store: {
+      healthy: true,
+      duration: 0,
+      state: "AVAILABLE",
 
-    timestamp: "2024-02-15T17:56:36.687+01:00",
-    sources: [
-      {
-        label: "FS[.]",
-        status: "HEALTHY",
-      },
-      {
-        label: "S3[s3.ldproxy.net/bplan]",
-        status: "HEALTHY",
-      },
-    ],
-  },
+      timestamp: "2024-02-15T17:56:36.687+01:00",
+      sources: [
+        {
+          label: "FS[.]",
+          status: "HEALTHY",
+        },
+        {
+          label: "S3[s3.ldproxy.net/bplan]",
+          status: "HEALTHY",
+        },
+      ],
+    },
+  };
 };

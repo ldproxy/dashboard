@@ -1,4 +1,9 @@
-import { Entity } from "@/dev-data/entities";
+import { Entity, fromDev } from "@/dev-data/entities";
+
+export const fetchedEntities =
+  process.env.DEPLOYMENTS || process.env.NODE_ENV !== "development"
+    ? {}
+    : fromDev();
 
 export type CategoryHealthCounts = {
   [key: string]: HealthCounts;

@@ -1,8 +1,8 @@
-import { codelists_foo } from "../../../../../src/dev-data/cfgValues";
+import { fetchedCodelists_foo } from "../../../../../src/lib/cfgValues";
 
 export default function handler(req: any, res: any) {
   if (req.method === "GET") {
-    res.status(200).json(codelists_foo);
+    res.status(200).json(fetchedCodelists_foo);
   } else {
     res.status(405).json({ message: "Method not allowed" });
   }
