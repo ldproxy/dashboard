@@ -27,7 +27,7 @@ interface Configuration {
 export default function HomePage() {
   const [configurations, setConfigurations] = useState<Configuration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showNoConfigMessage, setShowNoConfigMessage] = useState(false);
+  const [foundNoConfigMessage, setFoundNoConfigMessage] = useState(false);
 
   let id: string | null = "";
   let searchParams = useSearchParams();
@@ -59,7 +59,7 @@ export default function HomePage() {
   useEffect(() => {
     if (filteredConfigurations.length === 0) {
       const timer = setTimeout(() => {
-        setShowNoConfigMessage(true);
+        setFoundNoConfigMessage(true);
       }, 500);
       return () => clearTimeout(timer);
     }
@@ -90,7 +90,7 @@ export default function HomePage() {
           className="grid gap-4 md:grid-cols-1 lg:grid-cols-1 "
           style={{ marginBottom: "10px" }}
         >
-          {filteredConfigurations.length === 0 && showNoConfigMessage ? (
+          {filteredConfigurations.length === 0 && foundNoConfigMessage ? (
             <div>Keine Konfigurationen gefunden</div>
           ) : (
             filteredConfigurations.map((cfg, cfgIndex) =>

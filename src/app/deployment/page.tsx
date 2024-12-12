@@ -3,9 +3,7 @@ import { columns } from "@/components/dashboard/DataTableComponents/DataTableCol
 import Summary from "@/components/dashboard/Summary";
 import Info from "@/components/dashboard/InfoBox";
 import JobInfo from "@/components/dashboard/Jobinfo";
-import { Button } from "@/components/shadcn-ui/button";
-import { ReloadIcon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
-import Link from "next/link";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import dayjs from "dayjs";
 import {
   Tabs,
@@ -13,14 +11,11 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
-import { Badge } from "@/components/shadcn-ui/badge";
-import { sortCards, compareDataAcrossUrls } from "@/lib/utils";
+import { sortCards } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { Check } from "@/dev-data/health";
 import { getIcon } from "@/lib/icons";
-import { Entity } from "@/dev-data/entities";
-import { InputInfo } from "@/dev-data/info";
-import { MetricsInfo } from "@/dev-data/metrics";
+
 import { Job } from "@/dev-data/jobs";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { DevDeployment, autoRefreshInterval } from "@/dev-data/constants";
@@ -32,17 +27,14 @@ import { usePathname } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { getEntityCounts, getStateSummary } from "@/lib/entities";
 import { Deployment } from "@/dev-data/deployments";
-import { getEntities } from "@/lib/entities";
-import { getHealthChecks, summarizeStoreCheck } from "@/lib/health";
-import { getInfo } from "@/lib/info";
-import { getMetrics } from "@/lib/metrics";
-import { getJobs } from "@/lib/jobs";
-import { getDeployments } from "@/lib/deployments";
-import { getValues } from "@/lib/values";
-import { getDeploymentCfg } from "@/lib/cfg";
+import {
+  getDeployments,
+  getMatchingDeployment,
+  getDeploymentId,
+} from "@/lib/deployments";
+import { useDataLoader } from "@/lib/loadDataHook";
+import { summarizeStoreCheck } from "@/lib/health";
 
-type InfoType = { name: string; info: InputInfo }[];
-type MetricsType = { name: string; metrics: MetricsInfo[] };
 export type HealthChecksType = { [key: string]: Check[] };
 export type NodesDifferent = {
   entities: boolean;
@@ -51,151 +43,127 @@ export type NodesDifferent = {
 
 export default function DeploymentPage() {
   const [tab, setTab] = useState("overview");
-  const [entities, setEntities] = useState<Entity[]>([]);
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [healthChecks, setHealthChecks] = useState<HealthChecksType>({});
-  const [metrics, setMetrics] = useState<MetricsType[]>([
-    { name: "", metrics: [{ uptime: -1, memory: -1, apiUrl: "" }] },
-  ]);
-  const [info, setInfo] = useState<InfoType>([]);
-  const [values, setValues] = useState([] as any[]);
   const [tableData, setTableData] = useState([] as any[]);
-  const [cfg, setCfg] = useState<{}>({});
-  const [hasError, setHasError] = useState(false);
   const router = useRouter();
   let pathname = usePathname();
   const [deployments, setDeployments] = useState([
     { name: "", url: "", apiUrl: [""], id: "" },
   ] as Deployment[]);
-  const [deploymentName, setDeploymentName] = useState("");
   const [deploymentId, setDeploymentId] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const [healthStatuses, setHealthStatuses] = useState<
     { name: string; healthStatus: string }[] | null
   >(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [matchingDeployment, setMatchingDelpoyment] = useState({});
-  const [nodesDifferent, setNodesDifferent] = useState<NodesDifferent>({
-    entities: false,
-    values: false,
+  const [matchingDeployment, setMatchingDelpoyment] = useState<Deployment>({
+    id: "",
+    name: "",
+    apiUrl: [""],
   });
+  const {
+    entities,
+    jobs,
+    healthChecks,
+    metrics,
+    info,
+    values,
+    cfg,
+    hasError,
+    nodesDifferent,
+    loadData,
+  } = useDataLoader(matchingDeployment);
 
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 
   useEffect(() => {
-    getDeployments().then((data: any) => {
-      setDeployments(data);
-      getMatchingDeployment(data);
-    });
-  }, [multipleDeployments]);
-
-  const getMatchingDeployment = async (data: Deployment[]) => {
-    const currentUrl = new URL(window.location.href);
-    const queryParams = new URLSearchParams(currentUrl.search);
-    const did = queryParams.get("did");
-    const baseUrl = currentUrl.origin;
-    const apiUrl = `${baseUrl}/api`;
-    let deployment: Deployment | {} = {};
-    if (did) {
-      setDeploymentId(did);
-      deployment = data.find((d) => d.id === did) || {};
-    } else {
-      deployment =
-        data.find((deployment: Deployment) =>
-          deployment.apiUrl.includes(apiUrl)
-        ) || {};
+    if (isInitialLoad && deployments.length > 0) {
+      loadData().then(() => setIsInitialLoad(false));
     }
-    if ("name" in deployment && Object.keys(deployment).length > 0) {
-      setMatchingDelpoyment(deployment);
-      setDeploymentName(deployment.name);
-    }
-  };
-
-  const loadInfo = async () => {
-    try {
-      if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
-        const newInfo = await getInfo();
-        if (newInfo.length > 0) {
-          setInfo([
-            {
-              name: (matchingDeployment as Deployment).name,
-              info: newInfo as InputInfo,
-            },
-          ]);
-        } else {
-          setInfo([
-            {
-              name: (matchingDeployment as Deployment).name,
-              info: [] as InputInfo,
-            },
-          ]);
-        }
-      }
-    } catch (error) {
-      console.error("Error loading info:", error);
-    }
-  };
-
-  const getDeploymentId = async () => {
-    const currentUrl = new URL(window.location.href);
-    const queryParams = new URLSearchParams(currentUrl.search);
-    const did = queryParams.get("did");
-    if (did) {
-      setDeploymentId(did);
-    }
-  };
-
-  useEffect(() => {
-    getDeployments().then((data: any) => setDeployments(data));
-    if (multipleDeployments === "multi" || multipleDeployments === "saas") {
-      getDeploymentId();
-    }
-  }, [multipleDeployments]);
-
-  useEffect(() => {
-    const currentUrl = new URL(window.location.href);
-
-    if (currentUrl && deployments.length > 0) {
-      const currentDeployment = deployments.find(
-        (deployment) => deployment.url === currentUrl.href
-      );
-
-      if (currentDeployment) {
-        setDeploymentName(currentDeployment.name);
-      }
-    }
+    // not all dependendies to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deployments]);
 
-  const loadMetrics = async () => {
-    try {
-      if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
-        const newMetrics = await getMetrics();
-        setMetrics([
-          {
-            name: (matchingDeployment as Deployment).name,
-            metrics: newMetrics as MetricsInfo[],
-          },
-        ]);
-      }
-    } catch (error) {
-      console.error("Error loading metrics:", error);
+  useEffect(() => {
+    if (!isInitialLoad) {
+      const interval = setInterval(loadData, autoRefreshInterval);
+      return () => clearInterval(interval);
+    }
+    // not all dependendies to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInitialLoad]);
+
+  useEffect(() => {
+    getDeployments().then((data: any) => {
+      setDeployments(data);
+      getMatchingDeployment(data, setDeploymentId, setMatchingDelpoyment);
+    });
+    if (multipleDeployments === "multi" || multipleDeployments === "saas") {
+      getDeploymentId(setDeploymentId);
+    }
+  }, [multipleDeployments]);
+
+  useEffect(() => {
+    const updateHealthStatus = async () => {
+      const healthStatuses = await getHealthStatuses(healthChecks);
+      setHealthStatuses(healthStatuses);
+    };
+    updateHealthStatus();
+    // not all dependendies to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [healthChecks]);
+
+  useEffect(() => {
+    const storeCheck = Object.values(healthChecks)
+      .flat()
+      .filter(
+        (check: Check) =>
+          check &&
+          check.name &&
+          check.name.startsWith("app/") &&
+          check.name !== "app/store/values2"
+      )
+      .map((check) => {
+        if (check && check.name) {
+          const urlPart = check.url.match(/\/\/([^\/]+)/)?.[1] || "";
+          return {
+            label: check.name.substring(4),
+            url: urlPart,
+            status: check.state,
+            checked: dayjs(check.timestamp).format("HH:mm:ss"),
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+    const summarizedStoreCheck = summarizeStoreCheck(storeCheck);
+
+    setTableData(summarizedStoreCheck);
+  }, [healthChecks]);
+
+  useEffect(() => {
+    if (pathname) {
+      setTab(window.location.hash.slice(1) || "overview");
+    }
+  }, [pathname]);
+
+  const onTabChange = (tab: string) => {
+    setTab(tab);
+    if (deploymentId !== "") {
+      router.push(`${pathname}?did=${deploymentId}#${tab}`);
+    } else {
+      router.push(`${pathname}#${tab}`);
     }
   };
 
-  const loadHealthChecks = async () => {
-    try {
-      if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
-        let healthChecksObj: HealthChecksType = {};
-        const newHealthChecks = await getHealthChecks();
-        healthChecksObj[(matchingDeployment as Deployment).name] =
-          newHealthChecks;
-        setHealthChecks(healthChecksObj);
-        const healthStatuses = await getHealthStatuses(healthChecksObj);
-        setHealthStatuses(healthStatuses);
-      }
-    } catch (error) {
-      console.error("Error loading health checks:", error);
+  const getWarningMessage = () => {
+    const keys = (
+      Object.keys(nodesDifferent) as Array<keyof NodesDifferent>
+    ).filter((key) => nodesDifferent[key]);
+    if (keys.length > 0) {
+      return `Warning: Differences detected in ${keys.join(
+        " and "
+      )} across different replicas. This issue is likely temporary.`;
     }
+    return null;
   };
 
   const getHealthStatuses = async (healthChecks: HealthChecksType) => {
@@ -225,210 +193,21 @@ export default function DeploymentPage() {
     } else return null;
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        await Promise.all([
-          loadHealthChecks(),
-          loadInfo(),
-          loadMetrics(),
-          loadEntities(),
-          loadJobs(),
-          loadValues(),
-          checkDifferences(),
-          //loadCfg(),
-        ]);
-      } catch (error) {
-        console.error(
-          "Ein Fehler ist beim Laden der Daten aufgetreten:",
-          error
-        );
-      } finally {
-        setIsLoading(false);
-        setIsInitialLoad(false);
-      }
-    };
-    if (isInitialLoad && deployments.length > 0) {
-      loadData();
-    }
-    // not all dependendies to avoid infinite loop
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deployments]);
-
-  useEffect(() => {
-    if (!isInitialLoad) {
-      const loadData = async () => {
-        await Promise.all([
-          loadHealthChecks(),
-          loadInfo(),
-          loadMetrics(),
-          loadEntities(),
-          loadJobs(),
-          loadValues(),
-          checkDifferences(),
-          // loadCfg(),
-        ]);
-      };
-      const interval = setInterval(loadData, 2000);
-      return () => clearInterval(interval);
-    }
-    // not all dependendies to avoid infinite loop
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deployments, pathname, isInitialLoad]);
-
-  useEffect(() => {
-    const storeCheck = Object.values(healthChecks)
-      .flat()
-      .filter(
-        (check: Check) =>
-          check &&
-          check.name &&
-          check.name.startsWith("app/") &&
-          check.name !== "app/store/values2"
-      )
-      .map((check) => {
-        if (check && check.name) {
-          const urlPart = check.url.match(/\/\/([^\/]+)/)?.[1] || "";
-          return {
-            label: check.name.substring(4),
-            url: urlPart,
-            status: check.state,
-            checked: dayjs(check.timestamp).format("HH:mm:ss"),
-          };
-        }
-        return null;
-      })
-      .filter(Boolean);
-    const summarizedStoreCheck = summarizeStoreCheck(storeCheck);
-
-    setTableData(summarizedStoreCheck);
-    /*if (DevDeployment) {
-      console.log("storeCheck data:", storeCheck);
-    }
-    if (storeCheck && storeCheck.sources && storeCheck.healthy) {
-      setStoreState(storeCheck.healthy);
-      setTableData(
-        storeCheck.sources.map((source) => ({
-          label: source.label,
-          status: source.status,
-          checked: storeCheck.timestamp,
-        }))
-      );
-    }
-    if (DevDeployment) {
-      console.log("Table data:", tableData);
-    }*/
-  }, [healthChecks]);
-
-  const loadCfg = async () => {
-    try {
-      const newCfg = await getDeploymentCfg();
-      if (newCfg.message === "Method not allowed") {
-        setHasError(true);
-      } else {
-        setCfg(newCfg);
-      }
-    } catch (error) {
-      setHasError(true);
-
-      console.error("Error loading cfg:", error);
-    }
-  };
-
-  const loadJobs = async () => {
-    try {
-      const newJobs = await getJobs();
-      setJobs(newJobs);
-    } catch (error) {
-      console.error("Error loading jobs:", error);
-    }
-  };
-
-  const loadEntities = async () => {
-    try {
-      const newEntities = await getEntities();
-      const healthChecks = await getHealthChecks();
-
-      newEntities.forEach((entity: any) => {
-        const hc = healthChecks.find(
-          (check: any) => check.name === `entities/${entity.type}/${entity.id}`
-        );
-        entity.status = hc && hc.state ? hc.state : "UNKNOWN";
-      });
-
-      setEntities(newEntities);
-    } catch (error) {
-      console.error("Error loading entities:", error);
-    }
-  };
-
-  const loadValues = async () => {
-    try {
-      const newValues = await getValues();
-      setValues(newValues);
-    } catch (error) {
-      console.error("Error loading health values:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (pathname) {
-      setTab(window.location.hash.slice(1) || "overview");
-    }
-  }, [pathname]);
-
-  const onTabChange = (tab: string) => {
-    setTab(tab);
-    if (deploymentId !== "") {
-      router.push(`${pathname}?did=${deploymentId}#${tab}`);
-    } else {
-      router.push(`${pathname}#${tab}`);
-    }
-  };
-
   const totalSources = tableData.length;
   const totalValues = values.length;
-  if (DevDeployment) {
-    console.log("Values:", totalValues);
-    console.log("totalSources:", totalSources);
-    console.log("Jobs", jobs);
-  }
   const totalEntities = entities.length;
-
   const entityCounts = getEntityCounts(entities);
   const footer = getStateSummary(entityCounts);
-
   let sortedJobs = [];
   if (jobs.length > 0) {
     sortedJobs = sortCards(jobs);
   }
 
-  const checkDifferences = async () => {
-    const differences = await compareDataAcrossUrls();
-    const newNodesDifferent = { ...nodesDifferent };
-
-    if (differences.entitiesDifferent) {
-      newNodesDifferent.entities = true;
-    }
-    if (differences.valuesDifferent) {
-      newNodesDifferent.values = true;
-    }
-
-    setNodesDifferent(newNodesDifferent);
-  };
-
-  const getWarningMessage = () => {
-    const keys = (
-      Object.keys(nodesDifferent) as Array<keyof NodesDifferent>
-    ).filter((key) => nodesDifferent[key]);
-    if (keys.length > 0) {
-      return `Warning: Differences detected in ${keys.join(
-        " and "
-      )} across different replicas. This issue is likely temporary.`;
-    }
-    return null;
-  };
+  if (DevDeployment) {
+    console.log("Values:", totalValues);
+    console.log("totalSources:", totalSources);
+    console.log("Jobs", jobs);
+  }
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">

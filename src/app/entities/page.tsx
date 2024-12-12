@@ -9,9 +9,7 @@ import {
 } from "@/components/shadcn-ui/tabs";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { compareDataAcrossUrls } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { Entity } from "@/dev-data/entities";
 import { autoRefreshInterval, DevEntities } from "@/dev-data/constants";
 import { getIcon } from "@/lib/icons";
 import {
@@ -21,29 +19,21 @@ import {
   getStateSummary,
 } from "@/lib/entities";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
-import { getEntities } from "@/lib/entities";
-import { getHealthChecks } from "@/lib/health";
+import { useDataLoader } from "@/lib/loadDataHook";
+
+import { getDeploymentId } from "@/lib/deployments";
 
 export default function EntitiesPage() {
-  const [entities, setEntities] = useState<Entity[]>([]);
   const [tab, setTab] = useState("overview");
   const router = useRouter();
   let pathname = usePathname();
   const [deploymentId, setDeploymentId] = useState("");
-  const [nodesDifferent, setNodesDifferent] = useState({
-    entities: false,
+  const { entities, nodesDifferent, loadData } = useDataLoader({
+    loadEntities: true,
+    checkDifferences: true,
   });
 
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
-
-  const getDeploymentId = async () => {
-    const currentUrl = new URL(window.location.href);
-    const queryParams = new URLSearchParams(currentUrl.search);
-    const did = queryParams.get("did");
-    if (did) {
-      setDeploymentId(did);
-    }
-  };
 
   const entityCategories = entities
     .map(getEntityCategory)
@@ -63,42 +53,24 @@ export default function EntitiesPage() {
     entityCategories
   );
 
-  const loadEntities = async () => {
-    try {
-      const newEntities = await getEntities();
-      const healthChecks = await getHealthChecks();
-
-      newEntities.forEach((entity: any) => {
-        const hc = healthChecks.find(
-          (check: any) => check.name === `entities/${entity.type}/${entity.id}`
-        );
-        entity.status = hc && hc.state ? hc.state : "UNKNOWN";
-      });
-
-      setEntities(newEntities);
-    } catch (error) {
-      console.error("Error loading entities:", error);
-    }
-  };
-
   useEffect(() => {
-    const loadData = async () => {
-      await loadEntities();
-    };
-
-    loadData();
-    checkDifferences();
+    loadData({ loadEntities: true, checkDifferences: true });
 
     const interval = setInterval(() => {
-      loadEntities(), checkDifferences();
+      loadData({ loadEntities: true, checkDifferences: true });
     }, autoRefreshInterval);
+    return () => clearInterval(interval);
+    // not all dependendies to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
     if (multipleDeployments === "multi" || multipleDeployments === "saas") {
-      getDeploymentId();
+      getDeploymentId(setDeploymentId);
     }
-    return () => clearInterval(interval);
     // did not include function checkDifferences() to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [multipleDeployments, pathname]);
@@ -110,17 +82,6 @@ export default function EntitiesPage() {
     } else {
       router.push(`${pathname}#${tab}`);
     }
-  };
-
-  const checkDifferences = async () => {
-    const differences = await compareDataAcrossUrls();
-    const newNodesDifferent = { ...nodesDifferent };
-
-    if (differences.entitiesDifferent) {
-      newNodesDifferent.entities = true;
-    }
-
-    setNodesDifferent(newNodesDifferent);
   };
 
   const getWarningMessage = () => {

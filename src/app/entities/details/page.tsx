@@ -1,7 +1,6 @@
 "use client";
-import { Button } from "@/components/shadcn-ui/button";
 import { sortCards } from "@/lib/utils";
-import { ReloadIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
+import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Entity } from "@/dev-data/entities";
@@ -14,8 +13,9 @@ import { ClipLoader } from "react-spinners";
 import JobInfo from "@/components/dashboard/Jobinfo";
 import { Job } from "@/dev-data/jobs";
 import { getEntities } from "@/lib/entities";
-import { getHealthChecks, summarizeStoreCheck } from "@/lib/health";
-import { getJobs } from "@/lib/jobs";
+import { summarizeStoreCheck } from "@/lib/health";
+import { useDataLoader } from "@/lib/loadDataHook";
+
 import { getCfg } from "@/lib/cfg";
 
 import {
@@ -42,14 +42,17 @@ function CustomerPage() {
   const router = useRouter();
   const [entities, setEntities] = useState<Entity[]>([]);
   const [entity, setEntity] = useState<Entity | null>(null); // entities[params.id]);
-  const [healthChecks, setHealthChecks] = useState<Check[]>([]);
   const [cfg, setCfg] = useState<{}>({});
   const [isLoading, setIsLoading] = useState(true);
   const [tableData, setTableData] = useState([] as any[]);
   const [tab, setTab] = useState("overview");
   const [hasError, setHasError] = useState(false);
   const [tiles, setTiles] = useState(false);
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const { healthChecksEntities, jobs, loadData } = useDataLoader({
+    loadHealthChecksEntities: true,
+    loadJobs: true,
+  });
+  const healthChecks: Check[] = healthChecksEntities;
 
   let id: string | null = "";
   let searchParams = useSearchParams();
@@ -67,7 +70,7 @@ function CustomerPage() {
   }, [id]);
 
   useEffect(() => {
-    if (healthChecks && entity) {
+    if (healthChecks && healthChecks.length > 0 && entity) {
       const myCheck = healthChecks
         .filter(
           (check: Check) =>
@@ -118,24 +121,6 @@ function CustomerPage() {
     }
   }, [healthChecks, entity]);
 
-  const loadHealthChecks = async () => {
-    try {
-      const newHealthChecks = await getHealthChecks();
-      setHealthChecks(newHealthChecks);
-    } catch (error) {
-      console.error("Error loading health checks:", error);
-    }
-  };
-
-  const loadJobs = async () => {
-    try {
-      const newJobs = await getJobs();
-      setJobs(newJobs);
-    } catch (error) {
-      console.error("Error loading jobs:", error);
-    }
-  };
-
   const loadCfg = async () => {
     try {
       if (id !== null) {
@@ -173,11 +158,10 @@ function CustomerPage() {
   };
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadEntitiesAndCfg = async () => {
       await loadEntities();
-      await loadHealthChecks();
-      await loadJobs();
       await loadCfg();
+      loadData({ loadHealthChecksEntities: true, loadJobs: true });
       setIsLoading(false);
       if (DevEntities) {
         console.log("entities[id]", entities);
@@ -185,9 +169,11 @@ function CustomerPage() {
         console.log("cfg", cfg);
       }
     };
-    loadData();
+    loadEntitiesAndCfg();
+
     const interval = setInterval(() => {
-      loadData();
+      loadEntitiesAndCfg();
+      loadData({ loadHealthChecksEntities: true, loadJobs: true });
     }, autoRefreshInterval);
     return () => clearInterval(interval);
     // some dependencies ignored to avoid indefinite loop

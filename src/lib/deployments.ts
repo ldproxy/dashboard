@@ -51,3 +51,39 @@ export const postDeployment = async (deployment: Deployment) => {
     throw error;
   }
 };
+
+export const getMatchingDeployment = async (
+  data: Deployment[],
+  setDeploymentId: (did: string) => void,
+  setMatchingDelpoyment: (deployment: Deployment) => void
+) => {
+  const currentUrl = new URL(window.location.href);
+  const queryParams = new URLSearchParams(currentUrl.search);
+  const did = queryParams.get("did");
+  const baseUrl = currentUrl.origin;
+  const apiUrl = `${baseUrl}/api`;
+  let deployment: Deployment | {} = {};
+  if (did) {
+    setDeploymentId(did);
+    deployment = data.find((d) => d.id === did) || {};
+  } else {
+    deployment =
+      data.find((deployment: Deployment) =>
+        deployment.apiUrl.includes(apiUrl)
+      ) || {};
+  }
+  if ("name" in deployment && Object.keys(deployment).length > 0) {
+    setMatchingDelpoyment(deployment);
+  }
+};
+
+export const getDeploymentId = async (
+  setDeploymentId: (did: string) => void
+) => {
+  const currentUrl = new URL(window.location.href);
+  const queryParams = new URLSearchParams(currentUrl.search);
+  const did = queryParams.get("did");
+  if (did) {
+    setDeploymentId(did);
+  }
+};
