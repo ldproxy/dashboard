@@ -28,10 +28,7 @@ export default function EntitiesPage() {
   const router = useRouter();
   let pathname = usePathname();
   const [deploymentId, setDeploymentId] = useState("");
-  const { entities, nodesDifferent, loadData } = useDataLoader({
-    loadEntities: true,
-    checkDifferences: true,
-  });
+  const { entities, nodesDifferent, loadData } = useDataLoader();
 
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 

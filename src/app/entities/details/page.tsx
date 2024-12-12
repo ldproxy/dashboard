@@ -48,10 +48,7 @@ function CustomerPage() {
   const [tab, setTab] = useState("overview");
   const [hasError, setHasError] = useState(false);
   const [tiles, setTiles] = useState(false);
-  const { healthChecksEntities, jobs, loadData } = useDataLoader({
-    loadHealthChecksEntities: true,
-    loadJobs: true,
-  });
+  const { healthChecksEntities, jobs, loadData } = useDataLoader();
   const healthChecks: Check[] = healthChecksEntities;
 
   let id: string | null = "";

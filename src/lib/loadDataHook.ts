@@ -43,10 +43,7 @@ const defaultConfig: DataLoaderConfig = {
   checkDifferences: true,
 };
 
-export function useDataLoader(
-  arg1?: Deployment | DataLoaderConfig,
-  arg2?: DataLoaderConfig
-) {
+export function useDataLoader(matchingDeployment?: Deployment) {
   const [isLoading, setIsLoading] = useState(true);
   const [entities, setEntities] = useState<Entity[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -63,16 +60,6 @@ export function useDataLoader(
     entities: false,
     values: false,
   });
-  let matchingDeployment: Deployment | undefined;
-  let config: DataLoaderConfig;
-
-  if (arg1 && "id" in arg1) {
-    matchingDeployment = arg1;
-    config = arg2 || defaultConfig;
-  } else {
-    matchingDeployment = undefined;
-    config = (arg1 as DataLoaderConfig) || defaultConfig;
-  }
 
   const loadData = async (config: DataLoaderConfig = defaultConfig) => {
     setIsLoading(true);
