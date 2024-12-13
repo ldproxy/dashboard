@@ -8,7 +8,7 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
-import { compareDataAcrossUrls } from "@/lib/utils";
+import { useDataLoader } from "@/lib/loadDataHook";
 import { useEffect, useState } from "react";
 import { InputValue } from "@/dev-data/values";
 import { getIcon } from "@/lib/icons";
@@ -25,15 +25,12 @@ interface TableDataItem {
 }
 
 export default function EntitiesPage() {
-  const [values, setValues] = useState<any[]>([]);
   const [tab, setTab] = useState("overview");
   const [tableData, setTableData] = useState<TableDataItem[]>([]);
   const router = useRouter();
   let pathname = usePathname();
   const [deploymentId, setDeploymentId] = useState("");
-  const [nodesDifferent, setNodesDifferent] = useState({
-    values: false,
-  });
+  const { values, nodesDifferent, loadData } = useDataLoader();
 
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 
@@ -46,26 +43,10 @@ export default function EntitiesPage() {
     }
   };
 
-  const loadValues = async () => {
-    try {
-      const newValues = await getValues();
-      setValues(newValues);
-      const tableData = newValues.map((value: any) => ({
-        label: value.path,
-        type: value.type,
-      }));
-      setTableData(tableData);
-    } catch (error) {
-      console.error("Error loading values:", error);
-    }
-  };
-
   useEffect(() => {
-    loadValues();
-    checkDifferences();
+    loadData({ loadValues: true, checkDifferences: true });
     const interval = setInterval(() => {
-      loadValues();
-      checkDifferences();
+      loadData({ loadValues: true, checkDifferences: true });
     }, autoRefreshInterval);
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
@@ -78,12 +59,23 @@ export default function EntitiesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [multipleDeployments, pathname]);
 
-  const onTabChange = (tab: string) => {
-    setTab(tab);
-    if (deploymentId !== "") {
-      router.push(`${pathname}?did=${deploymentId}#${tab}`);
-    } else {
-      router.push(`${pathname}#${tab}`);
+  useEffect(() => {
+    if (values.length > 0) {
+      declareTableData();
+    }
+    // did not include checkDifferences() to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values]);
+
+  const declareTableData = async () => {
+    try {
+      const tableData = values.map((value: any) => ({
+        label: value.path,
+        type: value.type,
+      }));
+      setTableData(tableData);
+    } catch (error) {
+      console.error("Error loading values:", error);
     }
   };
 
@@ -100,22 +92,20 @@ export default function EntitiesPage() {
     return counts;
   }, {} as { [key: string]: number });
 
-  const checkDifferences = async () => {
-    const differences = await compareDataAcrossUrls();
-    const newNodesDifferent = { ...nodesDifferent };
-
-    if (differences.entitiesDifferent) {
-      newNodesDifferent.values = true;
-    }
-
-    setNodesDifferent(newNodesDifferent);
-  };
-
   const getWarningMessage = () => {
     if (nodesDifferent.values) {
       return `Warning: Differences detected in values across different replicas. This issue is likely temporary.`;
     }
     return null;
+  };
+
+  const onTabChange = (tab: string) => {
+    setTab(tab);
+    if (deploymentId !== "") {
+      router.push(`${pathname}?did=${deploymentId}#${tab}`);
+    } else {
+      router.push(`${pathname}#${tab}`);
+    }
   };
 
   return (
