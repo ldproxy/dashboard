@@ -35,7 +35,6 @@ type DataLoaderConfig = {
 const defaultConfig: DataLoaderConfig = {
   loadEntities: true,
   loadHealthChecks: true,
-  loadHealthChecksEntities: true,
   loadInfo: true,
   loadMetrics: true,
   loadJobs: true,

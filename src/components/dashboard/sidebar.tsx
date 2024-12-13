@@ -7,8 +7,7 @@ import React, { useEffect, useState } from "react";
 import { NavButton } from "./Navbutton";
 import { getIcon } from "@/lib/icons";
 import { usePathname } from "next/navigation";
-import { getDeployments } from "@/lib/deployments";
-import { set } from "react-hook-form";
+import { getDeployments, getDeploymentId } from "@/lib/deployments";
 
 export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   sections: SectionProps[];
@@ -48,17 +47,9 @@ export function Section({ title, entries, global }: SectionProps) {
     "did"
   );
 
-  const getDeploymentId = async () => {
-    const currentUrl = new URL(window.location.href);
-    const queryParams = new URLSearchParams(currentUrl.search);
-    const did = queryParams.get("did");
-    if (did) {
-      setDeploymentId(did);
-    }
-  };
   useEffect(() => {
     if (multipleDeployments === "multi" || multipleDeployments === "saas") {
-      getDeploymentId();
+      getDeploymentId(setDeploymentId);
     }
     getDeployments().then((data: any) => setDeployments(data));
   }, [pathname, multipleDeployments]);

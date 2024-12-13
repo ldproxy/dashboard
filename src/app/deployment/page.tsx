@@ -266,9 +266,11 @@ export default function DeploymentPage() {
           >
             {matchingDeployment &&
               Object.keys(matchingDeployment).length > 0 &&
-              info.length > 0 &&
               metrics.length > 0 &&
+              info.length > 0 &&
+              entities.length > 0 &&
               healthStatuses &&
+              healthStatuses.length > 0 &&
               (() => {
                 const deploymentInfo =
                   info &&

@@ -17,7 +17,7 @@ import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable"
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { autoRefreshInterval } from "@/dev-data/constants";
-import { getValues } from "@/lib/values";
+import { getDeploymentId } from "@/lib/deployments";
 
 interface TableDataItem {
   label: string;
@@ -34,15 +34,6 @@ export default function EntitiesPage() {
 
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 
-  const getDeploymentId = async () => {
-    const currentUrl = new URL(window.location.href);
-    const queryParams = new URLSearchParams(currentUrl.search);
-    const did = queryParams.get("did");
-    if (did) {
-      setDeploymentId(did);
-    }
-  };
-
   useEffect(() => {
     loadData({ loadValues: true, checkDifferences: true });
     const interval = setInterval(() => {
@@ -52,7 +43,7 @@ export default function EntitiesPage() {
       setTab(window.location.hash.slice(1) || "overview");
     }
     if (multipleDeployments === "multi" || multipleDeployments === "saas") {
-      getDeploymentId();
+      getDeploymentId(setDeploymentId);
     }
     return () => clearInterval(interval);
     // did not include checkDifferences() to avoid infinite loop
