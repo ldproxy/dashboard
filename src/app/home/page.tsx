@@ -16,15 +16,14 @@ import { buttonVariants } from "@/components/shadcn-ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { PopUpDialog } from "@/components/dashboard/CreateDeploymentPopUp";
 import { DevHome } from "@/dev-data/constants";
-import { getHealthChecks } from "@/lib/health";
-import { getInfo } from "@/lib/info";
+import { loadHealthChecksHomePage } from "@/lib/health";
+import { loadInfoHomePage } from "@/lib/info";
 
 type InfoType = { name: string; info: InputInfo }[];
 type HealthChecksType = { [key: string]: Check[] };
 
 export default function HomePage() {
   const [deployments, setDeployments] = useState([]);
-  const [healthChecks, setHealthChecks] = useState<HealthChecksType>({});
   const [availableNodes, setAvailableNodes] = useState([
     { name: "", availableUrlsCount: 0 },
   ]);
@@ -38,24 +37,6 @@ export default function HomePage() {
     { name: string; availableUrlsCount: number }[] | null
   >(null);
   const [popUp, setPopUp] = useState<boolean>(false);
-
-  const createDeployment = async (data: any) => {
-    try {
-      await postDeployment({
-        name: data.name,
-        apiUrl: [`http://${data.url}/api`],
-        url: `http://${data.url}/deployment`,
-        id: data.id,
-        cfg: data.cfg,
-      });
-      const deploymentsData = await getDeployments();
-      setDeployments(deploymentsData);
-      return { success: true };
-    } catch (error) {
-      console.error("Fehler beim Erstellen des Deployments", error);
-      return { success: false };
-    }
-  };
 
   const router = useRouter();
   const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
@@ -76,71 +57,17 @@ export default function HomePage() {
     });
   }, []);
 
-  const loadInfo = async () => {
-    try {
-      if (deployments.length > 0) {
-        const promises = deployments.map(async (deployment: any) => {
-          const newInfo = await getInfo(deployment.apiUrl);
-
-          if (newInfo && newInfo.length > 0) {
-            return { name: deployment.name, info: newInfo as InputInfo };
-          } else {
-            return { name: deployment.name, info: [] as InputInfo };
-          }
-        });
-        const results = await Promise.all(promises);
-        setInfo(results);
-      }
-    } catch (error) {
-      console.error("Error loading info:", error);
-    }
-  };
-
-  const loadHealthChecks = async () => {
-    try {
-      if (deployments.length > 0) {
-        let healthChecksObj: HealthChecksType = {};
-        const promises = deployments.map(async (deployment: any) => {
-          try {
-            const newHealthChecks = await getHealthChecks(deployment.apiUrl);
-            healthChecksObj[deployment.name] = newHealthChecks;
-          } catch (error) {
-            console.error(
-              "Error fetching health checks for",
-              deployment.name,
-              ":",
-              error
-            );
-            healthChecksObj[deployment.name] = [
-              { state: "OFFLINE", url: deployment.url },
-            ];
-          }
-        });
-        await Promise.all(promises);
-        setHealthChecks(healthChecksObj);
-        const healthStatuses = await getHealthStatuses(healthChecksObj);
-        const availableNodes = await getAvailableNodes(
-          healthChecksObj,
-          deployments
-        );
-        const healthyNodes = await getAvailableNodesCount(
-          healthChecksObj,
-          deployments
-        );
-        setHealthStatuses(healthStatuses);
-        setAvailableNodes(availableNodes);
-        setHealthyNodes(healthyNodes);
-      }
-    } catch (error) {
-      console.error("Error loading health checks:", error);
-    }
-  };
-
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        await Promise.all([loadHealthChecks(), loadInfo()]);
+        const [health, _] = await Promise.all([
+          loadHealthChecksHomePage(deployments),
+          loadInfoHomePage(deployments, setInfo),
+        ]);
+        if (health && Object.keys(health).length > 0) {
+          setHealthStatusAndNodes(health);
+        }
       } catch (error) {
         console.error(
           "Ein Fehler ist beim Laden der Daten aufgetreten:",
@@ -161,7 +88,13 @@ export default function HomePage() {
   useEffect(() => {
     if (!isInitialLoad) {
       const loadData = async () => {
-        await Promise.all([loadHealthChecks(), loadInfo()]);
+        const [health, _] = await Promise.all([
+          loadHealthChecksHomePage(deployments),
+          loadInfoHomePage(deployments, setInfo),
+        ]);
+        if (health && Object.keys(health).length > 0) {
+          setHealthStatusAndNodes(health);
+        }
       };
       const interval = setInterval(loadData, 2000);
       return () => clearInterval(interval);
@@ -169,6 +102,15 @@ export default function HomePage() {
     // not all dependendies to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deployments, isInitialLoad]);
+
+  const setHealthStatusAndNodes = async (health: HealthChecksType) => {
+    const healthStatuses = await getHealthStatuses(health);
+    const availableNodes = await getAvailableNodes(health, deployments);
+    const healthyNodes = getAvailableNodesCount(health, deployments);
+    setHealthStatuses(healthStatuses);
+    setAvailableNodes(availableNodes);
+    setHealthyNodes(healthyNodes);
+  };
 
   const getHealthStatuses = async (healthChecks: HealthChecksType) => {
     if (deployments.length > 0) {
@@ -196,6 +138,24 @@ export default function HomePage() {
         return { name: deployment.name, healthStatus };
       });
     } else return null;
+  };
+
+  const createDeployment = async (data: any) => {
+    try {
+      await postDeployment({
+        name: data.name,
+        apiUrl: [`http://${data.url}/api`],
+        url: `http://${data.url}/deployment`,
+        id: data.id,
+        cfg: data.cfg,
+      });
+      const deploymentsData = await getDeployments();
+      setDeployments(deploymentsData);
+      return { success: true };
+    } catch (error) {
+      console.error("Fehler beim Erstellen des Deployments", error);
+      return { success: false };
+    }
   };
 
   const currentUrl = new URL(window.location.href);

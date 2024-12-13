@@ -1,6 +1,10 @@
+import { Deployment } from "@/dev-data/deployments";
 import { fromDev } from "../dev-data/health";
 import { getApiUrl } from "./utils";
 import dayjs from "dayjs";
+import { Check } from "@/dev-data/health";
+
+type HealthChecksType = { [key: string]: Check[] };
 
 export const fetchedHealthChecks =
   process.env.DEPLOYMENTS || process.env.NODE_ENV !== "development"
@@ -77,3 +81,31 @@ export function summarizeStoreCheck(storeCheck: any[]): any[] {
 
   return Object.values(summarized);
 }
+
+export const loadHealthChecksHomePage = async (deployments: Deployment[]) => {
+  try {
+    if (deployments.length > 0) {
+      let healthChecksObj: HealthChecksType = {};
+      const promises = deployments.map(async (deployment: any) => {
+        try {
+          const newHealthChecks = await getHealthChecks(deployment.apiUrl);
+          healthChecksObj[deployment.name] = newHealthChecks;
+        } catch (error) {
+          console.error(
+            "Error fetching health checks for",
+            deployment.name,
+            ":",
+            error
+          );
+          healthChecksObj[deployment.name] = [
+            { state: "OFFLINE", url: deployment.url },
+          ];
+        }
+      });
+      await Promise.all(promises);
+      return healthChecksObj;
+    }
+  } catch (error) {
+    console.error("Error loading health checks:", error);
+  }
+};
