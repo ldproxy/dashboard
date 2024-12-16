@@ -18,7 +18,7 @@ import { getIcon } from "@/lib/icons";
 
 import { Job } from "@/dev-data/jobs";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
-import { DevDeployment, autoRefreshInterval } from "@/dev-data/constants";
+import { DevDeployment } from "@/dev-data/constants";
 import Prism from "prismjs";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
@@ -34,6 +34,7 @@ import {
 } from "@/lib/deployments";
 import { useDataLoader } from "@/lib/loadDataHook";
 import { summarizeStoreCheck } from "@/lib/health";
+import { useReloadInterval } from "../layout";
 
 export type HealthChecksType = { [key: string]: Check[] };
 export type NodesDifferent = {
@@ -42,6 +43,7 @@ export type NodesDifferent = {
 };
 
 export default function DeploymentPage() {
+  const autoRefreshInterval = useReloadInterval(2000);
   const [tab, setTab] = useState("overview");
   const [tableData, setTableData] = useState([] as any[]);
   const router = useRouter();
@@ -83,13 +85,13 @@ export default function DeploymentPage() {
   }, [deployments]);
 
   useEffect(() => {
-    if (!isInitialLoad) {
-      const interval = setInterval(loadData, autoRefreshInterval);
+    if (!isInitialLoad && autoRefreshInterval > 0) {
+      const interval = setInterval(loadData, autoRefreshInterval * 1000);
       return () => clearInterval(interval);
     }
     // not all dependendies to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isInitialLoad]);
+  }, [isInitialLoad, autoRefreshInterval]);
 
   useEffect(() => {
     getDeployments().then((data: any) => {
@@ -207,6 +209,7 @@ export default function DeploymentPage() {
     console.log("Values:", totalValues);
     console.log("totalSources:", totalSources);
     console.log("Jobs", jobs);
+    console.log("autoRefreshInterval", autoRefreshInterval);
   }
 
   return (
