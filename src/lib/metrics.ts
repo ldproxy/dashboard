@@ -1,4 +1,4 @@
-import { fromDev } from "@/dev-data/cfg";
+import { fromDev } from "@/dev-data/metrics";
 import { getApiUrl } from "@/lib/utils";
 
 export const fetchedMetrics =
@@ -23,6 +23,7 @@ export const getMetrics = async (API_URL?: string) => {
     throw new Error("Failed to fetch metrics");
   }
   const data = await response.json();
+  console.log("data", data);
 
   return data;
 };
