@@ -11,18 +11,7 @@ import { PopUpDialog } from "@/components/dashboard/CreateCfgPopUp";
 import { buttonVariants } from "@/components/shadcn-ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { DevCfg } from "@/dev-data/constants";
-import { postCfg, deleteConfig } from "@/lib/cfg";
-
-interface Entity {
-  title: string;
-  url: string;
-  content: {
-    id: string;
-    enabled: boolean;
-    providerType: string;
-    providerSubType: string;
-  };
-}
+import { postCfg } from "@/lib/cfg";
 
 interface Configuration {
   name: string;

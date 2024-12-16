@@ -2,8 +2,6 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/shadcn-ui/button";
-import { ReloadIcon } from "@radix-ui/react-icons";
 
 export default function ValuesPage() {
   const router = useRouter();
