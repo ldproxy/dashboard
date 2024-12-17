@@ -1,11 +1,5 @@
 "use client";
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  createContext,
-  useContext,
-} from "react";
+import React, { useEffect, useState, createContext, useContext } from "react";
 import Link from "next/link";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
@@ -98,7 +92,7 @@ export default function RootLayout({
                 </h2>
                 <div className="ml-auto flex w-full space-x-2 sm:justify-end">
                   <ReloadSelect
-                    reloadIntervall={reloadInterval}
+                    reloadInterval={reloadInterval}
                     setReloadInterval={setReloadInterval}
                   />
                   <Link

@@ -16,8 +16,8 @@ import { columns } from "@/components/dashboard/DataTableComponents/ColumnsValue
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { autoRefreshInterval } from "@/dev-data/constants";
 import { getDeploymentId } from "@/lib/deployments";
+import { useReloadInterval } from "../layout";
 
 interface TableDataItem {
   label: string;
@@ -25,6 +25,7 @@ interface TableDataItem {
 }
 
 export default function EntitiesPage() {
+  const autoRefreshInterval = useReloadInterval();
   const [tab, setTab] = useState("overview");
   const [tableData, setTableData] = useState<TableDataItem[]>([]);
   const router = useRouter();
@@ -36,19 +37,23 @@ export default function EntitiesPage() {
 
   useEffect(() => {
     loadData({ loadValues: true, checkDifferences: true });
-    const interval = setInterval(() => {
-      loadData({ loadValues: true, checkDifferences: true });
-    }, autoRefreshInterval);
+
+    if (autoRefreshInterval > 0) {
+      const interval = setInterval(() => {
+        loadData({ loadValues: true, checkDifferences: true });
+      }, autoRefreshInterval * 1000);
+      return () => clearInterval(interval);
+    }
+
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
     if (multipleDeployments === "multi" || multipleDeployments === "saas") {
       getDeploymentId(setDeploymentId);
     }
-    return () => clearInterval(interval);
     // did not include checkDifferences() to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [multipleDeployments, pathname]);
+  }, [multipleDeployments, pathname, autoRefreshInterval]);
 
   useEffect(() => {
     if (values.length > 0) {

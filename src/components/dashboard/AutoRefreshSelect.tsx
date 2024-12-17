@@ -1,30 +1,23 @@
 "use client";
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  createContext,
-  useContext,
-  useCallback,
-} from "react";
-import Link from "next/link";
-import { Inter } from "next/font/google";
-import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/components/shadcn-ui/theme";
-import { Sidebar } from "@/components/dashboard/Sidebar";
-import { DashboardIcon, ReloadIcon } from "@radix-ui/react-icons";
-import { useSearchParams } from "next/navigation";
-import { usePathname } from "next/navigation";
+import React, { useEffect, useState, useRef } from "react";
+import { ReloadIcon } from "@radix-ui/react-icons";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
 } from "@/components/shadcn-ui/select";
-
 import "../../app/globals.css";
 
-const ReloadSelect = ({ reloadInterval, setReloadInterval }) => {
+interface ReloadSelectProps {
+  reloadInterval: number;
+  setReloadInterval: (interval: number) => void;
+}
+
+const ReloadSelect: React.FC<ReloadSelectProps> = ({
+  reloadInterval,
+  setReloadInterval,
+}) => {
   const [showSelect, setShowSelect] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
   const reloadOptions = ["off", "1", "2", "5", "10", "20", "60"];

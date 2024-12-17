@@ -4,14 +4,12 @@ import { getValuesCfg } from "@/lib/cfgValues";
 import { ReloadIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getHealthChecks } from "@/lib/health";
-
 import Prism from "prismjs";
 import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import { ClipLoader } from "react-spinners";
 import { Suspense } from "react";
-import { autoRefreshInterval } from "@/dev-data/constants";
+import { useReloadInterval } from "../../layout";
 
 const SuspenseWrapper = () => (
   <Suspense fallback={<div>Loading...</div>}>
@@ -22,6 +20,7 @@ const SuspenseWrapper = () => (
 export default SuspenseWrapper;
 
 function CustomerPage() {
+  const autoRefreshInterval = useReloadInterval();
   const [cfg, setCfg] = useState<{}>({});
   const [hasError, setHasError] = useState(false);
   const router = useRouter();
@@ -52,13 +51,15 @@ function CustomerPage() {
 
   useEffect(() => {
     loadCfg();
-    const interval = setInterval(() => {
-      loadCfg();
-    }, autoRefreshInterval);
-    return () => clearInterval(interval);
+    if (autoRefreshInterval > 0) {
+      const interval = setInterval(() => {
+        loadCfg();
+      }, autoRefreshInterval * 1000);
+      return () => clearInterval(interval);
+    }
     // ignored dependency to avoid indefinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [autoRefreshInterval]);
 
   return (
     <>

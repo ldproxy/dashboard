@@ -10,7 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { autoRefreshInterval, DevEntities } from "@/dev-data/constants";
+import { DevEntities } from "@/dev-data/constants";
 import { getIcon } from "@/lib/icons";
 import {
   asLabel,
@@ -20,10 +20,12 @@ import {
 } from "@/lib/entities";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { useDataLoader } from "@/lib/loadDataHook";
+import { useReloadInterval } from "../layout";
 
 import { getDeploymentId } from "@/lib/deployments";
 
 export default function EntitiesPage() {
+  const autoRefreshInterval = useReloadInterval();
   const [tab, setTab] = useState("overview");
   const router = useRouter();
   let pathname = usePathname();
@@ -53,13 +55,15 @@ export default function EntitiesPage() {
   useEffect(() => {
     loadData({ loadEntities: true, checkDifferences: true });
 
-    const interval = setInterval(() => {
-      loadData({ loadEntities: true, checkDifferences: true });
-    }, autoRefreshInterval);
-    return () => clearInterval(interval);
+    if (autoRefreshInterval > 0) {
+      const interval = setInterval(() => {
+        loadData({ loadEntities: true, checkDifferences: true });
+      }, autoRefreshInterval * 1000);
+      return () => clearInterval(interval);
+    }
     // not all dependendies to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [autoRefreshInterval]);
 
   useEffect(() => {
     if (pathname) {

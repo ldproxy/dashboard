@@ -43,7 +43,7 @@ export type NodesDifferent = {
 };
 
 export default function DeploymentPage() {
-  const autoRefreshInterval = useReloadInterval(2000);
+  const autoRefreshInterval = useReloadInterval();
   const [tab, setTab] = useState("overview");
   const [tableData, setTableData] = useState([] as any[]);
   const router = useRouter();

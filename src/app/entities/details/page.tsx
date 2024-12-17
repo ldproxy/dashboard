@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Entity } from "@/dev-data/entities";
 import { Check } from "@/dev-data/health";
-import { autoRefreshInterval, DevEntities } from "@/dev-data/constants";
+import { DevEntities } from "@/dev-data/constants";
 import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -15,6 +15,7 @@ import { Job } from "@/dev-data/jobs";
 import { getEntities } from "@/lib/entities";
 import { summarizeStoreCheck } from "@/lib/health";
 import { useDataLoader } from "@/lib/loadDataHook";
+import { useReloadInterval } from "../../layout";
 
 import { getCfg } from "@/lib/cfg";
 
@@ -39,6 +40,7 @@ const SuspenseWrapper = () => (
 export default SuspenseWrapper;
 
 function CustomerPage() {
+  const autoRefreshInterval = useReloadInterval();
   const router = useRouter();
   const [entities, setEntities] = useState<Entity[]>([]);
   const [entity, setEntity] = useState<Entity | null>(null); // entities[params.id]);
@@ -168,14 +170,16 @@ function CustomerPage() {
     };
     loadEntitiesAndCfg();
 
-    const interval = setInterval(() => {
-      loadEntitiesAndCfg();
-      loadData({ loadHealthChecksEntities: true, loadJobs: true });
-    }, autoRefreshInterval);
-    return () => clearInterval(interval);
+    if (autoRefreshInterval > 0) {
+      const interval = setInterval(() => {
+        loadEntitiesAndCfg();
+        loadData({ loadHealthChecksEntities: true, loadJobs: true });
+      }, autoRefreshInterval * 1000);
+      return () => clearInterval(interval);
+    }
     // some dependencies ignored to avoid indefinite loop
     // eslint-disable-next-line
-  }, [tiles]);
+  }, [tiles, autoRefreshInterval]);
 
   const onTabChange = (tab: string) => {
     setTab(tab);
