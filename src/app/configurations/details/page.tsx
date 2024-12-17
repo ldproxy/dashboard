@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import InfoCfg from "@/components/dashboard/InfoCfg";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { DevCfg } from "@/dev-data/constants";
+import { useReloadInterval } from "../../layout";
 
 interface Entity {
   title: string;
@@ -25,6 +26,7 @@ interface Configuration {
 }
 
 export default function HomePage() {
+  const autoRefreshInterval = useReloadInterval();
   const [configurations, setConfigurations] = useState<Configuration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [foundNoConfigMessage, setFoundNoConfigMessage] = useState(false);
@@ -50,7 +52,16 @@ export default function HomePage() {
       }
       setIsLoading(false);
     });
-  }, []);
+
+    if (autoRefreshInterval > 0) {
+      const interval = setInterval(() => {
+        getCfgs().then((data: any) => {
+          setConfigurations(data);
+        });
+      }, autoRefreshInterval * 1000);
+      return () => clearInterval(interval);
+    }
+  }, [autoRefreshInterval]);
 
   const filteredConfigurations = configurations.filter(
     (cfg) => cfg.name === id && cfg.entities?.some((entity) => entity.title)

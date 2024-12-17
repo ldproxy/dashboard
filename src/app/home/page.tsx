@@ -18,11 +18,13 @@ import { PopUpDialog } from "@/components/dashboard/CreateDeploymentPopUp";
 import { DevHome } from "@/dev-data/constants";
 import { loadHealthChecksHomePage } from "@/lib/health";
 import { loadInfoHomePage } from "@/lib/info";
+import { useReloadInterval } from "../layout";
 
 type InfoType = { name: string; info: InputInfo }[];
 type HealthChecksType = { [key: string]: Check[] };
 
 export default function HomePage() {
+  const autoRefreshInterval = useReloadInterval();
   const [deployments, setDeployments] = useState([]);
   const [availableNodes, setAvailableNodes] = useState([
     { name: "", availableUrlsCount: 0 },
@@ -55,7 +57,16 @@ export default function HomePage() {
     getDeployments().then((data: any) => {
       setDeployments(data);
     });
-  }, []);
+
+    if (autoRefreshInterval > 0) {
+      const interval = setInterval(() => {
+        getDeployments().then((data: any) => {
+          setDeployments(data);
+        });
+      }, autoRefreshInterval * 1000);
+      return () => clearInterval(interval);
+    }
+  }, [autoRefreshInterval]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -86,7 +97,7 @@ export default function HomePage() {
   }, [deployments]);
 
   useEffect(() => {
-    if (!isInitialLoad) {
+    if (!isInitialLoad && autoRefreshInterval > 0) {
       const loadData = async () => {
         const [health, _] = await Promise.all([
           loadHealthChecksHomePage(deployments),
@@ -96,12 +107,12 @@ export default function HomePage() {
           setHealthStatusAndNodes(health);
         }
       };
-      const interval = setInterval(loadData, 2000);
+      const interval = setInterval(loadData, autoRefreshInterval * 1000);
       return () => clearInterval(interval);
     }
     // not all dependendies to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deployments, isInitialLoad]);
+  }, [deployments, isInitialLoad, autoRefreshInterval]);
 
   const setHealthStatusAndNodes = async (health: HealthChecksType) => {
     const healthStatuses = await getHealthStatuses(health);

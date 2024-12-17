@@ -12,6 +12,7 @@ import { buttonVariants } from "@/components/shadcn-ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { DevCfg } from "@/dev-data/constants";
 import { postCfg } from "@/lib/cfg";
+import { useReloadInterval } from "../layout";
 
 interface Configuration {
   name: string;
@@ -19,6 +20,7 @@ interface Configuration {
 }
 
 export default function HomePage() {
+  const autoRefreshInterval = useReloadInterval();
   const [configurations, setConfigurations] = useState<Configuration[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [popUp, setPopUp] = useState<boolean>(false);
@@ -36,8 +38,17 @@ export default function HomePage() {
         console.log("configurations", data);
       }
       setIsLoading(false);
+
+      if (autoRefreshInterval > 0) {
+        const interval = setInterval(() => {
+          getCfgs().then((data: any) => {
+            setConfigurations(data);
+          });
+        }, autoRefreshInterval * 1000);
+        return () => clearInterval(interval);
+      }
     });
-  }, []);
+  }, [autoRefreshInterval]);
 
   const hasNoQueryParams =
     new URLSearchParams(window.location.search).toString() === "";
