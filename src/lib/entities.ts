@@ -1,5 +1,4 @@
 import { Entity, fromDev } from "@/dev-data/entities";
-import { getApiUrl } from "./utils";
 
 export const fetchedEntities =
   process.env.DEPLOYMENTS || process.env.NODE_ENV !== "development"
@@ -75,21 +74,4 @@ export const getStateSummary = (counts: HealthCounts) => {
   }
 
   return summary;
-};
-
-export const getEntities = async (API_URL?: string) => {
-  const apiUrls = [API_URL];
-  let apiUrl = apiUrls[0];
-  if (!apiUrl) {
-    const apiUrls = await getApiUrl();
-    apiUrl = apiUrls[0];
-  }
-
-  const response = await fetch(`/api/fetchEntities?apiUrl=${apiUrl}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch Entities");
-  }
-  const data = await response.json();
-
-  return data;
 };

@@ -1,8 +1,8 @@
 import { Deployment } from "@/dev-data/deployments";
 import { fromDev } from "../dev-data/health";
-import { getApiUrl } from "./utils";
 import dayjs from "dayjs";
 import { Check } from "@/dev-data/health";
+import { fetchDataFromMultipleApiUrls } from "./fetchData";
 
 type HealthChecksType = { [key: string]: Check[] };
 
@@ -10,25 +10,6 @@ export const fetchedHealthChecks =
   process.env.DEPLOYMENTS || process.env.NODE_ENV !== "development"
     ? {}
     : fromDev();
-
-export const getHealthChecks = async (API_URL?: string) => {
-  let apiUrls: string[] = [];
-  if (API_URL) {
-    apiUrls = Array.isArray(API_URL) ? API_URL : [API_URL];
-  } else {
-    apiUrls = await getApiUrl();
-  }
-  if (apiUrls.length === 0) {
-    return [];
-  }
-  const response = await fetch(`/api/fetchHealth?apiUrls=${apiUrls.join(",")}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch health");
-  }
-  const data = await response.json();
-
-  return data;
-};
 
 export function summarizeStoreCheck(storeCheck: any[]): any[] {
   const labelCounts: { [label: string]: number } = {};
@@ -88,7 +69,10 @@ export const loadHealthChecksHomePage = async (deployments: Deployment[]) => {
       let healthChecksObj: HealthChecksType = {};
       const promises = deployments.map(async (deployment: any) => {
         try {
-          const newHealthChecks = await getHealthChecks(deployment.apiUrl);
+          const newHealthChecks = await fetchDataFromMultipleApiUrls(
+            "/api/fetchHealth",
+            deployment.apiUrl
+          );
           healthChecksObj[deployment.name] = newHealthChecks;
         } catch (error) {
           console.error(

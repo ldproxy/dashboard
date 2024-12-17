@@ -12,7 +12,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import JobInfo from "@/components/dashboard/Jobinfo";
 import { Job } from "@/dev-data/jobs";
-import { getEntities } from "@/lib/entities";
 import { summarizeStoreCheck } from "@/lib/health";
 import { useDataLoader } from "@/lib/loadDataHook";
 import { useReloadInterval } from "../../layout";
@@ -30,6 +29,7 @@ import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import { Suspense } from "react";
 import dayjs from "dayjs";
+import { fetchDataFromSingleApiUrl } from "@/lib/fetchData";
 
 const SuspenseWrapper = () => (
   <Suspense fallback={<div>Loading...</div>}>
@@ -136,9 +136,9 @@ function CustomerPage() {
     }
   };
 
-  const loadEntities = async () => {
+  const findEntity = async () => {
     try {
-      const newEntities = await getEntities();
+      const newEntities = await fetchDataFromSingleApiUrl("/api/fetchEntities");
       if (!newEntities) {
         return notFound();
       }
@@ -158,7 +158,7 @@ function CustomerPage() {
 
   useEffect(() => {
     const loadEntitiesAndCfg = async () => {
-      await loadEntities();
+      await findEntity();
       await loadCfg();
       loadData({ loadHealthChecksEntities: true, loadJobs: true });
       setIsLoading(false);
