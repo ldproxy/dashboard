@@ -2,7 +2,7 @@ import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import CustomersPage, {
   SummaryProps,
-} from "../../src/components/dashboard/homeInfo";
+} from "../src/components/dashboard/homeInfo";
 import { getIcon } from "@/lib/icons";
 
 import StoryWrapper from "./StoryWrapper";

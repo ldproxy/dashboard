@@ -1,6 +1,6 @@
 "use client";
 
-import Summary from "@/components/dashboard/summary";
+import Summary from "@/components/dashboard/Summary";
 import {
   Tabs,
   TabsList,

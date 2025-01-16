@@ -2,7 +2,7 @@ import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import CustomersPage, {
   SummaryProps,
-} from "../../src/components/dashboard/info";
+} from "../src/components/dashboard/info";
 import {
   GlobeIcon,
   ClockIcon,

@@ -1,6 +1,6 @@
 "use client";
 
-import Summary from "@/components/dashboard/summary";
+import Summary from "@/components/dashboard/Summary";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import {
   Tabs,
