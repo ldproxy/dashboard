@@ -1,12 +1,12 @@
-import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
+import { columns } from "../src/components/dashboard/DataTableComponents/DataTableColumns";
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import {
   DataTable,
   DataTableProps,
-} from "../../src/components/dashboard/DataTableComponents/DataTable";
+} from "../src/components/dashboard/DataTableComponents/DataTable";
 import StoryWrapper from "./StoryWrapper";
-import { HealthCheck } from "@/components/dashboard/DataTableComponents/DataTableColumns";
+import { HealthCheck } from "../src/components/dashboard/DataTableComponents/DataTableColumns";
 
 export default {
   title: "Components/DataTable",

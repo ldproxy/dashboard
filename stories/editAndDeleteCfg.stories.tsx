@@ -2,9 +2,9 @@
 
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
-import { EditAndDeletePopUpDialog } from "../components/dashboard/EditAndDeletePopUp";
-import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
-import { Button } from "@/components/shadcn-ui/button";
+import { EditAndDeletePopUpDialog } from "../src/components/dashboard/EditAndDeletePopUp";
+import { Dialog, DialogTrigger } from "../src/components/shadcn-ui/dialog";
+import { Button } from "../src/components/shadcn-ui/button";
 import StoryWrapper from "./StoryWrapper";
 
 export default {

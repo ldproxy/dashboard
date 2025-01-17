@@ -1,8 +1,8 @@
 import React from "react";
 import { Inter } from "next/font/google";
-import { ThemeProvider } from "@/components/shadcn-ui/theme";
-import { cn } from "@/lib/utils";
-import "../../src/app/globals.css";
+import { ThemeProvider } from "../src/components/shadcn-ui/theme";
+import { cn } from "../src/lib/utils";
+import "../src/app/globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
