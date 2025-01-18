@@ -23,6 +23,7 @@ import { useDataLoader } from "@/lib/loadDataHook";
 import { useReloadInterval } from "../layout";
 
 import { getDeploymentId } from "@/lib/deployments";
+import { IS_MODE_MULTI } from "@/lib/env";
 
 export default function EntitiesPage() {
   const autoRefreshInterval = useReloadInterval();
@@ -31,8 +32,6 @@ export default function EntitiesPage() {
   let pathname = usePathname();
   const [deploymentId, setDeploymentId] = useState("");
   const { entities, nodesDifferent, loadData } = useDataLoader();
-
-  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 
   const entityCategories = entities
     .map(getEntityCategory)
@@ -69,12 +68,12 @@ export default function EntitiesPage() {
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
-    if (multipleDeployments === "multi" || multipleDeployments === "saas") {
+    if (IS_MODE_MULTI) {
       getDeploymentId(setDeploymentId);
     }
     // did not include function checkDifferences() to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [multipleDeployments, pathname]);
+  }, [pathname]);
 
   const onTabChange = (tab: string) => {
     setTab(tab);

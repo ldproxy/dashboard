@@ -2,18 +2,15 @@ import {
   fromDevCodelists_foo,
   fromDevTilematrixsets_bar,
 } from "../dev-data/cfgValues";
+import { IS_PROD } from "./env";
 
 const API_URL2 = "/api";
 
 export const fetchedCodelists_foo =
-  process.env.DEPLOYMENTS || process.env.NODE_ENV !== "development"
-    ? {}
-    : fromDevCodelists_foo();
+  process.env.DEPLOYMENTS || IS_PROD ? {} : fromDevCodelists_foo();
 
 export const fetchedTilematrixsets_bar =
-  process.env.DEPLOYMENTS || process.env.NODE_ENV !== "development"
-    ? {}
-    : fromDevTilematrixsets_bar();
+  process.env.DEPLOYMENTS || IS_PROD ? {} : fromDevTilematrixsets_bar();
 
 export const getValuesCfg = async (param: string) => {
   try {

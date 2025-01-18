@@ -1,20 +1,6 @@
-export interface InputMetrics {
-  gauges: {
-    [key: string]: {
-      value: number;
-    };
-  };
-}
+import { InputMetrics } from "@/lib/metrics";
 
-export interface MetricsInfo {
-  uptime: number;
-  memory: number;
-  apiUrl: string;
-}
-
-export type Metrics = MetricsInfo[];
-
-export const fromDev = () => {
+export const fromDev = (): InputMetrics => {
   return {
     gauges: {
       "jvm.attribute.uptime": {

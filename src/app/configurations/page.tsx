@@ -26,10 +26,6 @@ export default function HomePage() {
   const [popUp, setPopUp] = useState<boolean>(false);
 
   const router = useRouter();
-  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
-  if (DevCfg) {
-    console.log("multipleDeployments", multipleDeployments);
-  }
 
   useEffect(() => {
     getCfgs().then((data: any) => {

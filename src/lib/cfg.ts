@@ -1,11 +1,9 @@
 import { fromDev } from "../dev-data/cfg";
+import { IS_DEV, IS_PROD } from "./env";
 
 const API_URL2 = "/api";
 
-export const cfgs =
-  process.env.DEPLOYMENTS || process.env.NODE_ENV !== "development"
-    ? []
-    : fromDev();
+export const cfgs = process.env.DEPLOYMENTS || IS_PROD ? [] : fromDev();
 
 export const addConfiguration = (
   configurations: any,

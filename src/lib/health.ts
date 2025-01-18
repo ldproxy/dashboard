@@ -1,15 +1,110 @@
 import { Deployment } from "@/dev-data/deployments";
-import { fromDev } from "../dev-data/health";
 import dayjs from "dayjs";
-import { Check } from "@/dev-data/health";
 import { fetchDataFromMultipleApiUrls } from "./fetchData";
+import { it } from "node:test";
+
+export interface InputCheck {
+  url?: string;
+  label?: string;
+  description?: string;
+  healthy: boolean;
+  timestamp: string;
+  state: string;
+  duration: number;
+  message?: string;
+  sources?: { label: string; status: string }[];
+  capabilities?: Record<
+    string,
+    {
+      label: string;
+      description: string;
+      healthy: boolean;
+      state: string;
+      message?: string;
+    }
+  >;
+  components?: Record<
+    string,
+    {
+      healthy: boolean;
+      state: string;
+      message?: string;
+      capabilities: [];
+    }
+  >;
+}
+
+export interface Check {
+  label?: string;
+  description?: string;
+  name?: string;
+  url: string;
+  healthy?: boolean;
+  state: string;
+  timestamp?: string;
+  duration?: number;
+  message?: string;
+  sources?: { label: string; status: string }[];
+  capabilities?: {
+    label?: string;
+    description?: string;
+    name: string;
+    healthy: boolean;
+    state: string;
+    message?: string;
+  }[];
+  components?: {
+    name: string;
+    healthy: boolean;
+    state: string;
+    message?: string;
+    capabilities: [];
+  }[];
+}
 
 type HealthChecksType = { [key: string]: Check[] };
 
-export const fetchedHealthChecks =
-  process.env.DEPLOYMENTS || process.env.NODE_ENV !== "development"
-    ? {}
-    : fromDev();
+export type SingleInputHealth = Record<string, InputCheck>;
+export type MultiInputHealth = {
+  url: string;
+  checks: SingleInputHealth;
+  state?: string;
+}[];
+
+const normalizeChecks = (input: SingleInputHealth, url: string): Check[] => {
+  return Object.keys(input).map((name) => ({
+    name,
+    url,
+    ...input[name],
+    capabilities: input[name].capabilities
+      ? Object.keys(input[name].capabilities!).map((cap) => ({
+          name: cap,
+          ...input[name].capabilities![cap],
+        }))
+      : undefined,
+    components: input[name].components
+      ? Object.keys(input[name].components!).map((comp) => ({
+          name: comp,
+          ...input[name].components![comp],
+        }))
+      : undefined,
+  }));
+};
+
+export const normalizeHealth = (
+  input: SingleInputHealth | MultiInputHealth
+): Check[] => {
+  if (Array.isArray(input)) {
+    return input.flatMap((item) => {
+      if (item.state) {
+        return [{ url: item.url, state: item.state }];
+      }
+      return normalizeChecks(item.checks, item.url);
+    });
+  }
+
+  return normalizeChecks(input, "TODO");
+};
 
 export function summarizeStoreCheck(storeCheck: any[]): any[] {
   const labelCounts: { [label: string]: number } = {};
@@ -70,7 +165,7 @@ export const loadHealthChecksHomePage = async (deployments: Deployment[]) => {
       const promises = deployments.map(async (deployment: any) => {
         try {
           const newHealthChecks = await fetchDataFromMultipleApiUrls(
-            "/api/fetchHealth",
+            "/api/health",
             deployment.apiUrl
           );
           healthChecksObj[deployment.name] = newHealthChecks;

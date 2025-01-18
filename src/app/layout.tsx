@@ -14,6 +14,7 @@ import { useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 
 import ReloadSelect from "@/components/dashboard/AutoRefreshSelect";
+import { IS_MODE_MULTI, IS_MODE_SAAS } from "@/lib/env";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -59,10 +60,7 @@ export default function RootLayout({
       }
     };
 
-    if (
-      process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS === "multi" ||
-      process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS === "saas"
-    ) {
+    if (IS_MODE_MULTI) {
       getDeploymentId();
     }
   }, [pathname, searchParams]);
@@ -134,19 +132,17 @@ export default function RootLayout({
                                 : "/values",
                             },
                           ],
-                          global:
-                            process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS ===
-                            "saas"
-                              ? [
-                                  {
-                                    title: "Configurations",
-                                    icon: icons.Reader,
-                                    route: deploymentId
-                                      ? `/configurations?did=${deploymentId}`
-                                      : "/configurations",
-                                  },
-                                ]
-                              : [],
+                          global: IS_MODE_SAAS
+                            ? [
+                                {
+                                  title: "Configurations",
+                                  icon: icons.Reader,
+                                  route: deploymentId
+                                    ? `/configurations?did=${deploymentId}`
+                                    : "/configurations",
+                                },
+                              ]
+                            : [],
                         },
                       ]}
                       className="hidden lg:block"

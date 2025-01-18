@@ -7,21 +7,17 @@ import dayjs from "dayjs";
 import { Deployment } from "@/dev-data/deployments";
 import { HealthChecksType } from "../../src/app/deployment/page";
 import { getDeployments } from "@/lib/deployments";
+import { IS_MODE_SINGLE } from "./env";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/*
-const currentUrl = new URL(window.location.href);
-const baseUrl = currentUrl.origin;
-const apiUrl = `${baseUrl}/api`;
-const API_URL = apiUrl;
-*/
-
-// const API_URL = "http://localhost:7081/api";
-
 export async function getApiUrl(): Promise<string[]> {
+  if (IS_MODE_SINGLE) {
+    return ["/api"];
+  }
+
   let apiUrl: string[] = [];
 
   const deployments = await getDeployments();

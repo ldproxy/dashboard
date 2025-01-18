@@ -1,6 +1,31 @@
-import { fromDev } from "@/dev-data/cfg";
+export interface InputValueWithPath {
+  path: string;
+  status: string;
+  type: string;
+}
 
-export const fetchedValues =
-  process.env.DEPLOYMENTS || process.env.NODE_ENV !== "development"
-    ? {}
-    : fromDev();
+export interface InputValueWithId {
+  id: string;
+  status: string;
+  type: string;
+}
+
+export type InputValue = InputValueWithPath | InputValueWithId;
+
+export type InputValues = Record<string, InputValue[]>;
+
+export type Value = InputValue & {
+  uid: string;
+};
+
+export const normalizeValues = (input: InputValues): Value[] => {
+  return Object.keys(input).flatMap((type) =>
+    Array.isArray(input[type])
+      ? input[type].map((value: any) => ({
+          type,
+          uid: `${type}_${value.path}`,
+          ...value,
+        }))
+      : []
+  );
+};

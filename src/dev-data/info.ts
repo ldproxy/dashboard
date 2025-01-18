@@ -1,15 +1,6 @@
-export interface InputInfoItem {
-  name: string;
-  version: string;
-  url: string;
-  env: string;
-  status: string;
-  apiUrl: string;
-}
+import { SingleInputInfo } from "@/lib/info";
 
-export type InputInfo = InputInfoItem[];
-
-export const fromDev = () => {
+export const fromDev = (): SingleInputInfo => {
   return {
     name: "demo.ldproxy.net",
     version: "3.6.2",

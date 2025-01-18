@@ -1,16 +1,4 @@
-export interface InputValueWithPath {
-  path: string;
-  status: string;
-  type: string;
-}
-
-export interface InputValueWithId {
-  id: string;
-  status: string;
-  type: string;
-}
-
-export type InputValue = InputValueWithPath | InputValueWithId;
+import { InputValue } from "@/lib/values";
 
 export const fromDev = (): InputValue[] => {
   return [

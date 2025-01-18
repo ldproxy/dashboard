@@ -1,4 +1,6 @@
-export const fromDev = () => {
+import { JobSets } from "@/lib/jobs";
+
+export const fromDev = (): JobSets => {
   return {
     sets: [
       {
@@ -170,33 +172,3 @@ export const fromDev = () => {
     ],
   };
 };
-
-interface TileSetProgress {
-  percent: number;
-  levels?: { [tms: string]: number[] };
-}
-
-export interface TileSets {
-  [key: string]: {
-    progress?: TileSetProgress;
-  };
-}
-
-interface JobDetails {
-  tileProvider: string;
-  tileSets: TileSets;
-  reseed: boolean;
-}
-
-export interface Job {
-  id: string;
-  entity: string;
-  label: string;
-  details: JobDetails;
-  percent: number;
-  startedAt: number;
-  updatedAt: number;
-  current: number;
-  total: number;
-  followUps: Job[];
-}

@@ -10,7 +10,6 @@ import {
 } from "@/components/shadcn-ui/tabs";
 import { useDataLoader } from "@/lib/loadDataHook";
 import { useEffect, useState } from "react";
-import { InputValue } from "@/dev-data/values";
 import { getIcon } from "@/lib/icons";
 import { columns } from "@/components/dashboard/DataTableComponents/ColumnsValues";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
@@ -18,6 +17,8 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { getDeploymentId } from "@/lib/deployments";
 import { useReloadInterval } from "../layout";
+import { IS_MODE_MULTI } from "@/lib/env";
+import { Value } from "@/lib/values";
 
 interface TableDataItem {
   label: string;
@@ -33,8 +34,6 @@ export default function EntitiesPage() {
   const [deploymentId, setDeploymentId] = useState("");
   const { values, nodesDifferent, loadData } = useDataLoader();
 
-  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
-
   useEffect(() => {
     loadData({ loadValues: true, checkDifferences: true });
 
@@ -48,12 +47,12 @@ export default function EntitiesPage() {
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
-    if (multipleDeployments === "multi" || multipleDeployments === "saas") {
+    if (IS_MODE_MULTI) {
       getDeploymentId(setDeploymentId);
     }
     // did not include checkDifferences() to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [multipleDeployments, pathname, autoRefreshInterval]);
+  }, [pathname, autoRefreshInterval]);
 
   useEffect(() => {
     if (values.length > 0) {
@@ -76,7 +75,7 @@ export default function EntitiesPage() {
   };
 
   const valueTypes = values
-    .map((value: InputValue) => value.type)
+    .map((value: Value) => value.type)
     .filter((typ, index, self) => self.indexOf(typ) === index);
 
   const valueTypeCounts = values.reduce((counts, value) => {

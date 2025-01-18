@@ -1,49 +1,4 @@
-export interface InputCheck {
-  label?: string;
-  description?: string;
-  healthy: boolean;
-  timestamp: string;
-  state: string;
-  duration: number;
-  message?: string;
-  sources?: { label: string; status: string }[];
-  capabilities?: {
-    label: string;
-    description: string;
-    name: string;
-    healthy: boolean;
-    state: string;
-    message?: string;
-  }[];
-}
-
-export interface Check {
-  label?: string;
-  description?: string;
-  name?: string;
-  url: string;
-  healthy?: boolean;
-  state: string;
-  timestamp?: string;
-  duration?: number;
-  message?: string;
-  sources?: { label: string; status: string }[];
-  capabilities?: {
-    label?: string;
-    description?: string;
-    name: string;
-    healthy: boolean;
-    state: string;
-    message?: string;
-  }[];
-  components?: {
-    name: string;
-    healthy: boolean;
-    state: string;
-    message?: string;
-    capabilities: [];
-  }[];
-}
+import { InputCheck } from "@/lib/health";
 
 export const fromDev = (): { [key: string]: InputCheck } => {
   return {
@@ -58,7 +13,7 @@ export const fromDev = (): { [key: string]: InputCheck } => {
       state: "AVAILABLE",
       duration: 0,
       timestamp: "2024-02-15T17:56:36.681+01:00",
-      capabilities: [
+      /*capabilities: [
         {
           label: "COLLECTIONS",
           description: "COLLECTIONS",
@@ -66,7 +21,7 @@ export const fromDev = (): { [key: string]: InputCheck } => {
           healthy: false,
           state: "UNAVAILABLE",
         },
-      ],
+      ]*/
       /*
 export const fetchedHealthChecks: { [key: string]: InputCheck } = {
   "app/crs": {

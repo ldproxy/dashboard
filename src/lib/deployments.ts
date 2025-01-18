@@ -1,4 +1,5 @@
 import { fromDev, Deployment } from "../dev-data/deployments";
+import { IS_PROD } from "./env";
 
 const fromEnv = (): Deployment[] => {
   const input = process.env.DEPLOYMENTS || "[]";
@@ -20,9 +21,7 @@ const fromEnv = (): Deployment[] => {
 };
 
 export const deployments =
-  process.env.DEPLOYMENTS || process.env.NODE_ENV !== "development"
-    ? fromEnv()
-    : fromDev();
+  process.env.DEPLOYMENTS || IS_PROD ? fromEnv() : fromDev();
 
 export const getDeployments = async () => {
   try {

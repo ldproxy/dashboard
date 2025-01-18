@@ -1,16 +1,4 @@
-export interface InputEntity {
-  id: string;
-  status: string;
-  subType: string;
-}
-
-export interface Entity {
-  id: string;
-  uid: string;
-  type: string;
-  status: string;
-  subType: string;
-}
+import { InputEntity } from "@/lib/entities";
 
 export const fromDev = (): { [key: string]: InputEntity[] } => {
   return {

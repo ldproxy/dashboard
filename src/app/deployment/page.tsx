@@ -13,10 +13,7 @@ import {
 } from "@/components/shadcn-ui/tabs";
 import { sortCards } from "@/lib/utils";
 import { useState, useEffect } from "react";
-import { Check } from "@/dev-data/health";
 import { getIcon } from "@/lib/icons";
-
-import { Job } from "@/dev-data/jobs";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { DevDeployment } from "@/dev-data/constants";
 import Prism from "prismjs";
@@ -33,8 +30,10 @@ import {
   getDeploymentId,
 } from "@/lib/deployments";
 import { useDataLoader } from "@/lib/loadDataHook";
-import { summarizeStoreCheck } from "@/lib/health";
+import { Check, summarizeStoreCheck } from "@/lib/health";
 import { useReloadInterval } from "../layout";
+import { IS_MODE_MULTI } from "@/lib/env";
+import { Job } from "@/lib/jobs";
 
 export type HealthChecksType = { [key: string]: Check[] };
 export type NodesDifferent = {
@@ -74,8 +73,6 @@ export default function DeploymentPage() {
     loadData,
   } = useDataLoader(matchingDeployment);
 
-  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
-
   useEffect(() => {
     if (isInitialLoad && deployments.length > 0) {
       loadData().then(() => setIsInitialLoad(false));
@@ -94,14 +91,14 @@ export default function DeploymentPage() {
   }, [isInitialLoad, autoRefreshInterval]);
 
   useEffect(() => {
-    getDeployments().then((data: any) => {
-      setDeployments(data);
-      getMatchingDeployment(data, setDeploymentId, setMatchingDelpoyment);
-    });
-    if (multipleDeployments === "multi" || multipleDeployments === "saas") {
+    if (IS_MODE_MULTI) {
+      getDeployments().then((data: any) => {
+        setDeployments(data);
+        getMatchingDeployment(data, setDeploymentId, setMatchingDelpoyment);
+      });
       getDeploymentId(setDeploymentId);
     }
-  }, [multipleDeployments]);
+  }, []);
 
   useEffect(() => {
     const updateHealthStatus = async () => {
@@ -219,8 +216,10 @@ export default function DeploymentPage() {
         {matchingDeployment &&
           Object.keys(matchingDeployment).length > 0 &&
           metrics &&
-          metrics.some((metric) =>
-            metric.metrics.some((m) => m.uptime === -1 && m.memory === -1)
+          metrics.some(
+            (metric) =>
+              Array.isArray(metric.metrics) &&
+              metric.metrics.some((m) => m.uptime === -1 && m.memory === -1)
           ) && (
             <div className="ml-auto">
               <ClipLoader color={"#123abc"} loading={true} size={20} />

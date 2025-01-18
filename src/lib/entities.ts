@@ -1,9 +1,16 @@
-import { Entity, fromDev } from "@/dev-data/entities";
+export interface InputEntity {
+  id: string;
+  status: string;
+  subType: string;
+}
 
-export const fetchedEntities =
-  process.env.DEPLOYMENTS || process.env.NODE_ENV !== "development"
-    ? {}
-    : fromDev();
+export interface Entity {
+  id: string;
+  uid: string;
+  type: string;
+  status: string;
+  subType: string;
+}
 
 export type CategoryHealthCounts = {
   [key: string]: HealthCounts;
@@ -14,6 +21,19 @@ export type HealthCounts = {
   limited: number;
   unavailable: number;
 };
+
+export const normalizeEntities = (
+  input: Record<string, InputEntity[]>
+): Entity[] =>
+  Object.keys(input)
+    .flatMap((type) =>
+      input[type].map((entity: any) => ({
+        type,
+        uid: `${type}_${entity.id}`,
+        ...entity,
+      }))
+    )
+    .filter((entity: any) => entity.status !== "DISABLED");
 
 export const getEntityCategory = (entity: Entity) => {
   return entity.type === "services" ? "API" : entity.subType.split(/[/]/)[0];

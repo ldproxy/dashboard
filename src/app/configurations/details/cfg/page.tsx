@@ -33,10 +33,6 @@ export default function HomePage() {
   const [cfg, setCfg] = useState<any>(null);
 
   const router = useRouter();
-  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
-  if (DevCfg) {
-    console.log("multipleDeployments", multipleDeployments);
-  }
 
   useEffect(() => {
     getCfgs().then((data: any) => {

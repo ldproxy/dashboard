@@ -5,8 +5,6 @@ import { getDeployments, postDeployment } from "@/lib/deployments";
 import { getIcon } from "@/lib/icons";
 import Link from "next/link";
 import { getAvailableNodes, getAvailableNodesCount } from "@/lib/utils";
-import { Check } from "@/dev-data/health";
-import { InputInfo } from "@/dev-data/info";
 import { Deployment } from "@/dev-data/deployments";
 import Info from "@/components/dashboard/InfoBox";
 import { ClipLoader } from "react-spinners";
@@ -16,11 +14,12 @@ import { buttonVariants } from "@/components/shadcn-ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { PopUpDialog } from "@/components/dashboard/CreateDeploymentPopUp";
 import { DevHome } from "@/dev-data/constants";
-import { loadHealthChecksHomePage } from "@/lib/health";
-import { loadInfoHomePage } from "@/lib/info";
+import { Check, loadHealthChecksHomePage } from "@/lib/health";
+import { InfoItem, loadInfoHomePage } from "@/lib/info";
 import { useReloadInterval } from "../layout";
+import { IS_MODE_SAAS, IS_MODE_SINGLE } from "@/lib/env";
 
-type InfoType = { name: string; info: InputInfo }[];
+type InfoType = { name: string; info: InfoItem }[];
 type HealthChecksType = { [key: string]: Check[] };
 
 export default function HomePage() {
@@ -41,17 +40,12 @@ export default function HomePage() {
   const [popUp, setPopUp] = useState<boolean>(false);
 
   const router = useRouter();
-  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
-  if (DevHome) {
-    console.log("multipleDeployments", multipleDeployments);
-  }
+
   useEffect(() => {
-    if (multipleDeployments === "single") {
-      if (multipleDeployments === "single") {
-        router.replace("/404");
-      }
+    if (IS_MODE_SINGLE) {
+      router.replace("/404");
     }
-  }, [multipleDeployments, router]);
+  }, [router]);
 
   useEffect(() => {
     getDeployments().then((data: any) => {
@@ -185,7 +179,7 @@ export default function HomePage() {
         {/* <Button className="font-bold" onClick={createDeployment}>
           Create Deployment
         </Button> */}
-        {process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS === "saas" && (
+        {IS_MODE_SAAS && (
           <Dialog onOpenChange={(open) => setPopUp(open)}>
             <DialogTrigger
               className={buttonVariants({ variant: "default" })}

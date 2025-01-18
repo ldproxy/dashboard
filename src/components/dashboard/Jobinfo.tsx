@@ -9,7 +9,7 @@ import {
 import React, { useState } from "react";
 import prettyMs from "pretty-ms";
 import { Progress } from "@/components/dashboard/Progress";
-import { TileSets } from "@/dev-data/jobs";
+import { TileSets } from "@/lib/jobs";
 
 export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   entity: string;

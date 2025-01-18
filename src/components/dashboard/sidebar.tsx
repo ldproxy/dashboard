@@ -8,6 +8,7 @@ import { NavButton } from "./Navbutton";
 import { getIcon } from "@/lib/icons";
 import { usePathname } from "next/navigation";
 import { getDeployments, getDeploymentId } from "@/lib/deployments";
+import { IS_MODE_MULTI } from "@/lib/env";
 
 export interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   sections: SectionProps[];
@@ -35,7 +36,6 @@ export function Section({ title, entries, global }: SectionProps) {
   const [isHomePage, setIsHomePage] = useState(true);
   const [isCfgPage, setIsCfgPage] = useState(true);
   const [deploymentId, setDeploymentId] = useState("");
-  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 
   const removeQueryFromUrl = (url: string) => {
     const urlObj = new URL(url, window.location.origin);
@@ -48,11 +48,11 @@ export function Section({ title, entries, global }: SectionProps) {
   );
 
   useEffect(() => {
-    if (multipleDeployments === "multi" || multipleDeployments === "saas") {
+    if (IS_MODE_MULTI) {
       getDeploymentId(setDeploymentId);
+      getDeployments().then((data: any) => setDeployments(data));
     }
-    getDeployments().then((data: any) => setDeployments(data));
-  }, [pathname, multipleDeployments]);
+  }, [pathname]);
 
   useEffect(() => {
     if (deployments.length > 0) {
@@ -73,9 +73,9 @@ export function Section({ title, entries, global }: SectionProps) {
           pathname === "/configurations/details" ||
           pathname === "/configurations/details/cfg"
       );
-    }, [multipleDeployments, pathname]);
+    }, [pathname]);
 
-  if (isHomePage && multipleDeployments === "true") {
+  if (isHomePage && IS_MODE_MULTI) {
     return (
       <div
         style={{
@@ -91,11 +91,8 @@ export function Section({ title, entries, global }: SectionProps) {
   }
 
   if (
-    (isHomePage &&
-      (multipleDeployments === "multi" || multipleDeployments === "saas")) ||
-    (isCfgPage &&
-      !hasDidQueryParam &&
-      (multipleDeployments === "multi" || multipleDeployments === "saas"))
+    (isHomePage && IS_MODE_MULTI) ||
+    (isCfgPage && !hasDidQueryParam && IS_MODE_MULTI)
   ) {
     return (
       <div className="px-3 py-2">

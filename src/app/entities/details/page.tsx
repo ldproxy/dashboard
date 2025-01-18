@@ -3,16 +3,13 @@ import { sortCards } from "@/lib/utils";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Entity } from "@/dev-data/entities";
-import { Check } from "@/dev-data/health";
 import { DevEntities } from "@/dev-data/constants";
 import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import JobInfo from "@/components/dashboard/Jobinfo";
-import { Job } from "@/dev-data/jobs";
-import { summarizeStoreCheck } from "@/lib/health";
+import { Check, summarizeStoreCheck } from "@/lib/health";
 import { useDataLoader } from "@/lib/loadDataHook";
 import { useReloadInterval } from "../../layout";
 
@@ -30,6 +27,8 @@ import "prismjs/themes/prism.css";
 import { Suspense } from "react";
 import dayjs from "dayjs";
 import { fetchDataFromSingleApiUrl } from "@/lib/fetchData";
+import { Entity, normalizeEntities } from "@/lib/entities";
+import { Job } from "@/lib/jobs";
 
 const SuspenseWrapper = () => (
   <Suspense fallback={<div>Loading...</div>}>
@@ -140,7 +139,10 @@ function CustomerPage() {
 
   const findEntity = async () => {
     try {
-      const newEntities = await fetchDataFromSingleApiUrl("/api/fetchEntities");
+      const newEntities = await fetchDataFromSingleApiUrl(
+        "/api/entities",
+        normalizeEntities
+      );
       if (!newEntities) {
         return notFound();
       }
