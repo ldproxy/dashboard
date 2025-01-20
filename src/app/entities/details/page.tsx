@@ -4,12 +4,15 @@ import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
 import { useState, useEffect } from "react";
 import { DevEntities } from "@/dev-data/constants";
-import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
+import {
+  columns,
+  HealthCheck,
+} from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import JobInfo from "@/components/dashboard/Jobinfo";
-import { Check, summarizeStoreCheck } from "@/lib/health";
+import { Check, summarizeStoreCheck, UiCheck } from "@/lib/health";
 import { useDataLoader } from "@/lib/loadDataHook";
 import { useReloadInterval } from "../../layout";
 
@@ -26,9 +29,10 @@ import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import { Suspense } from "react";
 import dayjs from "dayjs";
-import { fetchDataFromSingleApiUrl } from "@/lib/fetchData";
+import { fetchData } from "@/lib/fetchData";
 import { Entity, normalizeEntities } from "@/lib/entities";
 import { Job } from "@/lib/jobs";
+import { IS_MODE_MULTI, IS_MODE_SAAS } from "@/lib/env";
 
 const SuspenseWrapper = () => (
   <Suspense fallback={<div>Loading...</div>}>
@@ -45,7 +49,9 @@ function CustomerPage() {
   const [entity, setEntity] = useState<Entity | null>(null); // entities[params.id]);
   const [cfg, setCfg] = useState<{}>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [tableData, setTableData] = useState([] as any[]);
+  const [tableData, setTableData] = useState<HealthCheck[]>(
+    [] as HealthCheck[]
+  );
   const [tab, setTab] = useState("overview");
   const [hasError, setHasError] = useState(false);
   const [tiles, setTiles] = useState(false);
@@ -69,7 +75,7 @@ function CustomerPage() {
 
   useEffect(() => {
     if (healthChecks && healthChecks.length > 0 && entity) {
-      const myCheck = healthChecks
+      const myCheck: UiCheck[] = healthChecks
         .filter(
           (check: Check) =>
             check.name === `entities/${entity.type}/${entity.id}`
@@ -102,21 +108,23 @@ function CustomerPage() {
               label: check.label || "",
               description: check.description || "",
               url: urlPart,
-              status: check.state,
+              state: check.state,
               message: check.message,
               checked: dayjs(check.timestamp).format("HH:mm:ss"),
             };
           }
           return null;
         })
-        .filter(Boolean);
+        .filter((c) => c !== null) as UiCheck[];
 
-      const summarizedStoreCheck = summarizeStoreCheck(myCheck);
+      const summarizedStoreCheck = IS_MODE_MULTI
+        ? summarizeStoreCheck(myCheck)
+        : myCheck;
 
-      setTableData(summarizedStoreCheck);
+      setTableData(summarizedStoreCheck as HealthCheck[]);
 
       if (DevEntities) {
-        console.log("myCheck:", myCheck);
+        console.log("myCheck:", myCheck, summarizedStoreCheck);
       }
     }
   }, [healthChecks, entity]);
@@ -139,9 +147,10 @@ function CustomerPage() {
 
   const findEntity = async () => {
     try {
-      const newEntities = await fetchDataFromSingleApiUrl(
+      const newEntities = await fetchData(
         "/api/entities",
-        normalizeEntities
+        normalizeEntities,
+        true
       );
       if (!newEntities) {
         return notFound();
@@ -163,7 +172,9 @@ function CustomerPage() {
   useEffect(() => {
     const loadEntitiesAndCfg = async () => {
       await findEntity();
-      await loadCfg();
+      if (IS_MODE_SAAS) {
+        await loadCfg();
+      }
       loadData({ loadHealthChecksEntities: true, loadJobs: true });
       setIsLoading(false);
       if (DevEntities) {

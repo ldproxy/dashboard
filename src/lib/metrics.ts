@@ -1,3 +1,5 @@
+import { MultiResponse } from "@/app/api/util";
+
 export interface InputMetrics {
   gauges: {
     [key: string]: {
@@ -5,11 +7,6 @@ export interface InputMetrics {
     };
   };
 }
-
-export type MultiInputMetrics = {
-  url: string;
-  metrics: InputMetrics;
-}[];
 
 export interface MetricsInfo {
   uptime: number;
@@ -31,10 +28,10 @@ const normalizeSingleMetric = (
 };
 
 export const normalizeMetrics = (
-  input: InputMetrics | MultiInputMetrics
+  input: InputMetrics | MultiResponse<InputMetrics>
 ): Metrics => {
   if (Array.isArray(input)) {
-    return input.map((item) => normalizeSingleMetric(item.metrics, item.url));
+    return input.map((item) => normalizeSingleMetric(item.response!, item.url));
   }
 
   return [normalizeSingleMetric(input, "TODO")];

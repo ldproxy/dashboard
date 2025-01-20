@@ -1,10 +1,4 @@
-export type Deployment = {
-  id: string;
-  name: string;
-  apiUrl: string[];
-  url?: string;
-  cfg?: string;
-};
+import { Deployment } from "@/lib/deployments";
 
 export const fromDev = (): Deployment[] => {
   return [

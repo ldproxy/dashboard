@@ -4,10 +4,10 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import dayjs from "dayjs";
 
-import { Deployment } from "@/dev-data/deployments";
-import { HealthChecksType } from "../../src/app/deployment/page";
-import { getDeployments } from "@/lib/deployments";
+import { HealthChecksType } from "../app/deployment/page";
+import { Deployment, getDeployments } from "@/lib/deployments";
 import { IS_MODE_SINGLE } from "./env";
+import { fetchData } from "./fetchData";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -129,27 +129,9 @@ export function summarizeStoreCheck(storeCheck: any[]): any[] {
   return Object.values(summarized);
 }
 
-const fetchDataFromAllUrls = async (endpoint: string) => {
-  const apiUrls: string[] = await getApiUrl();
-
-  if (apiUrls.length === 0) {
-    return [];
-  }
-
-  const response = await fetch(
-    `/api/fetchFromAllUrls?apiUrls=${apiUrls.join(",")}&endpoint=${endpoint}`
-  );
-  if (!response.ok) {
-    throw new Error("Failed to fetch data");
-  }
-  const data = await response.json();
-
-  return data;
-};
-
 export const compareDataAcrossUrls = async () => {
-  const entitiesData = await fetchDataFromAllUrls("entities");
-  const valuesData = await fetchDataFromAllUrls("values");
+  const entitiesData = await fetchData("/entities", (r) => r);
+  const valuesData = await fetchData("/values", (r) => r);
 
   const hasDifferences = (data: any[][]) => {
     if (data.length <= 1) return false;

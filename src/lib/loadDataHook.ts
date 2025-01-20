@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { compareDataAcrossUrls } from "@/lib/utils";
-import { Deployment } from "@/dev-data/deployments";
 import { getDeploymentCfg } from "@/lib/cfg";
-import {
-  fetchDataFromSingleApiUrl,
-  fetchDataFromMultipleApiUrls,
-} from "./fetchData";
+import { fetchData } from "./fetchData";
 import { IS_MODE_MULTI } from "./env";
 import { Entity, normalizeEntities } from "./entities";
 import { Check, normalizeHealth } from "./health";
@@ -13,6 +9,7 @@ import { Infos, normalizeInfo } from "./info";
 import { Job, normalizeJobs } from "./jobs";
 import { MetricsInfo, normalizeMetrics } from "./metrics";
 import { normalizeValues } from "./values";
+import { Deployment } from "./deployments";
 
 type InfoType = { name: string; info: Infos }[];
 type MetricsType = { name: string; metrics: MetricsInfo[] };
@@ -86,10 +83,7 @@ export function useDataLoader(matchingDeployment?: Deployment) {
     try {
       if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
         let healthChecksObj: HealthChecksType = {};
-        const newHealthChecks = await fetchDataFromMultipleApiUrls(
-          "/api/health",
-          normalizeHealth
-        );
+        const newHealthChecks = await fetchData("/api/health", normalizeHealth);
         healthChecksObj[(matchingDeployment as Deployment).name] =
           newHealthChecks;
         setHealthChecks(healthChecksObj);
@@ -101,10 +95,7 @@ export function useDataLoader(matchingDeployment?: Deployment) {
 
   const loadHealthChecksEntities = async () => {
     try {
-      const newHealthChecks = await fetchDataFromMultipleApiUrls(
-        "/api/health",
-        normalizeHealth
-      );
+      const newHealthChecks = await fetchData("/api/health", normalizeHealth);
       setHealthChecksEntities(newHealthChecks);
     } catch (error) {
       console.error("Error loading health checks:", error);
@@ -114,10 +105,7 @@ export function useDataLoader(matchingDeployment?: Deployment) {
   const loadInfo = async () => {
     try {
       if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
-        const newInfo = await fetchDataFromMultipleApiUrls(
-          "api/info",
-          normalizeInfo
-        );
+        const newInfo = await fetchData("api/info", normalizeInfo);
         if (newInfo.length > 0) {
           setInfo([
             {
@@ -142,10 +130,7 @@ export function useDataLoader(matchingDeployment?: Deployment) {
   const loadMetrics = async () => {
     try {
       if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
-        const newMetrics = await fetchDataFromMultipleApiUrls(
-          "api/metrics",
-          normalizeMetrics
-        );
+        const newMetrics = await fetchData("api/metrics", normalizeMetrics);
         setMetrics([
           {
             name: (matchingDeployment as Deployment).name,
@@ -160,14 +145,12 @@ export function useDataLoader(matchingDeployment?: Deployment) {
 
   const loadEntities = async () => {
     try {
-      const newEntities = await fetchDataFromSingleApiUrl(
+      const newEntities = await fetchData(
         "api/entities",
-        normalizeEntities
+        normalizeEntities,
+        true
       );
-      const healthChecks = await fetchDataFromMultipleApiUrls(
-        "/api/health",
-        normalizeHealth
-      );
+      const healthChecks = await fetchData("/api/health", normalizeHealth);
 
       if (Array.isArray(newEntities)) {
         newEntities.forEach((entity: any) => {
@@ -189,10 +172,7 @@ export function useDataLoader(matchingDeployment?: Deployment) {
 
   const loadJobs = async () => {
     try {
-      const newJobs = await fetchDataFromSingleApiUrl(
-        "/api/jobs",
-        normalizeJobs
-      );
+      const newJobs = await fetchData("/api/jobs", normalizeJobs, true);
       setJobs(newJobs);
     } catch (error) {
       console.error("Error loading jobs:", error);
@@ -216,10 +196,7 @@ export function useDataLoader(matchingDeployment?: Deployment) {
 
   const loadValues = async () => {
     try {
-      const newValues = await fetchDataFromSingleApiUrl(
-        "/api/values",
-        normalizeValues
-      );
+      const newValues = await fetchData("/api/values", normalizeValues, true);
       setValues(newValues);
     } catch (error) {
       console.error("Error loading health values:", error);

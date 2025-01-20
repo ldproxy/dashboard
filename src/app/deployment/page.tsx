@@ -1,7 +1,7 @@
 "use client";
 import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import Summary from "@/components/dashboard/Summary";
-import Info from "@/components/dashboard/InfoBox";
+import InfoBox from "@/components/dashboard/InfoBox";
 import JobInfo from "@/components/dashboard/Jobinfo";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import dayjs from "dayjs";
@@ -23,16 +23,16 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { getEntityCounts, getStateSummary } from "@/lib/entities";
-import { Deployment } from "@/dev-data/deployments";
 import {
   getDeployments,
   getMatchingDeployment,
   getDeploymentId,
+  Deployment,
 } from "@/lib/deployments";
 import { useDataLoader } from "@/lib/loadDataHook";
-import { Check, summarizeStoreCheck } from "@/lib/health";
+import { Check, summarizeStoreCheck, UiCheck } from "@/lib/health";
 import { useReloadInterval } from "../layout";
-import { IS_MODE_MULTI } from "@/lib/env";
+import { IS_MODE_MULTI, IS_MODE_SINGLE } from "@/lib/env";
 import { Job } from "@/lib/jobs";
 
 export type HealthChecksType = { [key: string]: Check[] };
@@ -111,7 +111,7 @@ export default function DeploymentPage() {
   }, [healthChecks]);
 
   useEffect(() => {
-    const storeCheck = Object.values(healthChecks)
+    const storeCheck: UiCheck[] = Object.values(healthChecks)
       .flat()
       .filter(
         (check: Check) =>
@@ -126,13 +126,14 @@ export default function DeploymentPage() {
           return {
             label: check.name.substring(4),
             url: urlPart,
-            status: check.state,
+            state: check.state,
             checked: dayjs(check.timestamp).format("HH:mm:ss"),
           };
         }
         return null;
       })
-      .filter(Boolean);
+      .filter((c) => c !== null) as UiCheck[];
+
     const summarizedStoreCheck = summarizeStoreCheck(storeCheck);
 
     setTableData(summarizedStoreCheck);
@@ -303,7 +304,7 @@ export default function DeploymentPage() {
                 }
 
                 const infoComponent = (
-                  <Info
+                  <InfoBox
                     key={(matchingDeployment as Deployment).id}
                     name={
                       matchingDeployment &&

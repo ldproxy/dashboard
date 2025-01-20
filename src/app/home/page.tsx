@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getDeployments, postDeployment } from "@/lib/deployments";
+import { Deployment, getDeployments, postDeployment } from "@/lib/deployments";
 import { getIcon } from "@/lib/icons";
 import Link from "next/link";
 import { getAvailableNodes, getAvailableNodesCount } from "@/lib/utils";
-import { Deployment } from "@/dev-data/deployments";
 import Info from "@/components/dashboard/InfoBox";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";

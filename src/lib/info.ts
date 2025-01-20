@@ -1,7 +1,8 @@
-import { Deployment } from "@/dev-data/deployments";
-import { fetchDataFromMultipleApiUrls } from "./fetchData";
+import { MultiResponse } from "@/app/api/util";
+import { Deployment } from "./deployments";
+import { fetchData } from "./fetchData";
 
-export type SingleInputInfo = {
+export type InputInfo = {
   name: string;
   version: string;
   url: string;
@@ -9,23 +10,18 @@ export type SingleInputInfo = {
   status: string;
 };
 
-export type InfoItem = SingleInputInfo & {
+export type InfoItem = InputInfo & {
   apiUrl: string;
 };
 
 export type Infos = InfoItem[];
 
-export type MultiInputInfo = {
-  url: string;
-  info: SingleInputInfo;
-}[];
-
 export const normalizeInfo = (
-  input: SingleInputInfo | MultiInputInfo
+  input: InputInfo | MultiResponse<InputInfo>
 ): Infos => {
   if (Array.isArray(input)) {
     return input.map((item) => ({
-      ...item.info,
+      ...item.response!,
       apiUrl: item.url,
     }));
   }
@@ -39,8 +35,10 @@ export const loadInfoHomePage = async (
   try {
     if (deployments.length > 0) {
       const promises = deployments.map(async (deployment: any) => {
-        const newInfo = await fetchDataFromMultipleApiUrls(
+        const newInfo = await fetchData(
           "api/info",
+          normalizeInfo,
+          false,
           deployment.apiUrl
         );
 

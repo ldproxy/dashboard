@@ -1,7 +1,12 @@
-import { fromDev, Deployment } from "../dev-data/deployments";
-import { IS_PROD } from "./env";
+export type Deployment = {
+  id: string;
+  name: string;
+  apiUrl: string[];
+  url?: string;
+  cfg?: string;
+};
 
-const fromEnv = (): Deployment[] => {
+export const fromEnv = (): Deployment[] => {
   const input = process.env.DEPLOYMENTS || "[]";
 
   try {
@@ -19,9 +24,6 @@ const fromEnv = (): Deployment[] => {
     );
   }
 };
-
-export const deployments =
-  process.env.DEPLOYMENTS || IS_PROD ? fromEnv() : fromDev();
 
 export const getDeployments = async () => {
   try {

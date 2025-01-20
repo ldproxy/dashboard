@@ -20,7 +20,7 @@ export type HealthCheck = {
   name: string;
   label?: string;
   description?: string;
-  status: string;
+  state: string;
   checked: string;
   message: string;
   subRows: HealthCheck[];
@@ -90,7 +90,7 @@ export const columns: ColumnDef<HealthCheck>[] = [
         let badgeColor = "";
         let textColor = "white";
 
-        switch (row.original.status) {
+        switch (row.original.state) {
           case "HEALTHY":
           case "AVAILABLE":
             badgeColor = "#4CAF50";
@@ -112,7 +112,7 @@ export const columns: ColumnDef<HealthCheck>[] = [
               cursor: "default",
             }}
           >
-            {row.original.status}
+            {row.original.state}
           </Badge>
         );
       }

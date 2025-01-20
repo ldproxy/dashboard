@@ -11,6 +11,7 @@ import { filesize } from "filesize";
 import prettyMs from "pretty-ms";
 import { columns } from "@/components/dashboard/DataTableComponents/ColumnsInfoBox";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
+import { IS_MODE_SINGLE } from "@/lib/env";
 
 export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
@@ -56,7 +57,7 @@ export default function CustomersPage({
     window.open(formattedUrl, "_blank", "noopener,noreferrer");
   };
 
-  if (versions.length > 0 && uptimes.length > 0 && memories.length > 0) {
+  if (versions.length > 0 || uptimes.length > 0 || memories.length > 0) {
     const formattedMemories = memories.map((memory) =>
       filesize(memory.memory, { base: 10 })
     );
@@ -70,6 +71,159 @@ export default function CustomersPage({
       uptime: formattedUptimes[index],
       memory: formattedMemories[index],
     }));
+
+    if (IS_MODE_SINGLE) {
+      return (
+        <Card className="shadow-lg">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle
+              className={`text-sm font-semibold mb-2 ${
+                healthStatus === "ACTIVE" ||
+                healthStatus === "true" ||
+                healthStatus === "HEALTHY"
+                  ? "text-success"
+                  : healthStatus === "OFFLINE"
+                  ? "text-muted-foreground"
+                  : healthStatus === "LIMITED"
+                  ? "text-yellow-500"
+                  : "text-destructive"
+              }`}
+              style={{ fontSize: "1.25rem" }}
+            >
+              {healthStatus}
+            </CardTitle>
+            {Icon ? <Icon className="h-4 w-4 text-muted-foreground" /> : null}
+          </CardHeader>
+          <CardContent className="flex items-center">
+            <div className="text-2xl font-bold break-normal">{name}</div>
+            {formattedUrl && (
+              <div className="text-2xl font-bold break-normal">
+                <a
+                  href={formattedUrl}
+                  onClick={handleLinkClick}
+                  className="text-blue-500 hover:underline relative"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  {formattedUrl.replace(/https?:\/\//, "")}
+                  <ExternalLinkIcon
+                    className="h-4 w-4 text-blue-500"
+                    style={{ marginLeft: "5px" }}
+                  />
+                  <span className="absolute left-0 bottom-full mb-1 hidden w-max bg-gray-700 text-white text-xs rounded py-1 px-2 z-10 group-hover:block">
+                    {formattedUrl.replace(/https?:\/\//, "")}
+                  </span>
+                </a>
+              </div>
+            )}
+            <div className="flex-1"></div>
+            <div style={{ marginRight: "225px", marginTop: "-30px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                {IconFooter3 ? (
+                  <IconFooter3
+                    className="h-4 w-4 text-muted-foreground"
+                    style={{ marginRight: "5px", marginTop: "2px" }}
+                  />
+                ) : null}
+                <span
+                  style={{
+                    color: "dimgray",
+                    width: "65px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Version:
+                </span>
+                <span
+                  style={{
+                    color: "dimgray",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {versions[0].version}
+                </span>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                {IconFooter1 ? (
+                  <IconFooter1
+                    className="h-4 w-4 text-muted-foreground"
+                    style={{ marginRight: "5px", marginTop: "2px" }}
+                  />
+                ) : null}
+                <span
+                  style={{
+                    color: "dimgray",
+                    width: "65px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Uptime:
+                </span>
+                <span
+                  style={{
+                    color: "dimgray",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {formattedUptimes[0]}
+                </span>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                {IconFooter2 ? (
+                  <IconFooter2
+                    className="h-4 w-4 text-muted-foreground"
+                    style={{ marginRight: "5px", marginTop: "2px" }}
+                  />
+                ) : null}
+                <span
+                  style={{
+                    color: "dimgray",
+                    width: "65px",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Memory:
+                </span>
+                <span
+                  style={{
+                    color: "dimgray",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {formattedMemories[0]}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
 
     return (
       <Card className={cardClassName}>

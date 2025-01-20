@@ -19,3 +19,7 @@ if (DevCfg) {
   console.log("IS_MODE_MULTI", IS_MODE_MULTI);
   console.log("IS_MODE_SINGLE", IS_MODE_SINGLE);
 }
+
+export const USE_DEV_DEPLOYMENTS = IS_DEV && !process.env.DEPLOYMENTS;
+
+export const USE_DEV_DATA = IS_DEV && process.env.USE_DEV_DATA;

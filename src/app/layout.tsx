@@ -93,13 +93,13 @@ export default function RootLayout({
                     reloadInterval={reloadInterval}
                     setReloadInterval={setReloadInterval}
                   />
-                  <Link
+                  <a
                     href="/api"
                     target="_blank"
                     style={{ marginRight: "-10px", marginLeft: "18px" }}
                   >
                     <span>API</span>
-                  </Link>
+                  </a>
                 </div>
               </div>
               <div className="border-t">

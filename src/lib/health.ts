@@ -1,7 +1,7 @@
-import { Deployment } from "@/dev-data/deployments";
 import dayjs from "dayjs";
-import { fetchDataFromMultipleApiUrls } from "./fetchData";
-import { it } from "node:test";
+import { fetchData } from "./fetchData";
+import { Deployment } from "./deployments";
+import { MultiResponse } from "@/app/api/util";
 
 export interface InputCheck {
   url?: string;
@@ -62,16 +62,21 @@ export interface Check {
   }[];
 }
 
+export interface UiCheck {
+  label: string;
+  description?: string;
+  name?: string;
+  url: string;
+  state: string;
+  message?: string;
+  checked: string;
+}
+
 type HealthChecksType = { [key: string]: Check[] };
 
-export type SingleInputHealth = Record<string, InputCheck>;
-export type MultiInputHealth = {
-  url: string;
-  checks: SingleInputHealth;
-  state?: string;
-}[];
+export type InputHealth = Record<string, InputCheck>;
 
-const normalizeChecks = (input: SingleInputHealth, url: string): Check[] => {
+const normalizeChecks = (input: InputHealth, url: string): Check[] => {
   return Object.keys(input).map((name) => ({
     name,
     url,
@@ -92,21 +97,21 @@ const normalizeChecks = (input: SingleInputHealth, url: string): Check[] => {
 };
 
 export const normalizeHealth = (
-  input: SingleInputHealth | MultiInputHealth
+  input: InputHealth | MultiResponse<InputHealth>
 ): Check[] => {
   if (Array.isArray(input)) {
     return input.flatMap((item) => {
-      if (item.state) {
-        return [{ url: item.url, state: item.state }];
+      if (item.offline || item.response === null) {
+        return [{ url: item.url, state: "OFFLINE" }];
       }
-      return normalizeChecks(item.checks, item.url);
+      return normalizeChecks(item.response!, item.url);
     });
   }
 
   return normalizeChecks(input, "TODO");
 };
 
-export function summarizeStoreCheck(storeCheck: any[]): any[] {
+export function summarizeStoreCheck(storeCheck: UiCheck[]): UiCheck[] {
   const labelCounts: { [label: string]: number } = {};
   const summarized: { [label: string]: any } = {};
 
@@ -126,15 +131,15 @@ export function summarizeStoreCheck(storeCheck: any[]): any[] {
       const existingCheck = summarized[check.label];
       existingCheck.subRows.push(check);
 
-      if (check.status === "UNAVAILABLE") {
+      if (check.state === "UNAVAILABLE") {
         existingCheck.status = "UNAVAILABLE";
       } else if (
-        check.status === "LIMITED" &&
+        check.state === "LIMITED" &&
         existingCheck.status !== "UNAVAILABLE"
       ) {
         existingCheck.status = "LIMITED";
       } else if (
-        check.status === "AVAILABLE" &&
+        check.state === "AVAILABLE" &&
         existingCheck.status !== "UNAVAILABLE" &&
         existingCheck.status !== "LIMITED"
       ) {
@@ -164,8 +169,10 @@ export const loadHealthChecksHomePage = async (deployments: Deployment[]) => {
       let healthChecksObj: HealthChecksType = {};
       const promises = deployments.map(async (deployment: any) => {
         try {
-          const newHealthChecks = await fetchDataFromMultipleApiUrls(
+          const newHealthChecks = await fetchData(
             "/api/health",
+            normalizeHealth,
+            false,
             deployment.apiUrl
           );
           healthChecksObj[deployment.name] = newHealthChecks;

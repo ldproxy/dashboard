@@ -1,6 +1,6 @@
-import { SingleInputInfo } from "@/lib/info";
+import { InputInfo } from "@/lib/info";
 
-export const fromDev = (): SingleInputInfo => {
+export const fromDev = (): InputInfo => {
   return {
     name: "demo.ldproxy.net",
     version: "3.6.2",

@@ -4,15 +4,15 @@ const nextConfig = {
   experimental: {
     missingSuspenseWithCSRBailout: false,
   },
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-        port: "",
-        pathname: "**",
-      },
-    ],
+  webpack: (config) => {
+    if (process.env.STATIC_EXPORT !== "true" || !config.module) {
+      return config;
+    }
+    config.module.rules?.push({
+      test: /src\/app\/api/,
+      loader: "ignore-loader",
+    });
+    return config;
   },
   async headers() {
     return [
