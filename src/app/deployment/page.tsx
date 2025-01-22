@@ -12,7 +12,7 @@ import {
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
 import { sortCards } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { getIcon } from "@/lib/icons";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { DevDeployment } from "@/dev-data/constants";
@@ -420,7 +420,7 @@ export default function DeploymentPage() {
         <TabsContent value="jobs">
           {sortedJobs.length > 0 ? (
             sortedJobs.map((job: Job) => (
-              <>
+              <React.Fragment key={job.id}>
                 <div
                   className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
                   style={{ marginBottom: "10px" }}
@@ -438,7 +438,7 @@ export default function DeploymentPage() {
                   />
                 </div>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>
-              </>
+              </React.Fragment>
             ))
           ) : (
             <span>Currently No Jobs</span>

@@ -8,6 +8,7 @@ import { HealthChecksType } from "../app/deployment/page";
 import { Deployment, getDeployments } from "@/lib/deployments";
 import { IS_MODE_SINGLE } from "./env";
 import { fetchData } from "./fetchData";
+import { MultiResponse } from "@/app/api/util";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -130,22 +131,45 @@ export function summarizeStoreCheck(storeCheck: any[]): any[] {
 }
 
 export const compareDataAcrossUrls = async () => {
-  const entitiesData = await fetchData("/entities", (r) => r);
-  const valuesData = await fetchData("/values", (r) => r);
+  try {
+    const entitiesData: MultiResponse<any> = await fetchData(
+      "/api/entities",
+      (r) => r
+    );
+    const valuesData: MultiResponse<any> = await fetchData(
+      "/api/values",
+      (r) => r
+    );
 
-  const hasDifferences = (data: any[][]) => {
-    if (data.length <= 1) return false;
-    const [first, ...rest] = data;
-    return rest.some((item) => JSON.stringify(item) !== JSON.stringify(first));
-  };
+    const entities = entitiesData
+      .filter((entity) => !entity.offline)
+      .map((entity) => entity.response);
+    const values = valuesData
+      .filter((value) => !value.offline)
+      .map((value) => value.response);
 
-  const entitiesDifferent = hasDifferences(entitiesData);
-  const valuesDifferent = hasDifferences(valuesData);
+    const hasDifferences = (data: any[][]) => {
+      if (data.length <= 1) return false;
+      const [first, ...rest] = data;
+      return rest.some(
+        (item) => JSON.stringify(item) !== JSON.stringify(first)
+      );
+    };
 
-  return {
-    entitiesDifferent,
-    valuesDifferent,
-  };
+    const entitiesDifferent = hasDifferences(entities);
+    const valuesDifferent = hasDifferences(values);
+
+    return {
+      entitiesDifferent,
+      valuesDifferent,
+    };
+  } catch (error) {
+    console.error("Error comparing data:", error);
+    return {
+      entitiesDifferent: false,
+      valuesDifferent: false,
+    };
+  }
 };
 
 export const getAvailableNodes = async (

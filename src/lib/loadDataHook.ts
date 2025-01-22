@@ -69,8 +69,9 @@ export function useDataLoader(matchingDeployment?: Deployment) {
       if (config.loadEntities) promises.push(loadEntities());
       if (config.loadJobs) promises.push(loadJobs());
       if (config.loadValues) promises.push(loadValues());
-      if (IS_MODE_MULTI && config.checkDifferences)
+      if (IS_MODE_MULTI && config.checkDifferences) {
         promises.push(checkDifferences());
+      }
       await Promise.all(promises);
     } catch (error) {
       console.error("Error loading data:", error);

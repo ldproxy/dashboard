@@ -19,11 +19,12 @@ export const fetchData = async (
     if (apiUrls.length === 0) {
       return [];
     }
-    if (firstOnly) {
-      apiUrls = [apiUrls[0]];
-    }
 
     suffix = `?apiUrls=${apiUrls.join(",")}`;
+
+    if (firstOnly) {
+      suffix += "&firstOnly=true";
+    }
   }
 
   const response = await fetch(`${url}${suffix}`);
@@ -31,7 +32,15 @@ export const fetchData = async (
   if (!response.ok) {
     throw new Error("Failed to fetch data");
   }
-  const data = await response.json();
+  try {
+    const data = await response.json();
 
-  return normalize(data);
+    if (firstOnly) {
+      return data ? normalize(data) : [];
+    }
+
+    return normalize(data);
+  } catch (error) {
+    console.error("Error parsing response:", error);
+  }
 };

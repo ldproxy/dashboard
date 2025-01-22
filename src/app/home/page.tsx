@@ -162,10 +162,6 @@ export default function HomePage() {
     }
   };
 
-  const currentUrl = new URL(window.location.href);
-  const baseUrl = currentUrl.origin;
-  const deploymentUrl = `${baseUrl}/deployment`;
-
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between space-y-2">
@@ -259,10 +255,7 @@ export default function HomePage() {
               return deploymentHealthStatus === "OFFLINE" ? (
                 <div key={index}>{infoComponent}</div>
               ) : (
-                <Link
-                  href={`${deploymentUrl}?did=${deployment.id}`}
-                  key={index}
-                >
+                <Link href={`/deployment?did=${deployment.id}`} key={index}>
                   {infoComponent}
                 </Link>
               );

@@ -15,6 +15,7 @@ export const IS_MODE_MULTI =
 export const IS_MODE_SINGLE = !IS_MODE_MULTI && !IS_MODE_SAAS;
 
 if (DevCfg) {
+  console.log("IS_DEV", IS_DEV);
   console.log("IS_MODE_SAAS", IS_MODE_SAAS);
   console.log("IS_MODE_MULTI", IS_MODE_MULTI);
   console.log("IS_MODE_SINGLE", IS_MODE_SINGLE);
