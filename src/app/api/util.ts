@@ -71,10 +71,6 @@ export const fetchMulti = async <T>(
       try {
         const res = await fetch(url + endpoint);
 
-        if (!res.ok) {
-          return errorResponse(url, endpoint, fallback, res.status);
-        }
-
         const response: T = await res.json();
 
         return { url, response } as MultiResponseItem<T>;
@@ -97,7 +93,6 @@ export const fetchMultiFirst = async <T>(
 
       if (!res.ok) {
         logError(url, res.status);
-        continue;
       }
 
       const response: T = await res.json();
