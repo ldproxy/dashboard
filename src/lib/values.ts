@@ -19,9 +19,9 @@ export type Value = InputValue & {
 };
 
 export const normalizeValues = (input: InputValues): Value[] => {
-  return Object.keys(input).flatMap((type) =>
-    Array.isArray(input[type])
-      ? input[type].map((value: any) => ({
+  return Object.keys(input.response).flatMap((type: any) =>
+    Array.isArray(input.response[type])
+      ? input.response[type].map((value: any) => ({
           type,
           uid: `${type}_${value.path}`,
           ...value,
