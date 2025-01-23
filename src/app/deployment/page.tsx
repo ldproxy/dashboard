@@ -71,6 +71,7 @@ export default function DeploymentPage() {
     hasError,
     nodesDifferent,
     loadData,
+    errorStatus,
   } = useDataLoader(matchingDeployment);
 
   useEffect(() => {
@@ -259,6 +260,18 @@ export default function DeploymentPage() {
           <div className="flex items-center space-x-2 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
             <ExclamationTriangleIcon className="h-5 w-5" />
             <span>{getWarningMessage()}</span>
+          </div>
+        )}
+        {Object.keys(errorStatus).length > 0 && (
+          <div className="flex items-center space-x-2 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+            <ExclamationTriangleIcon className="h-5 w-5" />
+            <span>
+              {Object.entries(errorStatus).map(([key, value]) => (
+                <div key={key}>
+                  Error {value} fetching data from endpoint {key}!
+                </div>
+              ))}
+            </span>
           </div>
         )}
 

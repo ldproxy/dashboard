@@ -5,6 +5,7 @@ import { USE_DEV_DATA } from "@/lib/env";
 export type MultiResponseItem<T> = {
   url: string;
   response: T | null;
+  errorStatus?: string;
   offline?: boolean;
 };
 
@@ -73,6 +74,15 @@ export const fetchMulti = async <T>(
 
         const response: T = await res.json();
 
+        if (!res.ok) {
+          const errorStatus = res.status;
+          return {
+            url,
+            response,
+            errorStatus: `${errorStatus.toString()}${endpoint}`,
+          } as MultiResponseItem<T>;
+        }
+
         return { url, response } as MultiResponseItem<T>;
       } catch (error) {
         return errorResponse(url, endpoint, fallback, error);
@@ -85,25 +95,30 @@ export const fetchMultiFirst = async <T>(
   apiUrls: string[],
   endpoint: string,
   fallback: T | null = null
-): Promise<T | null> => {
+): Promise<{ response: T | null; errorStatus?: string }> => {
   for (const apiUrl of apiUrls) {
     const url = apiUrl + endpoint;
     try {
       const res = await fetch(url);
 
-      if (!res.ok) {
-        logError(url, res.status);
-      }
-
       const response: T = await res.json();
 
-      return response;
+      if (!res.ok) {
+        logError(url, res.status);
+        const errorStatus = res.status;
+        return {
+          response,
+          errorStatus: `${errorStatus.toString()}${endpoint}`,
+        };
+      }
+
+      return { response };
     } catch (error: any) {
       logError(url, error);
     }
   }
 
-  return fallback;
+  return { response: fallback };
 };
 
 export const fetchMultiPlain = async <T>(

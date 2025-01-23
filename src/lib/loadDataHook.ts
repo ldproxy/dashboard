@@ -56,6 +56,7 @@ export function useDataLoader(matchingDeployment?: Deployment) {
     entities: false,
     values: false,
   });
+  const [errorStatus, setErrorStatus] = useState<{ [key: string]: number }>({});
 
   const loadData = async (config: DataLoaderConfig = defaultConfig) => {
     setIsLoading(true);
@@ -80,11 +81,53 @@ export function useDataLoader(matchingDeployment?: Deployment) {
     }
   };
 
+  const peek = async (data: any) => {
+    let hasError = false;
+    const newErrorStatus: { [key: string]: number } = { ...errorStatus };
+
+    const processErrorStatus = (errorStatus: string) => {
+      const [code, path] = errorStatus.split("/");
+      if (path) {
+        newErrorStatus[path] = parseInt(code, 10);
+      }
+    };
+
+    if (data.errorStatus) {
+      processErrorStatus(data.errorStatus);
+      hasError = true;
+      delete data.errorStatus;
+    }
+
+    if (Array.isArray(data)) {
+      data.forEach((item) => {
+        if (item.errorStatus) {
+          processErrorStatus(item.errorStatus);
+          hasError = true;
+          delete item.errorStatus;
+        }
+      });
+    }
+
+    if (hasError) {
+      setErrorStatus((prevErrorStatus) => ({
+        ...prevErrorStatus,
+        ...newErrorStatus,
+      }));
+    }
+    return data;
+  };
+
   const loadHealthChecks = async () => {
     try {
       if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
         let healthChecksObj: HealthChecksType = {};
-        const newHealthChecks = await fetchData("/api/health", normalizeHealth);
+        const newHealthChecks = await fetchData(
+          "/api/health",
+          normalizeHealth,
+          false,
+          undefined,
+          peek
+        );
         healthChecksObj[(matchingDeployment as Deployment).name] =
           newHealthChecks;
         setHealthChecks(healthChecksObj);
@@ -96,7 +139,13 @@ export function useDataLoader(matchingDeployment?: Deployment) {
 
   const loadHealthChecksEntities = async () => {
     try {
-      const newHealthChecks = await fetchData("/api/health", normalizeHealth);
+      const newHealthChecks = await fetchData(
+        "/api/health",
+        normalizeHealth,
+        false,
+        undefined,
+        peek
+      );
       setHealthChecksEntities(newHealthChecks);
     } catch (error) {
       console.error("Error loading health checks:", error);
@@ -106,7 +155,13 @@ export function useDataLoader(matchingDeployment?: Deployment) {
   const loadInfo = async () => {
     try {
       if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
-        const newInfo = await fetchData("api/info", normalizeInfo);
+        const newInfo = await fetchData(
+          "api/info",
+          normalizeInfo,
+          false,
+          undefined,
+          peek
+        );
         if (newInfo.length > 0) {
           setInfo([
             {
@@ -131,7 +186,13 @@ export function useDataLoader(matchingDeployment?: Deployment) {
   const loadMetrics = async () => {
     try {
       if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
-        const newMetrics = await fetchData("api/metrics", normalizeMetrics);
+        const newMetrics = await fetchData(
+          "api/metrics",
+          normalizeMetrics,
+          false,
+          undefined,
+          peek
+        );
         setMetrics([
           {
             name: (matchingDeployment as Deployment).name,
@@ -149,7 +210,9 @@ export function useDataLoader(matchingDeployment?: Deployment) {
       const newEntities = await fetchData(
         "api/entities",
         normalizeEntities,
-        true
+        true,
+        undefined,
+        peek
       );
       const healthChecks = await fetchData("/api/health", normalizeHealth);
 
@@ -173,7 +236,13 @@ export function useDataLoader(matchingDeployment?: Deployment) {
 
   const loadJobs = async () => {
     try {
-      const newJobs = await fetchData("/api/jobs", normalizeJobs, true);
+      const newJobs = await fetchData(
+        "/api/jobs",
+        normalizeJobs,
+        true,
+        undefined,
+        peek
+      );
       setJobs(newJobs);
     } catch (error) {
       console.error("Error loading jobs:", error);
@@ -197,7 +266,13 @@ export function useDataLoader(matchingDeployment?: Deployment) {
 
   const loadValues = async () => {
     try {
-      const newValues = await fetchData("/api/values", normalizeValues, true);
+      const newValues = await fetchData(
+        "/api/values",
+        normalizeValues,
+        true,
+        undefined,
+        peek
+      );
       setValues(newValues);
     } catch (error) {
       console.error("Error loading health values:", error);
@@ -231,5 +306,6 @@ export function useDataLoader(matchingDeployment?: Deployment) {
     hasError,
     nodesDifferent,
     loadData,
+    errorStatus,
   };
 }

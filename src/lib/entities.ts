@@ -24,16 +24,23 @@ export type HealthCounts = {
 
 export const normalizeEntities = (
   input: Record<string, InputEntity[]>
-): Entity[] =>
-  Object.keys(input)
-    .flatMap((type) =>
-      input[type].map((entity: any) => ({
-        type,
-        uid: `${type}_${entity.id}`,
-        ...entity,
-      }))
+): Entity[] => {
+  if (!input.response) {
+    console.error("input.response is undefined");
+    return [];
+  }
+  return Object.keys(input.response)
+    .flatMap((type: any) =>
+      Array.isArray(input.response[type])
+        ? input.response[type].map((entity: any) => ({
+            type,
+            uid: `${type}_${entity.id}`,
+            ...entity,
+          }))
+        : []
     )
     .filter((entity: any) => entity.status !== "DISABLED");
+};
 
 export const getEntityCategory = (entity: Entity) => {
   return entity.type === "services" ? "API" : entity.subType.split(/[/]/)[0];
