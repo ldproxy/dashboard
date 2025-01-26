@@ -17,7 +17,6 @@ import { Check, loadHealthChecksHomePage } from "@/lib/health";
 import { InfoItem, loadInfoHomePage } from "@/lib/info";
 import { useReloadInterval } from "../layout";
 import { IS_MODE_SAAS, IS_MODE_SINGLE } from "@/lib/env";
-
 type InfoType = { name: string; info: InfoItem }[];
 type HealthChecksType = { [key: string]: Check[] };
 
@@ -115,7 +114,6 @@ export default function HomePage() {
     setAvailableNodes(availableNodes);
     setHealthyNodes(healthyNodes);
   };
-
   const getHealthStatuses = async (healthChecks: HealthChecksType) => {
     if (deployments.length > 0) {
       return deployments.map((deployment: Deployment) => {
@@ -127,13 +125,8 @@ export default function HomePage() {
             healthStatus = "HEALTHY";
           } else if (checks.every((check) => check.state === "OFFLINE")) {
             healthStatus = "OFFLINE";
-          } else if (
-            checks.some((check) => check.state === "OFFLINE") &&
-            checks.some((check) => check.state === "AVAILABLE")
-          ) {
-            healthStatus = "LIMITED";
           } else {
-            healthStatus = "AVAILABLE";
+            healthStatus = "LIMITED";
           }
         } else {
           healthStatus = "OFFLINE";

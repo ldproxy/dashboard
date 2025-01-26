@@ -86,7 +86,8 @@ export function useDataLoader(matchingDeployment?: Deployment) {
     const newErrorStatus: { [key: string]: number } = { ...errorStatus };
 
     const processErrorStatus = (errorStatus: string) => {
-      const [code, path] = errorStatus.split("/");
+      const [code, ...pathParts] = errorStatus.split("/");
+      const path = pathParts.join("/");
       if (path) {
         newErrorStatus[path] = parseInt(code, 10);
       }

@@ -174,17 +174,19 @@ export default function DeploymentPage() {
       let healthStatus = "";
 
       if (checks && checks.length > 0) {
-        if (checks.some((check) => check.state === "UNAVAILABLE")) {
-          healthStatus = "UNHEALTHY";
+        if (
+          (checks.some(
+            (check) =>
+              check.state === "OFFLINE" || check.state === "UNAVAILABLE"
+          ) &&
+            checks.some((check) => check.state === "AVAILABLE")) ||
+          Object.keys(errorStatus).length > 0
+        ) {
+          healthStatus = "LIMITED";
         } else if (checks.every((check) => check.state === "AVAILABLE")) {
           healthStatus = "HEALTHY";
         } else if (checks.every((check) => check.state === "OFFLINE")) {
           healthStatus = "OFFLINE";
-        } else if (
-          checks.some((check) => check.state === "OFFLINE") &&
-          checks.some((check) => check.state === "AVAILABLE")
-        ) {
-          healthStatus = "LIMITED";
         }
       } else {
         healthStatus = "OFFLINE";
@@ -193,7 +195,6 @@ export default function DeploymentPage() {
       return [{ name: (matchingDeployment as Deployment).name, healthStatus }];
     } else return null;
   };
-
   const totalSources = tableData.length;
   const totalValues = values.length;
   const totalEntities = entities.length;
@@ -209,6 +210,7 @@ export default function DeploymentPage() {
     console.log("totalSources:", totalSources);
     console.log("Jobs", jobs);
     console.log("autoRefreshInterval", autoRefreshInterval);
+    console.log("errorStatusDeployment", errorStatus);
   }
 
   return (

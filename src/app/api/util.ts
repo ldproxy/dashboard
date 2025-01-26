@@ -79,7 +79,7 @@ export const fetchMulti = async <T>(
           return {
             url,
             response,
-            errorStatus: `${errorStatus.toString()}${endpoint}`,
+            errorStatus: `${errorStatus.toString()}/${url}${endpoint}`,
           } as MultiResponseItem<T>;
         }
 
@@ -108,7 +108,7 @@ export const fetchMultiFirst = async <T>(
         const errorStatus = res.status;
         return {
           response,
-          errorStatus: `${errorStatus.toString()}${endpoint}`,
+          errorStatus: `${errorStatus.toString()}/${url}${endpoint}`,
         };
       }
 
