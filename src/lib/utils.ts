@@ -172,7 +172,7 @@ export const compareDataAcrossUrls = async () => {
   }
 };
 
-export const getAvailableNodes = async (
+export const getLimitedNodes = async (
   healthChecks: HealthChecksType,
   deployments: Deployment[]
 ): Promise<{ name: string; availableUrlsCount: number }[]> => {
@@ -180,17 +180,28 @@ export const getAvailableNodes = async (
     const uniqueUrls = new Set<string>();
     const checks = healthChecks[deployment.name];
 
+    let hasAvailableOrLimited = false;
+    let hasLimitedOrUnavailable = false;
+
     checks.forEach((check) => {
-      if (check.state !== "OFFLINE") {
+      if (check.state === "AVAILABLE" || check.state === "LIMITED") {
         uniqueUrls.add(check.url);
+        hasAvailableOrLimited = true;
+      }
+      if (check.state === "LIMITED" || check.state === "UNAVAILABLE") {
+        hasLimitedOrUnavailable = true;
       }
     });
 
-    return { name: deployment.name, availableUrlsCount: uniqueUrls.size };
+    return {
+      name: deployment.name,
+      availableUrlsCount:
+        hasAvailableOrLimited && hasLimitedOrUnavailable ? uniqueUrls.size : 0,
+    };
   });
 };
 
-export const getAvailableNodesCount = (
+export const getHealthyNodesCount = (
   healthChecks: HealthChecksType,
   deployments: Deployment[]
 ): { name: string; availableUrlsCount: number }[] => {
@@ -200,16 +211,43 @@ export const getAvailableNodesCount = (
 
     checks.forEach((check) => {
       if (!urlStateMap.has(check.url)) {
-        urlStateMap.set(check.url, check.state === "AVAILABLE");
-      } else if (check.state !== "AVAILABLE") {
+        urlStateMap.set(check.url, check.healthy === true);
+      } else if (check.healthy !== true) {
         urlStateMap.set(check.url, false);
       }
     });
 
     const availableUrlsCount = Array.from(urlStateMap.values()).filter(
-      (isAvailable) => isAvailable
+      (isHealthy) => isHealthy === true
     ).length;
 
     return { name: deployment.name, availableUrlsCount };
+  });
+};
+
+export const getOfflineNodesCount = (
+  healthChecks: HealthChecksType,
+  deployments: Deployment[]
+): { name: string; offlineUrlsCount: number }[] => {
+  return deployments.map((deployment: Deployment) => {
+    const checks = healthChecks[deployment.name];
+    const urlStateMap = new Map<string, boolean>();
+
+    checks.forEach((check) => {
+      if (!urlStateMap.has(check.url)) {
+        urlStateMap.set(
+          check.url,
+          check.state === "UNAVAILABLE" || check.state === "OFFLINE"
+        );
+      } else if (check.state !== "UNAVAILABLE" && check.state !== "OFFLINE") {
+        urlStateMap.set(check.url, false);
+      }
+    });
+
+    const offlineUrlsCount = Array.from(urlStateMap.values()).filter(
+      (isOffline) => isOffline === true
+    ).length;
+
+    return { name: deployment.name, offlineUrlsCount };
   });
 };

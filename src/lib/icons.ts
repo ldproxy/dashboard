@@ -15,8 +15,10 @@ import {
   TrashIcon,
   Pencil1Icon,
   ExternalLinkIcon,
+  CrossCircledIcon,
 } from "@radix-ui/react-icons";
 import { IconProps } from "@radix-ui/react-icons/dist/types";
+import { Cross } from "lucide-react";
 
 export const icons = {
   Play: "Play",
@@ -34,6 +36,7 @@ export const icons = {
   Trash: "Trash",
   Pencil1: "Pencil1",
   ExternalLink: "ExternalLink",
+  Cross: "Cross",
 };
 
 export const getIcon = (
@@ -70,6 +73,8 @@ export const getIcon = (
       return Pencil1Icon;
     case icons.ExternalLink:
       return ExternalLinkIcon;
+    case icons.Cross:
+      return CrossCircledIcon;
     default:
       return undefined;
   }

@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { Deployment, getDeployments, postDeployment } from "@/lib/deployments";
 import { getIcon } from "@/lib/icons";
 import Link from "next/link";
-import { getAvailableNodes, getAvailableNodesCount } from "@/lib/utils";
+import {
+  getLimitedNodes,
+  getHealthyNodesCount,
+  getOfflineNodesCount,
+} from "@/lib/utils";
 import Info from "@/components/dashboard/InfoBox";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
@@ -23,8 +27,11 @@ type HealthChecksType = { [key: string]: Check[] };
 export default function HomePage() {
   const autoRefreshInterval = useReloadInterval();
   const [deployments, setDeployments] = useState([]);
-  const [availableNodes, setAvailableNodes] = useState([
+  const [limitedNodes, setLimitedNodes] = useState([
     { name: "", availableUrlsCount: 0 },
+  ]);
+  const [offlineNodes, setOfflineNodes] = useState([
+    { name: "", offlineUrlsCount: 0 },
   ]);
   const [info, setInfo] = useState<InfoType>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -107,11 +114,13 @@ export default function HomePage() {
   }, [deployments, isInitialLoad, autoRefreshInterval]);
 
   const setHealthStatusAndNodes = async (health: HealthChecksType) => {
+    console.log("gesund", health);
     const healthStatuses = await getHealthStatuses(health);
-    const availableNodes = await getAvailableNodes(health, deployments);
-    const healthyNodes = getAvailableNodesCount(health, deployments);
+    const limitedNodes = await getLimitedNodes(health, deployments);
+    const healthyNodes = getHealthyNodesCount(health, deployments);
+    const offlineNodes = getOfflineNodesCount(health, deployments);
     setHealthStatuses(healthStatuses);
-    setAvailableNodes(availableNodes);
+    setLimitedNodes(limitedNodes);
     setHealthyNodes(healthyNodes);
   };
   const getHealthStatuses = async (healthChecks: HealthChecksType) => {
@@ -198,14 +207,20 @@ export default function HomePage() {
                 healthStatuses.find((h) => h.name === deployment.name)
                   ?.healthStatus;
 
-              const availableNodesCount =
-                availableNodes.find((node) => node.name === deployment.name)
+              const limitedNodesCount =
+                limitedNodes.find((node) => node.name === deployment.name)
                   ?.availableUrlsCount || 0;
 
               const healthyNodesCount =
                 (healthyNodes &&
                   healthyNodes.find((node) => node.name === deployment.name)
                     ?.availableUrlsCount) ||
+                0;
+
+              const offlineNodesCount =
+                (offlineNodes &&
+                  offlineNodes.find((node) => node.name === deployment.name)
+                    ?.offlineUrlsCount) ||
                 0;
 
               if (DevHome) {
@@ -230,8 +245,9 @@ export default function HomePage() {
                       : ""
                   }
                   totalNodes={deployment.apiUrl.length}
-                  availableNodes={availableNodesCount}
-                  HealthyNodes={healthyNodesCount}
+                  limitedNodes={limitedNodesCount}
+                  healthyNodes={healthyNodesCount}
+                  offlineNodes={offlineNodesCount}
                   healthStatus={
                     deploymentHealthStatus &&
                     typeof deploymentHealthStatus === "string"
@@ -241,6 +257,7 @@ export default function HomePage() {
                   IconFooter1={getIcon("InfoCircled")}
                   IconFooter2={getIcon("CheckCircled")}
                   IconFooter3={getIcon("QuestionMark")}
+                  IconFooter4={getIcon("Cross")}
                   className="hover:bg-gray-100 transition-colors duration-200"
                 />
               );

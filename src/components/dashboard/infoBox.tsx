@@ -17,9 +17,10 @@ export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
   url: string;
   totalNodes?: number;
-  availableNodes?: number;
+  limitedNodes?: number;
   healthStatus: string;
-  HealthyNodes?: number;
+  healthyNodes?: number;
+  offlineNodes?: number;
   versions?: { version: string; apiUrl: string }[];
   uptimes?: { uptime: number; apiUrl: string }[];
   memories?: { memory: number; apiUrl: string }[];
@@ -27,6 +28,7 @@ export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   IconFooter1?: React.FunctionComponent<IconProps>;
   IconFooter2?: React.FunctionComponent<IconProps>;
   IconFooter3?: React.FunctionComponent<IconProps>;
+  IconFooter4?: React.FunctionComponent<IconProps>;
   className?: string;
 }
 
@@ -34,9 +36,10 @@ export default function CustomersPage({
   name,
   url,
   totalNodes,
-  availableNodes,
+  limitedNodes,
   healthStatus,
-  HealthyNodes,
+  healthyNodes,
+  offlineNodes,
   versions = [],
   uptimes = [],
   memories = [],
@@ -44,6 +47,7 @@ export default function CustomersPage({
   IconFooter1,
   IconFooter2,
   IconFooter3,
+  IconFooter4,
   className,
 }: SummaryProps) {
   const cardClassName = `shadow-lg ${className} ${
@@ -419,7 +423,7 @@ export default function CustomersPage({
                   marginLeft: "5px",
                 }}
               >
-                {HealthyNodes}
+                {healthyNodes}
               </span>
             </div>
             <div
@@ -443,7 +447,7 @@ export default function CustomersPage({
                   fontWeight: "bold",
                 }}
               >
-                Available:
+                Limited:
               </span>
               <span
                 style={{
@@ -453,7 +457,41 @@ export default function CustomersPage({
                   marginLeft: "5px",
                 }}
               >
-                {availableNodes}
+                {limitedNodes}
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: "10px",
+              }}
+            >
+              {IconFooter4 ? (
+                <IconFooter4
+                  className="h-4 w-4 text-muted-foreground"
+                  style={{ marginRight: "5px", marginTop: "2px" }}
+                />
+              ) : null}
+              <span
+                style={{
+                  color: "dimgray",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                }}
+              >
+                Offline:
+              </span>
+              <span
+                style={{
+                  color: "dimgray",
+                  fontSize: "14px",
+                  fontWeight: "bold",
+                  marginLeft: "5px",
+                }}
+              >
+                {offlineNodes}
               </span>
             </div>
           </div>
