@@ -162,36 +162,3 @@ export function summarizeStoreCheck(storeCheck: UiCheck[]): UiCheck[] {
 
   return Object.values(summarized);
 }
-
-export const loadHealthChecksHomePage = async (deployments: Deployment[]) => {
-  try {
-    if (deployments.length > 0) {
-      let healthChecksObj: HealthChecksType = {};
-      const promises = deployments.map(async (deployment: any) => {
-        try {
-          const newHealthChecks = await fetchData(
-            "/api/health",
-            normalizeHealth,
-            false,
-            deployment.apiUrl
-          );
-          healthChecksObj[deployment.name] = newHealthChecks;
-        } catch (error) {
-          console.error(
-            "Error fetching health checks for",
-            deployment.name,
-            ":",
-            error
-          );
-          healthChecksObj[deployment.name] = [
-            { state: "OFFLINE", url: deployment.url },
-          ];
-        }
-      });
-      await Promise.all(promises);
-      return healthChecksObj;
-    }
-  } catch (error) {
-    console.error("Error loading health checks:", error);
-  }
-};

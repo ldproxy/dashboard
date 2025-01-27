@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Deployment, getDeployments, postDeployment } from "@/lib/deployments";
 import { getIcon } from "@/lib/icons";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import {
   getLimitedNodes,
@@ -17,12 +18,13 @@ import { buttonVariants } from "@/components/shadcn-ui/button";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { PopUpDialog } from "@/components/dashboard/CreateDeploymentPopUp";
 import { DevHome } from "@/dev-data/constants";
-import { Check, loadHealthChecksHomePage } from "@/lib/health";
+import { Check } from "@/lib/health";
 import { InfoItem, loadInfoHomePage } from "@/lib/info";
 import { useReloadInterval } from "../layout";
 import { IS_MODE_SAAS, IS_MODE_SINGLE } from "@/lib/env";
 type InfoType = { name: string; info: InfoItem }[];
 type HealthChecksType = { [key: string]: Check[] };
+import { useDataLoader } from "@/lib/loadDataHook";
 
 export default function HomePage() {
   const autoRefreshInterval = useReloadInterval();
@@ -43,7 +45,8 @@ export default function HomePage() {
     { name: string; availableUrlsCount: number }[] | null
   >(null);
   const [popUp, setPopUp] = useState<boolean>(false);
-
+  const { healthCecksHomepage, loadData, errorStatus, fetchError } =
+    useDataLoader(undefined, deployments);
   const router = useRouter();
 
   useEffect(() => {
@@ -68,16 +71,21 @@ export default function HomePage() {
   }, [autoRefreshInterval]);
 
   useEffect(() => {
-    const loadData = async () => {
+    // not all dependendies to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deployments]);
+
+  useEffect(() => {
+    const loadDataHomepage = async () => {
       setIsLoading(true);
       try {
-        const [health, _] = await Promise.all([
-          loadHealthChecksHomePage(deployments),
-          loadInfoHomePage(deployments, setInfo),
-        ]);
-        if (health && Object.keys(health).length > 0) {
-          setHealthStatusAndNodes(health);
+        if (
+          healthCecksHomepage &&
+          Object.keys(healthCecksHomepage).length > 0
+        ) {
+          setHealthStatusAndNodes(healthCecksHomepage);
         }
+        await Promise.all([loadInfoHomePage(deployments, setInfo)]);
       } catch (error) {
         console.error(
           "Ein Fehler ist beim Laden der Daten aufgetreten:",
@@ -89,29 +97,36 @@ export default function HomePage() {
       }
     };
     if (isInitialLoad && deployments.length > 0) {
-      loadData();
+      (async () => {
+        await loadData({ loadHealthChecksHomepage: true, loadInfo: true });
+        loadDataHomepage();
+      })();
     }
     // not all dependendies to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deployments]);
+  }, [deployments, healthCecksHomepage]);
 
   useEffect(() => {
     if (!isInitialLoad && autoRefreshInterval > 0) {
-      const loadData = async () => {
-        const [health, _] = await Promise.all([
-          loadHealthChecksHomePage(deployments),
-          loadInfoHomePage(deployments, setInfo),
-        ]);
-        if (health && Object.keys(health).length > 0) {
-          setHealthStatusAndNodes(health);
+      const loadDataHomepage = async () => {
+        loadData({ loadHealthChecksHomepage: true });
+
+        await Promise.all([loadInfoHomePage(deployments, setInfo)]);
+        if (
+          healthCecksHomepage &&
+          Object.keys(healthCecksHomepage).length > 0
+        ) {
+          setHealthStatusAndNodes(healthCecksHomepage);
         }
       };
-      const interval = setInterval(loadData, autoRefreshInterval * 1000);
+      const interval = setInterval(() => {
+        loadDataHomepage();
+      }, autoRefreshInterval * 1000);
       return () => clearInterval(interval);
     }
     // not all dependendies to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deployments, isInitialLoad, autoRefreshInterval]);
+  }, [deployments, isInitialLoad, autoRefreshInterval, healthCecksHomepage]);
 
   const setHealthStatusAndNodes = async (health: HealthChecksType) => {
     console.log("gesund", health);
@@ -122,6 +137,7 @@ export default function HomePage() {
     setHealthStatuses(healthStatuses);
     setLimitedNodes(limitedNodes);
     setHealthyNodes(healthyNodes);
+    setOfflineNodes(offlineNodes);
   };
   const getHealthStatuses = async (healthChecks: HealthChecksType) => {
     if (deployments.length > 0) {
@@ -130,7 +146,9 @@ export default function HomePage() {
         let healthStatus = "";
 
         if (checks && checks.length > 0) {
-          if (checks.every((check) => check.state === "AVAILABLE")) {
+          if (Object.keys(errorStatus).length > 0) {
+            healthStatus = "LIMITED";
+          } else if (checks.every((check) => check.state === "AVAILABLE")) {
             healthStatus = "HEALTHY";
           } else if (checks.every((check) => check.state === "OFFLINE")) {
             healthStatus = "OFFLINE";
@@ -163,7 +181,6 @@ export default function HomePage() {
       return { success: false };
     }
   };
-
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between space-y-2">
@@ -194,6 +211,18 @@ export default function HomePage() {
           className="grid gap-4 md:grid-cols-1 lg:grid-cols-1 "
           style={{ marginBottom: "10px" }}
         >
+          {Object.values(fetchError).map(
+            (error, index) =>
+              error && (
+                <div
+                  key={index}
+                  className="flex items-center space-x-2 p-4 bg-red-100 border border-red-400 text-red-700 rounded"
+                >
+                  <ExclamationTriangleIcon className="h-5 w-5" />
+                  <span>{error}</span>
+                </div>
+              )
+          )}
           {deployments.map((deployment: any, index: number) =>
             (() => {
               const deploymentInfo =

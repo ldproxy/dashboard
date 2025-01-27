@@ -21,6 +21,7 @@ export type NodesDifferent = {
 type DataLoaderConfig = {
   loadEntities?: boolean;
   loadHealthChecks?: boolean;
+  loadHealthChecksHomepage?: boolean;
   loadHealthChecksEntities?: boolean;
   loadInfo?: boolean;
   loadMetrics?: boolean;
@@ -39,7 +40,10 @@ const defaultConfig: DataLoaderConfig = {
   checkDifferences: true,
 };
 
-export function useDataLoader(matchingDeployment?: Deployment) {
+export function useDataLoader(
+  matchingDeployment?: Deployment,
+  deployments?: Deployment[]
+) {
   const fetchingTimeout = 1000;
   const [fetchError, setFetchError] = useState<{
     [key: string]: string | null;
@@ -48,6 +52,8 @@ export function useDataLoader(matchingDeployment?: Deployment) {
   const [entities, setEntities] = useState<Entity[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [healthChecks, setHealthChecks] = useState<HealthChecksType>({});
+  const [healthCecksHomepage, setHealthChecksHomepage] =
+    useState<HealthChecksType>({});
   const [healthChecksEntities, setHealthChecksEntities] = useState<Check[]>([]);
   const [metrics, setMetrics] = useState<MetricsType[]>([
     { name: "", metrics: [{ uptime: 0, memory: 0, apiUrl: "" }] },
@@ -67,6 +73,8 @@ export function useDataLoader(matchingDeployment?: Deployment) {
     try {
       const promises = [];
       if (config.loadHealthChecks) promises.push(loadHealthChecks());
+      if (config.loadHealthChecksHomepage)
+        promises.push(loadHealthChecksHomepage());
       if (config.loadHealthChecksEntities)
         promises.push(loadHealthChecksEntities());
       if (config.loadInfo) promises.push(loadInfo());
@@ -88,7 +96,6 @@ export function useDataLoader(matchingDeployment?: Deployment) {
   const peek = async (data: any) => {
     let hasError = false;
     const newErrorStatus: { [key: string]: number } = { ...errorStatus };
-
     const processErrorStatus = (errorStatus: string) => {
       const [code, ...pathParts] = errorStatus.split("/");
       const path = pathParts.join("/");
@@ -126,6 +133,68 @@ export function useDataLoader(matchingDeployment?: Deployment) {
       }));
     }
     return data;
+  };
+
+  const loadHealthChecksHomepage = async () => {
+    try {
+      if (deployments && deployments.length > 0) {
+        const timeout = new Promise((_, reject) =>
+          setTimeout(
+            () =>
+              reject(
+                new Error(
+                  `Fetching health took longer than ${fetchingTimeout} ms`
+                )
+              ),
+            fetchingTimeout
+          )
+        );
+
+        let healthChecksObj: HealthChecksType = {};
+        const promises = deployments.map(async (deployment: any) => {
+          try {
+            const newHealthChecks = await Promise.race([
+              fetchData(
+                "/api/health",
+                normalizeHealth,
+                false,
+                deployment.apiUrl,
+                peek
+              ),
+              timeout,
+            ]);
+
+            healthChecksObj[deployment.name] = newHealthChecks;
+          } catch (error: any) {
+            if (error.message.includes("took longer than")) {
+              setFetchError((prev: any) => ({
+                ...prev,
+                loadHealthChecksHomepage: `Timeout: Fetching health took longer than ${fetchingTimeout} ms`,
+              }));
+            } else {
+              setFetchError((prev: any) => ({
+                ...prev,
+                loadHealthChecksHomepage:
+                  "Error loading health: " + error.message,
+              }));
+            }
+            console.error(
+              "Error fetching health checks for",
+              deployment.name,
+              ":",
+              error
+            );
+            healthChecksObj[deployment.name] = [
+              { state: "OFFLINE", url: deployment.url },
+            ];
+          }
+        });
+        await Promise.all(promises);
+        setHealthChecksHomepage(healthChecksObj);
+      }
+    } catch (error: any) {
+      console.error("Error loading health checks:", error);
+    }
   };
 
   const loadHealthChecks = async () => {
@@ -454,6 +523,7 @@ export function useDataLoader(matchingDeployment?: Deployment) {
     entities,
     jobs,
     healthChecks,
+    healthCecksHomepage,
     healthChecksEntities,
     metrics,
     info,

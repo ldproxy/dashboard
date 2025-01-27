@@ -369,14 +369,14 @@ export default function CustomersPage({
               {IconFooter1 ? (
                 <IconFooter1
                   className="h-4 w-4 text-muted-foreground"
-                  style={{ marginRight: "5px", marginTop: "2px" }}
+                  style={{ marginRight: "5px" }}
                 />
               ) : null}
               <span
                 style={{
                   color: "dimgray",
                   fontSize: "14px",
-                  fontWeight: "bold",
+                  fontWeight: "900",
                 }}
               >
                 Total:
@@ -385,7 +385,7 @@ export default function CustomersPage({
                 style={{
                   color: "dimgray",
                   fontSize: "14px",
-                  fontWeight: "bold",
+                  fontWeight: "900",
                   marginLeft: "5px",
                 }}
               >
@@ -403,7 +403,7 @@ export default function CustomersPage({
               {IconFooter2 ? (
                 <IconFooter2
                   className="h-4 w-4 text-muted-foreground"
-                  style={{ marginRight: "5px", marginTop: "2px" }}
+                  style={{ marginRight: "5px" }}
                 />
               ) : null}
               <span
@@ -437,7 +437,7 @@ export default function CustomersPage({
               {IconFooter3 ? (
                 <IconFooter3
                   className="h-4 w-4 text-muted-foreground"
-                  style={{ marginRight: "5px", marginTop: "2px" }}
+                  style={{ marginRight: "5px" }}
                 />
               ) : null}
               <span
@@ -471,7 +471,7 @@ export default function CustomersPage({
               {IconFooter4 ? (
                 <IconFooter4
                   className="h-4 w-4 text-muted-foreground"
-                  style={{ marginRight: "5px", marginTop: "2px" }}
+                  style={{ marginRight: "5px" }}
                 />
               ) : null}
               <span
