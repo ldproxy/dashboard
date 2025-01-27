@@ -40,13 +40,17 @@ const defaultConfig: DataLoaderConfig = {
 };
 
 export function useDataLoader(matchingDeployment?: Deployment) {
+  const fetchingTimeout = 1000;
+  const [fetchError, setFetchError] = useState<{
+    [key: string]: string | null;
+  }>({});
   const [isLoading, setIsLoading] = useState(true);
   const [entities, setEntities] = useState<Entity[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [healthChecks, setHealthChecks] = useState<HealthChecksType>({});
   const [healthChecksEntities, setHealthChecksEntities] = useState<Check[]>([]);
   const [metrics, setMetrics] = useState<MetricsType[]>([
-    { name: "", metrics: [{ uptime: -1, memory: -1, apiUrl: "" }] },
+    { name: "", metrics: [{ uptime: 0, memory: 0, apiUrl: "" }] },
   ]);
   const [info, setInfo] = useState<InfoType>([]);
   const [values, setValues] = useState([] as any[]);
@@ -121,48 +125,96 @@ export function useDataLoader(matchingDeployment?: Deployment) {
   const loadHealthChecks = async () => {
     try {
       if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
-        let healthChecksObj: HealthChecksType = {};
-        const newHealthChecks = await fetchData(
-          "/api/health",
-          normalizeHealth,
-          false,
-          undefined,
-          peek
+        const timeout = new Promise((_, reject) =>
+          setTimeout(
+            () =>
+              reject(
+                new Error(
+                  `Fetching health took longer than ${fetchingTimeout} ms`
+                )
+              ),
+            fetchingTimeout
+          )
         );
+
+        let healthChecksObj: HealthChecksType = {};
+        const newHealthChecks = await Promise.race([
+          fetchData("/api/health", normalizeHealth, false, undefined, peek),
+          timeout,
+        ]);
         healthChecksObj[(matchingDeployment as Deployment).name] =
           newHealthChecks;
         setHealthChecks(healthChecksObj);
       }
-    } catch (error) {
-      console.error("Error loading health checks:", error);
+    } catch (error: any) {
+      if (error.message.includes("took longer than")) {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadHealthChecks: `Timeout: Fetching health took longer than ${fetchingTimeout} ms`,
+        }));
+      } else {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadHealthChecks: "Error loading health: " + error.message,
+        }));
+      }
     }
   };
 
   const loadHealthChecksEntities = async () => {
     try {
-      const newHealthChecks = await fetchData(
-        "/api/health",
-        normalizeHealth,
-        false,
-        undefined,
-        peek
+      const timeout = new Promise((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error(
+                `Fetching health took longer than ${fetchingTimeout} ms`
+              )
+            ),
+          fetchingTimeout
+        )
       );
+
+      const newHealthChecks = await Promise.race([
+        fetchData("/api/health", normalizeHealth, false, undefined, peek),
+        timeout,
+      ]);
       setHealthChecksEntities(newHealthChecks);
-    } catch (error) {
-      console.error("Error loading health checks:", error);
+    } catch (error: any) {
+      if (error.message.includes("took longer than")) {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadHealthChecksEntities: `Timeout: Fetching health took longer than ${fetchingTimeout} ms`,
+        }));
+      } else {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadHealthChecksEntities:
+            "Error loading health checks: " + error.message,
+        }));
+      }
     }
   };
 
   const loadInfo = async () => {
     try {
       if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
-        const newInfo = await fetchData(
-          "api/info",
-          normalizeInfo,
-          false,
-          undefined,
-          peek
+        const timeout = new Promise((_, reject) =>
+          setTimeout(
+            () =>
+              reject(
+                new Error(
+                  `Fetching info took longer than ${fetchingTimeout} ms`
+                )
+              ),
+            fetchingTimeout
+          )
         );
+
+        const newInfo = await Promise.race([
+          fetchData("api/info", normalizeInfo, false, undefined, peek),
+          timeout,
+        ]);
         if (newInfo.length > 0) {
           setInfo([
             {
@@ -179,21 +231,43 @@ export function useDataLoader(matchingDeployment?: Deployment) {
           ]);
         }
       }
-    } catch (error) {
-      console.error("Error loading info:", error);
+    } catch (error: any) {
+      if (
+        error.message === `Fetching info took longer than ${fetchingTimeout} ms`
+      ) {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadInfo: `Timeout: Fetching info took longer than ${fetchingTimeout} ms`,
+        }));
+      } else {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadInfo: "Error loading info: " + error.message,
+        }));
+      }
     }
   };
 
   const loadMetrics = async () => {
     try {
       if (matchingDeployment && Object.keys(matchingDeployment).length > 0) {
-        const newMetrics = await fetchData(
-          "api/metrics",
-          normalizeMetrics,
-          false,
-          undefined,
-          peek
+        const timeout = new Promise((_, reject) =>
+          setTimeout(
+            () =>
+              reject(
+                new Error(
+                  `Fetching metrics took longer than ${fetchingTimeout} ms`
+                )
+              ),
+            fetchingTimeout
+          )
         );
+
+        const newMetrics = await Promise.race([
+          fetchData("api/metrics", normalizeMetrics, false, undefined, peek),
+          timeout,
+        ]);
+
         setMetrics([
           {
             name: (matchingDeployment as Deployment).name,
@@ -201,20 +275,42 @@ export function useDataLoader(matchingDeployment?: Deployment) {
           },
         ]);
       }
-    } catch (error) {
-      console.error("Error loading metrics:", error);
+    } catch (error: any) {
+      if (
+        error.message ===
+        `Fetching metrics took longer than ${fetchingTimeout} ms`
+      ) {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadMetrics: `Timeout: Fetching metrics took longer than ${fetchingTimeout} ms`,
+        }));
+      } else {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadMetrics: "Error loading metrics: " + error.message,
+        }));
+      }
     }
   };
 
   const loadEntities = async () => {
     try {
-      const newEntities = await fetchData(
-        "api/entities",
-        normalizeEntities,
-        true,
-        undefined,
-        peek
+      const timeout = new Promise((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error(
+                `Fetching entities took longer than ${fetchingTimeout} ms`
+              )
+            ),
+          fetchingTimeout
+        )
       );
+
+      const newEntities = await Promise.race([
+        fetchData("api/entities", normalizeEntities, true, undefined, peek),
+        timeout,
+      ]);
       const healthChecks = await fetchData("/api/health", normalizeHealth);
 
       if (Array.isArray(newEntities)) {
@@ -230,23 +326,55 @@ export function useDataLoader(matchingDeployment?: Deployment) {
       } else {
         console.error("Entities not an array:", newEntities);
       }
-    } catch (error) {
-      console.error("Error loading entities:", error);
+    } catch (error: any) {
+      if (
+        error.message ===
+        `Fetching entities took longer than ${fetchingTimeout} ms`
+      ) {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadEntities: `Timeout: Fetching entities took longer than ${fetchingTimeout} ms`,
+        }));
+      } else {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadEntities: "Error loading entities: " + error.message,
+        }));
+      }
     }
   };
 
   const loadJobs = async () => {
     try {
-      const newJobs = await fetchData(
-        "/api/jobs",
-        normalizeJobs,
-        true,
-        undefined,
-        peek
+      const timeout = new Promise((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error(`Fetching jobs took longer than ${fetchingTimeout} ms`)
+            ),
+          fetchingTimeout
+        )
       );
+
+      const newJobs = await Promise.race([
+        fetchData("/api/jobs", normalizeJobs, true, undefined, peek),
+        timeout,
+      ]);
       setJobs(newJobs);
-    } catch (error) {
-      console.error("Error loading jobs:", error);
+    } catch (error: any) {
+      if (
+        error.message === `Fetching jobs took longer than ${fetchingTimeout} ms`
+      ) {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadJobs: `Timeout: Fetching jobs took longer than ${fetchingTimeout} ms`,
+        }));
+      } else {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadJobs: "Error loading jobs: " + error.message,
+        }));
+      }
     }
   };
 
@@ -267,16 +395,38 @@ export function useDataLoader(matchingDeployment?: Deployment) {
 
   const loadValues = async () => {
     try {
-      const newValues = await fetchData(
-        "/api/values",
-        normalizeValues,
-        true,
-        undefined,
-        peek
+      const timeout = new Promise((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error(
+                `Fetching values took longer than ${fetchingTimeout} ms`
+              )
+            ),
+          fetchingTimeout
+        )
       );
+
+      const newValues = await Promise.race([
+        fetchData("/api/values", normalizeValues, true, undefined, peek),
+        timeout,
+      ]);
       setValues(newValues);
-    } catch (error) {
-      console.error("Error loading health values:", error);
+    } catch (error: any) {
+      if (
+        error.message ===
+        `Fetching values took longer than ${fetchingTimeout} ms`
+      ) {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadValues: `Timeout: Fetching values took longer than ${fetchingTimeout} ms`,
+        }));
+      } else {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadValues: "Error loading values: " + error.message,
+        }));
+      }
     }
   };
 
@@ -308,5 +458,6 @@ export function useDataLoader(matchingDeployment?: Deployment) {
     nodesDifferent,
     loadData,
     errorStatus,
+    fetchError,
   };
 }

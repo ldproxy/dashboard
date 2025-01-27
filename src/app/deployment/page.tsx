@@ -72,6 +72,7 @@ export default function DeploymentPage() {
     nodesDifferent,
     loadData,
     errorStatus,
+    fetchError,
   } = useDataLoader(matchingDeployment);
 
   useEffect(() => {
@@ -212,7 +213,6 @@ export default function DeploymentPage() {
     console.log("autoRefreshInterval", autoRefreshInterval);
     console.log("errorStatusDeployment", errorStatus);
   }
-
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between space-y-2">
@@ -275,6 +275,18 @@ export default function DeploymentPage() {
               ))}
             </span>
           </div>
+        )}
+        {Object.values(fetchError).map(
+          (error, index) =>
+            error && (
+              <div
+                key={index}
+                className="flex items-center space-x-2 p-4 bg-red-100 border border-red-400 text-red-700 rounded"
+              >
+                <ExclamationTriangleIcon className="h-5 w-5" />
+                <span>{error}</span>
+              </div>
+            )
         )}
 
         <TabsContent value="overview">
