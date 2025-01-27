@@ -92,8 +92,14 @@ export function useDataLoader(matchingDeployment?: Deployment) {
     const processErrorStatus = (errorStatus: string) => {
       const [code, ...pathParts] = errorStatus.split("/");
       const path = pathParts.join("/");
-      if (path) {
-        newErrorStatus[path] = parseInt(code, 10);
+      const statusCode = parseInt(code, 10);
+
+      if (statusCode === 200) {
+        if (newErrorStatus[path]) {
+          delete newErrorStatus[path];
+        }
+      } else if (path) {
+        newErrorStatus[path] = statusCode;
       }
     };
 
@@ -443,7 +449,6 @@ export function useDataLoader(matchingDeployment?: Deployment) {
 
     setNodesDifferent(newNodesDifferent);
   };
-
   return {
     isLoading,
     entities,

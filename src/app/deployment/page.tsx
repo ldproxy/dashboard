@@ -266,10 +266,10 @@ export default function DeploymentPage() {
         )}
         {Object.keys(errorStatus).length > 0 && (
           <div className="flex items-center space-x-2 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
-            <ExclamationTriangleIcon className="h-5 w-5" />
             <span>
               {Object.entries(errorStatus).map(([key, value]) => (
-                <div key={key}>
+                <div className="flex items-center" key={key}>
+                  <ExclamationTriangleIcon className="h-5 w-5 mr-5" />
                   Error {value} fetching data from endpoint {key}!
                 </div>
               ))}

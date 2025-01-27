@@ -74,16 +74,12 @@ export const fetchMulti = async <T>(
 
         const response: T = await res.json();
 
-        if (!res.ok) {
-          const errorStatus = res.status;
-          return {
-            url,
-            response,
-            errorStatus: `${errorStatus.toString()}/${url}${endpoint}`,
-          } as MultiResponseItem<T>;
-        }
-
-        return { url, response } as MultiResponseItem<T>;
+        const errorStatus = res.status;
+        return {
+          url,
+          response,
+          errorStatus: `${errorStatus.toString()}/${url}${endpoint}`,
+        } as MultiResponseItem<T>;
       } catch (error) {
         return errorResponse(url, endpoint, fallback, error);
       }
@@ -103,16 +99,12 @@ export const fetchMultiFirst = async <T>(
 
       const response: T = await res.json();
 
-      if (!res.ok) {
-        logError(url, res.status);
-        const errorStatus = res.status;
-        return {
-          response,
-          errorStatus: `${errorStatus.toString()}/${url}${endpoint}`,
-        };
-      }
-
-      return { response };
+      logError(url, res.status);
+      const errorStatus = res.status;
+      return {
+        response,
+        errorStatus: `${errorStatus.toString()}/${url}${endpoint}`,
+      };
     } catch (error: any) {
       logError(url, error);
     }
