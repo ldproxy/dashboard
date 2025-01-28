@@ -73,22 +73,16 @@ export function useDataLoader(
   const loadData = async (config: DataLoaderConfig = defaultConfig) => {
     setIsLoading(true);
     try {
-      const promises = [];
-      if (config.loadHealthChecks) promises.push(loadHealthChecks());
-      if (config.loadHealthChecksHomepage)
-        promises.push(loadHealthChecksHomepage());
-      if (config.loadHealthChecksEntities)
-        promises.push(loadHealthChecksEntities());
-      if (config.loadInfo) promises.push(loadInfo());
-      if (config.loadInfoHomepage) promises.push(loadInfoHomePage());
-      if (config.loadMetrics) promises.push(loadMetrics());
-      if (config.loadEntities) promises.push(loadEntities());
-      if (config.loadJobs) promises.push(loadJobs());
-      if (config.loadValues) promises.push(loadValues());
-      if (IS_MODE_MULTI && config.checkDifferences) {
-        promises.push(checkDifferences());
-      }
-      await Promise.all(promises);
+      if (config.loadHealthChecks) await loadHealthChecks();
+      if (config.loadHealthChecksHomepage) await loadHealthChecksHomepage();
+      if (config.loadHealthChecksEntities) await loadHealthChecksEntities();
+      if (config.loadInfo) await loadInfo();
+      if (config.loadInfoHomepage) await loadInfoHomePage();
+      if (config.loadMetrics) await loadMetrics();
+      if (config.loadEntities) await loadEntities();
+      if (config.loadJobs) await loadJobs();
+      if (config.loadValues) await loadValues();
+      if (IS_MODE_MULTI && config.checkDifferences) await checkDifferences();
     } catch (error) {
       console.error("Error loading data:", error);
     } finally {
@@ -193,7 +187,10 @@ export function useDataLoader(
           }
         });
         await Promise.all(promises);
-        setHealthChecksHomepage(healthChecksObj);
+        await new Promise<void>((resolve) => {
+          setHealthChecksHomepage(healthChecksObj);
+          resolve();
+        });
       }
     } catch (error: any) {
       console.error("Error loading health checks:", error);
