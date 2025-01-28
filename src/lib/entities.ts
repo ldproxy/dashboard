@@ -25,6 +25,9 @@ export type HealthCounts = {
 export const normalizeEntities = (
   input: Record<string, InputEntity[]>
 ): Entity[] => {
+  if (Array.isArray(input)) {
+    input = input[0];
+  }
   if (!input.response) {
     console.error("input.response is undefined");
     return [];

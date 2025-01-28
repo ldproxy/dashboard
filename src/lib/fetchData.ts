@@ -26,6 +26,8 @@ export const fetchData = async (
     if (firstOnly) {
       suffix += "&firstOnly=true";
     }
+  } else {
+    suffix = `?apiUrls=http://localhost:7081/api`;
   }
 
   const response = await fetch(`${url}${suffix}`);
