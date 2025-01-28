@@ -15,10 +15,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export async function getApiUrl(): Promise<string[]> {
-  if (IS_MODE_SINGLE) {
-    return ["/api"];
-  }
-
   let apiUrl: string[] = [];
 
   const deployments = await getDeployments();
