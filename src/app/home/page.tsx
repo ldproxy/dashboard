@@ -19,7 +19,7 @@ import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { PopUpDialog } from "@/components/dashboard/CreateDeploymentPopUp";
 import { DevHome } from "@/dev-data/constants";
 import { Check } from "@/lib/health";
-import { InfoItem, loadInfoHomePage } from "@/lib/info";
+import { InfoItem } from "@/lib/info";
 import { useReloadInterval } from "../layout";
 import { IS_MODE_SAAS, IS_MODE_SINGLE } from "@/lib/env";
 type InfoType = { name: string; info: InfoItem }[];
@@ -35,7 +35,6 @@ export default function HomePage() {
   const [offlineNodes, setOfflineNodes] = useState([
     { name: "", offlineUrlsCount: 0 },
   ]);
-  const [info, setInfo] = useState<InfoType>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [healthStatuses, setHealthStatuses] = useState<
@@ -45,8 +44,13 @@ export default function HomePage() {
     { name: string; availableUrlsCount: number }[] | null
   >(null);
   const [popUp, setPopUp] = useState<boolean>(false);
-  const { healthCecksHomepage, loadData, errorStatus, fetchError } =
-    useDataLoader(undefined, deployments);
+  const {
+    healthCecksHomepage,
+    infoHomepage,
+    loadData,
+    errorStatus,
+    fetchError,
+  } = useDataLoader(undefined, deployments);
   const router = useRouter();
 
   useEffect(() => {
@@ -85,7 +89,6 @@ export default function HomePage() {
         ) {
           setHealthStatusAndNodes(healthCecksHomepage);
         }
-        await Promise.all([loadInfoHomePage(deployments, setInfo)]);
       } catch (error) {
         console.error(
           "Ein Fehler ist beim Laden der Daten aufgetreten:",
@@ -98,7 +101,10 @@ export default function HomePage() {
     };
     if (isInitialLoad && deployments.length > 0) {
       (async () => {
-        await loadData({ loadHealthChecksHomepage: true, loadInfo: true });
+        await loadData({
+          loadHealthChecksHomepage: true,
+          loadInfoHomepage: true,
+        });
         loadDataHomepage();
       })();
     }
@@ -109,9 +115,8 @@ export default function HomePage() {
   useEffect(() => {
     if (!isInitialLoad && autoRefreshInterval > 0) {
       const loadDataHomepage = async () => {
-        loadData({ loadHealthChecksHomepage: true });
+        loadData({ loadHealthChecksHomepage: true, loadInfoHomepage: true });
 
-        await Promise.all([loadInfoHomePage(deployments, setInfo)]);
         if (
           healthCecksHomepage &&
           Object.keys(healthCecksHomepage).length > 0
@@ -129,7 +134,6 @@ export default function HomePage() {
   }, [deployments, isInitialLoad, autoRefreshInterval, healthCecksHomepage]);
 
   const setHealthStatusAndNodes = async (health: HealthChecksType) => {
-    console.log("gesund", health);
     const healthStatuses = await getHealthStatuses(health);
     const limitedNodes = await getLimitedNodes(health, deployments);
     const healthyNodes = getHealthyNodesCount(health, deployments);
@@ -146,7 +150,11 @@ export default function HomePage() {
         let healthStatus = "";
 
         if (checks && checks.length > 0) {
-          if (Object.keys(errorStatus).length > 0) {
+          const hasErrorStatus = deployment.apiUrl.some((url) =>
+            Object.keys(errorStatus).includes(url)
+          );
+
+          if (hasErrorStatus) {
             healthStatus = "LIMITED";
           } else if (checks.every((check) => check.state === "AVAILABLE")) {
             healthStatus = "HEALTHY";
@@ -158,7 +166,6 @@ export default function HomePage() {
         } else {
           healthStatus = "OFFLINE";
         }
-
         return { name: deployment.name, healthStatus };
       });
     } else return null;
@@ -226,8 +233,8 @@ export default function HomePage() {
           {deployments.map((deployment: any, index: number) =>
             (() => {
               const deploymentInfo =
-                info &&
-                info.find((i) => {
+                infoHomepage &&
+                infoHomepage.find((i) => {
                   return i.name === deployment.name;
                 });
 

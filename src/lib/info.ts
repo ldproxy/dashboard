@@ -27,31 +27,3 @@ export const normalizeInfo = (
   }
   return [{ ...input, apiUrl: "TODO" }];
 };
-
-export const loadInfoHomePage = async (
-  deployments: Deployment[],
-  setInfo: any
-) => {
-  try {
-    if (deployments.length > 0) {
-      const promises = deployments.map(async (deployment: any) => {
-        const newInfo = await fetchData(
-          "api/info",
-          normalizeInfo,
-          false,
-          deployment.apiUrl
-        );
-
-        if (newInfo && newInfo.length > 0) {
-          return { name: deployment.name, info: newInfo as Infos };
-        } else {
-          return { name: deployment.name, info: [] as Infos };
-        }
-      });
-      const results = await Promise.all(promises);
-      setInfo(results);
-    }
-  } catch (error) {
-    console.error("Error loading info:", error);
-  }
-};

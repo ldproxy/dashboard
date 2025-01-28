@@ -22,6 +22,7 @@ type DataLoaderConfig = {
   loadEntities?: boolean;
   loadHealthChecks?: boolean;
   loadHealthChecksHomepage?: boolean;
+  loadInfoHomepage?: boolean;
   loadHealthChecksEntities?: boolean;
   loadInfo?: boolean;
   loadMetrics?: boolean;
@@ -54,6 +55,7 @@ export function useDataLoader(
   const [healthChecks, setHealthChecks] = useState<HealthChecksType>({});
   const [healthCecksHomepage, setHealthChecksHomepage] =
     useState<HealthChecksType>({});
+  const [infoHomepage, setInfoHomepage] = useState<InfoType>([]);
   const [healthChecksEntities, setHealthChecksEntities] = useState<Check[]>([]);
   const [metrics, setMetrics] = useState<MetricsType[]>([
     { name: "", metrics: [{ uptime: 0, memory: 0, apiUrl: "" }] },
@@ -78,6 +80,7 @@ export function useDataLoader(
       if (config.loadHealthChecksEntities)
         promises.push(loadHealthChecksEntities());
       if (config.loadInfo) promises.push(loadInfo());
+      if (config.loadInfoHomepage) promises.push(loadInfoHomePage());
       if (config.loadMetrics) promises.push(loadMetrics());
       if (config.loadEntities) promises.push(loadEntities());
       if (config.loadJobs) promises.push(loadJobs());
@@ -266,6 +269,59 @@ export function useDataLoader(
           ...prev,
           loadHealthChecksEntities:
             "Error loading health checks: " + error.message,
+        }));
+      }
+    }
+  };
+
+  const loadInfoHomePage = async () => {
+    try {
+      if (deployments && deployments.length > 0) {
+        const timeout = new Promise((_, reject) =>
+          setTimeout(
+            () =>
+              reject(
+                new Error(
+                  `Fetching info took longer than ${fetchingTimeout} ms`
+                )
+              ),
+            fetchingTimeout
+          )
+        );
+
+        const promises = deployments.map(async (deployment: any) => {
+          const newInfo = await Promise.race([
+            fetchData(
+              "api/info",
+              normalizeInfo,
+              false,
+              deployment.apiUrl,
+              peek
+            ),
+            timeout,
+          ]);
+
+          if (newInfo && newInfo.length > 0) {
+            return { name: deployment.name, info: newInfo as Infos };
+          } else {
+            return { name: deployment.name, info: [] as Infos };
+          }
+        });
+        const results = await Promise.all(promises);
+        setInfoHomepage(results);
+      }
+    } catch (error: any) {
+      if (
+        error.message === `Fetching info took longer than ${fetchingTimeout} ms`
+      ) {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadInfoHomepage: `Timeout: Fetching info took longer than ${fetchingTimeout} ms`,
+        }));
+      } else {
+        setFetchError((prev: any) => ({
+          ...prev,
+          loadInfoHomepage: "Error loading info: " + error.message,
         }));
       }
     }
@@ -527,6 +583,7 @@ export function useDataLoader(
     healthChecksEntities,
     metrics,
     info,
+    infoHomepage,
     values,
     cfg,
     hasError,
