@@ -45,6 +45,31 @@ export function DataTable<HealthCheck, TValue>({
   columns,
   data,
 }: DataTableProps<HealthCheck, TValue>) {
+  /*
+  const testData = React.useMemo(
+    () => [
+      {
+        id: 1,
+        name: "Row 1",
+        description: "description",
+        label: "Label 1",
+        subRows: [
+          { id: 2, name: "Sub Row 1" },
+          { id: 3, name: "Sub Row 2" },
+        ],
+      },
+      {
+        id: 4,
+        name: "Row 2",
+        subRows: [
+          { id: 5, name: "Sub Row 3" },
+          { id: 6, name: "Sub Row 4" },
+        ],
+      },
+    ],
+    []
+  );
+*/
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

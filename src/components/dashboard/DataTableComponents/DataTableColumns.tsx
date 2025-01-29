@@ -45,7 +45,7 @@ export const columns: ColumnDef<HealthCheck>[] = [
       <div className={`${row.depth === 0 ? "ml-4 flex items-center" : "ml-8"}`}>
         {row.depth === 0
           ? row.original.label || row.original.name || row.original.url
-          : row.original.url}{" "}
+          : row.original.name}
         {row.depth === 0 && row.original.description && (
           <TooltipProvider>
             <Tooltip>
