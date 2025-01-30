@@ -27,29 +27,33 @@ BaseHealth.args = {
     {
       label: "crs",
       url: "localhost:7081",
+      state: "AVAILABLE",
       status: "AVAILABLE",
       checked: "12:36:14",
       message: "",
       subRows: [
         {
-          label: "crs",
+          label: "subRow1",
           url: "localhost:3000",
-          status: "AVAILABLE",
+          state: "UNAVAILABLE",
+          status: "UNAVAILABLE",
           checked: "17:56:36",
           message: "",
           subRows: [],
         },
         {
-          label: "crs",
+          label: "subRow2",
           url: "localhost:7081",
+          state: "AVAILABLE",
           status: "AVAILABLE",
           checked: "10:36:54",
           message: "",
           subRows: [],
         },
         {
-          label: "crs",
+          label: "subRow3",
           url: "localhost:3000",
+          state: "AVAILABLE",
           status: "AVAILABLE",
           checked: "17:56:36",
           message: "",
@@ -60,6 +64,7 @@ BaseHealth.args = {
     {
       label: "store/resources",
       url: "localhost:7081",
+      state: "AVAILABLE",
       status: "AVAILABLE",
       checked: "12:36:14",
       message: "",
@@ -68,6 +73,7 @@ BaseHealth.args = {
     {
       label: "store/values",
       url: "localhost:7081",
+      state: "AVAILABLE",
       status: "AVAILABLE",
       checked: "12:36:14",
       message: "",
@@ -76,6 +82,7 @@ BaseHealth.args = {
     {
       label: "styles",
       url: "localhost:7081",
+      state: "AVAILABLE",
       status: "AVAILABLE",
       checked: "12:36:14",
       message: "",
@@ -84,6 +91,7 @@ BaseHealth.args = {
     {
       label: "tilematrixsets",
       url: "localhost:7081",
+      state: "AVAILABLE",
       status: "AVAILABLE",
       checked: "12:36:14",
       message: "",

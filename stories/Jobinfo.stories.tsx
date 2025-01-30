@@ -66,6 +66,9 @@ Ready.args = {
     WebMercatorQuad: {
       progress: {
         percent: 100,
+        levels: {
+          1: [100],
+        },
       },
     },
   },

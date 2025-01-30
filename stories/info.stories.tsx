@@ -24,7 +24,6 @@ const Template: StoryFn<SummaryProps> = (args) => (
 
 export const Single = Template.bind({});
 Single.args = {
-  name: "foo (ldproxy 3000)",
   url: "http://localhost:3000/",
   versions: [{ version: "1.0.0", apiUrl: "http://localhost:3000/api" }],
   uptimes: [{ uptime: 123456789, apiUrl: "http://localhost:3000/api" }],
@@ -40,8 +39,8 @@ Single.args = {
 
 export const Multi2 = Template.bind({});
 Multi2.args = {
-  name: "foo (ldproxy 3000)",
   url: "http://localhost:3000/",
+  name: "bb-lika",
   versions: [
     { version: "1.0.0", apiUrl: "http://localhost:3000/api" },
     { version: "10.1.0", apiUrl: "http://localhost:7081/api" },
@@ -60,7 +59,6 @@ Multi2.args = {
 
 export const Multi3 = Template.bind({});
 Multi3.args = {
-  name: "foo (ldproxy 3000)",
   url: "http://localhost:3000/",
   versions: [
     { version: "1.0.0", apiUrl: "http://localhost:3000/api" },
@@ -83,7 +81,6 @@ Multi3.args = {
 
 export const Multi4 = Template.bind({});
 Multi4.args = {
-  name: "foo (ldproxy 3000)",
   url: "http://localhost:3000/",
   versions: [
     { version: "1.0.0", apiUrl: "http://localhost:3000/api" },

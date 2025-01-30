@@ -42,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [deploymentId, setDeploymentId] = useState("");
-  const [reloadInterval, setReloadInterval] = useState<number>(0);
+  const [reloadInterval, setReloadInterval] = useState<number>(1);
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
