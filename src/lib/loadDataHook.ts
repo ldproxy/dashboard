@@ -10,6 +10,7 @@ import { Job, normalizeJobs } from "./jobs";
 import { MetricsInfo, normalizeMetrics } from "./metrics";
 import { normalizeValues } from "./values";
 import { Deployment } from "./deployments";
+import { JobSets } from "./jobs";
 
 type InfoType = { name: string; info: Infos }[];
 type MetricsType = { name: string; metrics: MetricsInfo[] };
@@ -51,7 +52,7 @@ export function useDataLoader(
   }>({});
   const [isLoading, setIsLoading] = useState(true);
   const [entities, setEntities] = useState<Entity[]>([]);
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobs, setJobs] = useState<{ url: string; sets: Job[] }[]>([]);
   const [healthChecks, setHealthChecks] = useState<HealthChecksType>({});
   const [healthCecksHomepage, setHealthChecksHomepage] =
     useState<HealthChecksType>({});
@@ -485,7 +486,7 @@ export function useDataLoader(
       );
 
       const newJobs = await Promise.race([
-        fetchData("/api/jobs", normalizeJobs, true, undefined, peek),
+        fetchData("/api/jobs", normalizeJobs, false, undefined, peek),
         timeout,
       ]);
       setJobs(newJobs);

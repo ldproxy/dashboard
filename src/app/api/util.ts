@@ -1,6 +1,7 @@
 import { type NextRequest } from "next/server";
 import { DevApi } from "@/dev-data/constants";
 import { USE_DEV_DATA } from "@/lib/env";
+import { JobSets } from "@/lib/jobs";
 
 export type MultiResponseItem<T> = {
   url: string;
@@ -14,13 +15,17 @@ export type MultiResponse<T> = MultiResponseItem<T>[];
 export const passThrough = async <T>(
   req: NextRequest,
   endpoint: string,
-  fromDev: () => T,
+  fromDev: () => { url: string; response: JobSets }[],
   fallback?: T
 ): Promise<Response> => {
   if (USE_DEV_DATA) {
     return Response.json(fromDev());
   }
-
+  /*
+  if (endpoint === "/jobs") {
+    return Response.json(fromDev());
+  }
+*/
   const firstOnly = parseBoolean(req, "firstOnly");
   const fetchData = firstOnly ? fetchMultiFirst<T> : fetchMulti<T>;
   let apiUrls: string[];

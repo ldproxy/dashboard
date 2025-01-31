@@ -201,8 +201,8 @@ export default function DeploymentPage() {
   const totalEntities = entities.length;
   const entityCounts = getEntityCounts(entities);
   const footer = getStateSummary(entityCounts);
-  let sortedJobs = [];
-  if (jobs.length > 0) {
+  let sortedJobs: { url: string; sets: Job[] }[] = [];
+  if (jobs && jobs.length > 0) {
     sortedJobs = sortCards(jobs);
   }
 
@@ -446,27 +446,32 @@ export default function DeploymentPage() {
         </TabsContent>
         <TabsContent value="jobs">
           {sortedJobs.length > 0 ? (
-            sortedJobs.map((job: Job) => (
-              <React.Fragment key={job.id}>
-                <div
-                  className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
-                  style={{ marginBottom: "10px" }}
-                >
-                  <JobInfo
-                    key={job.id}
-                    entity={job.entity}
-                    label={job.label}
-                    tilesets={job.details.tileSets}
-                    percent={job.percent}
-                    startedAt={job.startedAt}
-                    updatedAt={job.updatedAt}
-                    info={`${job.current}/${job.total}`}
-                    id={job.id}
-                  />
-                </div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>
-              </React.Fragment>
-            ))
+            sortedJobs.map(
+              (job: { url: string; sets: Job[] }) =>
+                job.sets &&
+                job.sets.length > 0 &&
+                job.sets.map((jobSet: Job) => (
+                  <React.Fragment key={jobSet.id}>
+                    <div
+                      className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
+                      style={{ marginBottom: "10px" }}
+                    >
+                      <JobInfo
+                        key={jobSet.id}
+                        entity={jobSet.entity}
+                        label={jobSet.label}
+                        tilesets={jobSet.details.tileSets}
+                        percent={jobSet.percent}
+                        startedAt={jobSet.startedAt}
+                        updatedAt={jobSet.updatedAt}
+                        info={`${jobSet.current}/${jobSet.total}`}
+                        id={jobSet.id}
+                      />
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>
+                  </React.Fragment>
+                ))
+            )
           ) : (
             <span>Currently No Jobs</span>
           )}

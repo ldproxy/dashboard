@@ -1,13 +1,33 @@
 interface TileSetProgress {
   percent?: number;
+  current: number;
+  done: boolean;
+  parameters?: {
+    clipBoundingBox?: {
+      xmin: number;
+      ymin: number;
+      xmax: number;
+      ymax: number;
+      epsgCrs?: {
+        code: number;
+        forceAxisOrder?: string;
+      };
+    };
+    substitutions?: {
+      apiUri: string;
+      serviceUrl: string;
+    };
+  };
   total: number;
   WebMercatorQuad?: { [level: number]: number };
   levels?: { [tms: string]: number[] };
+  [key: string]: any;
 }
 
 export interface TileSets {
   [key: string]: {
     progress?: TileSetProgress;
+    parameters?: any;
   };
 }
 
@@ -19,6 +39,7 @@ interface JobDetails {
 
 export interface Job {
   id: string;
+  finishedAt: number;
   type: string;
   entity: string;
   label: string;
@@ -39,11 +60,18 @@ export interface JobSets {
   sets: Job[];
 }
 
-export const normalizeJobs = (input: JobSets) => {
-  return expandJobs(input.sets);
+export interface JobsWithUrl {
+  sets: Job[];
+  url: string | undefined;
+}
+
+export const normalizeJobs = (input: { url: string; response: JobSets }[]) => {
+  return input.map(({ url, response }) => {
+    return expandJobs(response.sets, url);
+  });
 };
 
-const expandJobs = (jobs: Job[] = []): Job[] => {
+const expandJobs = (jobs: Job[] = [], url?: string): JobsWithUrl => {
   const allJobs = [...jobs];
 
   for (const followUp of jobs.flatMap(expandJob)) {
@@ -52,7 +80,7 @@ const expandJobs = (jobs: Job[] = []): Job[] => {
     }
   }
 
-  return allJobs;
+  return { sets: allJobs, url };
 };
 
 const expandJob = (job: Job): Job[] => {

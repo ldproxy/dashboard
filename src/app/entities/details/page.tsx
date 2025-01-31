@@ -255,8 +255,17 @@ function CustomerPage() {
               {id &&
                 tiles &&
                 jobs &&
+                jobs.length > 0 &&
                 jobs.some(
-                  (job: Job) => job.entity === id?.split("_").slice(1).join("_")
+                  (job) =>
+                    job.sets &&
+                    job.sets.length > 0 &&
+                    job.sets.some((jobSet: Job) => {
+                      console.log("blub", jobSet.entity, id);
+                      return (
+                        jobSet.entity === id?.split("_").slice(1).join("_")
+                      );
+                    })
                 ) && (
                   <TabsTrigger value="jobs">
                     <span>Jobs</span>
@@ -279,35 +288,52 @@ function CustomerPage() {
           <TabsContent value="jobs">
             {id &&
             sortedJobs.length > 0 &&
-            sortedJobs.filter(
-              (job: Job) => job.entity === id?.split("_").slice(1).join("_")
-            ).length > 0
+            sortedJobs.some(
+              (job) =>
+                job &&
+                job.sets.length > 0 &&
+                job.sets.some(
+                  (jobSet: Job) =>
+                    jobSet.entity === id?.split("_").slice(1).join("_")
+                )
+            )
               ? sortedJobs
                   .filter(
-                    (job: Job) =>
-                      job.entity === id?.split("_").slice(1).join("_")
+                    (job) =>
+                      job &&
+                      job.sets.some(
+                        (jobSet: Job) =>
+                          jobSet.entity === id?.split("_").slice(1).join("_")
+                      )
                   )
-                  .map((job: Job) => (
-                    <>
-                      <div
-                        className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
-                        style={{ marginBottom: "10px" }}
-                      >
-                        <JobInfo
-                          key={job.id}
-                          entity={job.entity}
-                          label={job.label}
-                          tilesets={job.details.tileSets}
-                          percent={job.percent}
-                          startedAt={job.startedAt}
-                          updatedAt={job.updatedAt}
-                          info={`${job.current}/${job.total}`}
-                          id={job.id}
-                        />
-                      </div>
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>
-                    </>
-                  ))
+                  .map((job) =>
+                    job.sets
+                      .filter(
+                        (jobSet: Job) =>
+                          jobSet.entity === id?.split("_").slice(1).join("_")
+                      )
+                      .map((jobSet: Job) => (
+                        <>
+                          <div
+                            className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
+                            style={{ marginBottom: "10px" }}
+                          >
+                            <JobInfo
+                              key={jobSet.id}
+                              entity={jobSet.entity}
+                              label={jobSet.label}
+                              tilesets={jobSet.details.tileSets}
+                              percent={jobSet.percent}
+                              startedAt={jobSet.startedAt}
+                              updatedAt={jobSet.updatedAt}
+                              info={`${jobSet.current}/${jobSet.total}`}
+                              id={jobSet.id}
+                            />
+                          </div>
+                          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>
+                        </>
+                      ))
+                  )
               : null}
           </TabsContent>
           <TabsContent value="cfg">
