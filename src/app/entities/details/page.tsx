@@ -328,6 +328,7 @@ function CustomerPage() {
                               updatedAt={jobSet.updatedAt}
                               info={`${jobSet.current}/${jobSet.total}`}
                               id={jobSet.id}
+                              url={job.url}
                             />
                           </div>
                           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>

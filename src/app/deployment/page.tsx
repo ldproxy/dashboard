@@ -213,6 +213,7 @@ export default function DeploymentPage() {
     console.log("autoRefreshInterval", autoRefreshInterval);
     console.log("errorStatusDeployment", errorStatus);
   }
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between space-y-2">
@@ -466,6 +467,7 @@ export default function DeploymentPage() {
                         updatedAt={jobSet.updatedAt}
                         info={`${jobSet.current}/${jobSet.total}`}
                         id={jobSet.id}
+                        url={job.url}
                       />
                     </div>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>

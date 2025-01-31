@@ -1,11 +1,9 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/shadcn-ui/card";
-// import { Progress } from "@/components/shadcn-ui/progress";
 import React, { useState } from "react";
 import prettyMs from "pretty-ms";
 import { Progress } from "@/components/dashboard/Progress";
@@ -20,9 +18,10 @@ export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   updatedAt: number;
   id: string;
   info: string;
+  url: string;
 }
 
-export default function CustomersPage({
+export default function JobInfo({
   entity,
   tilesets,
   label,
@@ -31,6 +30,7 @@ export default function CustomersPage({
   updatedAt,
   id,
   info,
+  url,
 }: SummaryProps) {
   const durationInMs = (updatedAt - startedAt) * 1000;
   const readableDuration =
@@ -91,18 +91,6 @@ export default function CustomersPage({
             marginRight: "90px",
           }}
         >
-          {/*<div
-            title={entity}
-            className="w-5/6"
-            style={{
-              textWrap: "nowrap",
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {entity}
-          </div>*/}
-          {/*TODO <span>&nbsp;{info}</span>*/}
           <div>
             <div
               className={`flex flex-col justify-center items-center w-5/6 ${
@@ -112,7 +100,7 @@ export default function CustomersPage({
               <div
                 className="text-center"
                 style={{
-                  marginTop: "0px",
+                  marginTop: "-20px",
                   marginBottom: "10px",
                 }}
               >
@@ -125,6 +113,22 @@ export default function CustomersPage({
                 }`}
               />
               <span className="w-1/6 text-right mt-3">{percent}%</span>
+            </div>
+            <div className={`flex flex-col justify-center items-center w-5/6`}>
+              <span
+                className={`w-5/6 text-right mt-3 ${
+                  percent === 100 ? "text-green-500" : "text-blue-500"
+                }`}
+                style={{
+                  textAlign: "center",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+                title={url}
+              >
+                {url}
+              </span>
             </div>
           </div>
         </div>
