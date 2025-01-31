@@ -18,7 +18,6 @@ import {
   CrossCircledIcon,
 } from "@radix-ui/react-icons";
 import { IconProps } from "@radix-ui/react-icons/dist/types";
-import { Cross } from "lucide-react";
 
 export const icons = {
   Play: "Play",

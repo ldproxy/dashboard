@@ -5,7 +5,7 @@ import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/shadcn-ui/theme";
 import { Sidebar } from "@/components/dashboard/Sidebar";
-import { DashboardIcon, ReloadIcon } from "@radix-ui/react-icons";
+import { DashboardIcon } from "@radix-ui/react-icons";
 import { icons } from "@/lib/icons";
 import { Dev } from "@/dev-data/constants";
 import "./globals.css";
@@ -110,6 +110,7 @@ export default function RootLayout({
                         {
                           title: "",
                           entries: [
+                            { title: "Home", icon: icons.Home, route: "/home" },
                             {
                               title: "Deployment",
                               icon: icons.Play,
