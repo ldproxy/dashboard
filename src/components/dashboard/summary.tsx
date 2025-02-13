@@ -85,7 +85,7 @@ export default function CustomersPage({
             </span>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap" }}>
-            <p
+            <div
               className="text-xs text-muted-foreground"
               style={{
                 display: "flex",
@@ -94,7 +94,7 @@ export default function CustomersPage({
               }}
             >
               {footer ? <FooterSummary footer={footer} /> : null}
-            </p>
+            </div>
           </div>
         </CardContent>
       </Card>

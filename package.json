@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "devSingle": "next dev",
-    "devSingleMock": "USE_DEV_DATA=true next dev",
+    "devSingleMock": "NEXT_PUBLIC_USE_DEV_DATA=true next dev",
     "devMulti": "NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS=multi next dev",
-    "devMultiMock": "USE_DEV_DATA=true NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS=multi next dev",
+    "devMultiMock": "NEXT_PUBLIC_USE_DEV_DATA=true NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS=multi next dev",
     "devSaas": "NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS=saas next dev",
     "buildSingle": "STATIC_EXPORT=true next build && rm -rf ../xtraplatform/xtraplatform-ops/src/main/resources/dashboard/* && cp -r out/* ../xtraplatform/xtraplatform-ops/src/main/resources/dashboard/",
     "buildMulti": "NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS=multi next build",

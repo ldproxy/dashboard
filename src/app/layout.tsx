@@ -14,7 +14,7 @@ import { useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 
 import ReloadSelect from "@/components/dashboard/AutoRefreshSelect";
-import { IS_MODE_MULTI, IS_MODE_SAAS } from "@/lib/env";
+import { IS_MODE_MULTI, IS_MODE_SAAS, IS_MODE_SINGLE } from "@/lib/env";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -42,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [deploymentId, setDeploymentId] = useState("");
-  const [reloadInterval, setReloadInterval] = useState<number>(1);
+  const [reloadInterval, setReloadInterval] = useState<number>(5);
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
@@ -67,7 +67,7 @@ export default function RootLayout({
 
   return (
     <ReloadIntervalContext.Provider value={{ reloadInterval }}>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
           className={cn(
             "min-h-screen bg-background font-sans antialiased",
@@ -89,6 +89,7 @@ export default function RootLayout({
                   </Link>
                 </h2>
                 <div className="ml-auto flex w-full space-x-2 sm:justify-end">
+                  {/*TODO: blur, show selected, manual refresh */}
                   <ReloadSelect
                     reloadInterval={reloadInterval}
                     setReloadInterval={setReloadInterval}
@@ -110,7 +111,12 @@ export default function RootLayout({
                         {
                           title: "",
                           entries: [
-                            { title: "Home", icon: icons.Home, route: "/home" },
+                            {
+                              title: "Home",
+                              icon: icons.Home,
+                              route: "/home",
+                              ignore: IS_MODE_SINGLE,
+                            },
                             {
                               title: "Deployment",
                               icon: icons.Play,

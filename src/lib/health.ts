@@ -38,7 +38,7 @@ export interface Check {
   label?: string;
   description?: string;
   name?: string;
-  url: string;
+  url?: string;
   healthy?: boolean;
   state: string;
   timestamp?: string;
@@ -66,7 +66,7 @@ export interface UiCheck {
   label: string;
   description?: string;
   name?: string;
-  url: string;
+  url?: string;
   state: string;
   message?: string;
   checked: string;
@@ -76,7 +76,7 @@ type HealthChecksType = { [key: string]: Check[] };
 
 export type InputHealth = Record<string, InputCheck>;
 
-const normalizeChecks = (input: InputHealth, url: string): Check[] => {
+const normalizeChecks = (input: InputHealth, url?: string): Check[] => {
   return Object.keys(input).map((name) => ({
     name,
     url,
@@ -108,7 +108,7 @@ export const normalizeHealth = (
     });
   }
 
-  return normalizeChecks(input, "TODO");
+  return normalizeChecks(input);
 };
 
 export function summarizeStoreCheck(storeCheck: UiCheck[]): UiCheck[] {

@@ -116,23 +116,15 @@ export default function DeploymentPage() {
     const storeCheck: UiCheck[] = Object.values(healthChecks)
       .flat()
       .filter(
-        (check: Check) =>
-          check &&
-          check.name &&
-          check.name.startsWith("app/") &&
-          check.name !== "app/store/values2"
+        (check: Check) => check && check.name && check.name.startsWith("app/")
       )
       .map((check) => {
-        if (check && check.name) {
-          const urlPart = check.url.match(/\/\/([^\/]+)/)?.[1] || "";
-          return {
-            label: check.name.substring(4),
-            url: urlPart,
-            state: check.state,
-            checked: dayjs(check.timestamp).format("HH:mm:ss"),
-          };
-        }
-        return null;
+        return {
+          ...check,
+          url: check.url?.match(/\/\/([^\/]+)/)?.[1] || "",
+          description: check.description?.replaceAll("\n", "<br/>"),
+          checked: dayjs(check.timestamp).format("HH:mm:ss"),
+        };
       })
       .filter((c) => c !== null) as UiCheck[];
 

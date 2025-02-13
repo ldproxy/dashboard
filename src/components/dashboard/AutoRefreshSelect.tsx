@@ -20,7 +20,7 @@ const ReloadSelect: React.FC<ReloadSelectProps> = ({
 }) => {
   const [showSelect, setShowSelect] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
-  const reloadOptions = ["off", "1", "2", "5", "10", "20", "60"];
+  const reloadOptions = ["off", "1", "5", "30", "60"];
 
   const handleIconClick = () => {
     setShowSelect(!showSelect);

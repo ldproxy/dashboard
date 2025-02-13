@@ -2,22 +2,6 @@ interface TileSetProgress {
   percent?: number;
   current: number;
   done: boolean;
-  parameters?: {
-    clipBoundingBox?: {
-      xmin: number;
-      ymin: number;
-      xmax: number;
-      ymax: number;
-      epsgCrs?: {
-        code: number;
-        forceAxisOrder?: string;
-      };
-    };
-    substitutions?: {
-      apiUri: string;
-      serviceUrl: string;
-    };
-  };
   total: number;
   WebMercatorQuad?: { [level: number]: number };
   levels?: { [tms: string]: number[] };
@@ -62,13 +46,19 @@ export interface JobSets {
 
 export interface JobsWithUrl {
   sets: Job[];
-  url: string | undefined;
+  url?: string;
 }
 
-export const normalizeJobs = (input: { url: string; response: JobSets }[]) => {
-  return input.map(({ url, response }) => {
-    return expandJobs(response.sets, url);
-  });
+export const normalizeJobs = (
+  input: JobSets | { url: string; response: JobSets }[]
+): JobsWithUrl[] => {
+  if (Array.isArray(input)) {
+    return input.map(({ url, response }) => {
+      return expandJobs(response.sets, url);
+    });
+  }
+
+  return [expandJobs(input.sets)];
 };
 
 const expandJobs = (jobs: Job[] = [], url?: string): JobsWithUrl => {

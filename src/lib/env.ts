@@ -23,4 +23,4 @@ if (DevCfg) {
 
 export const USE_DEV_DEPLOYMENTS = IS_DEV && !process.env.DEPLOYMENTS;
 
-export const USE_DEV_DATA = IS_DEV && process.env.USE_DEV_DATA;
+export const USE_DEV_DATA = IS_DEV && process.env.NEXT_PUBLIC_USE_DEV_DATA;

@@ -50,7 +50,11 @@ export const columns: ColumnDef<HealthCheck>[] = [
               <TooltipTrigger>
                 <QuestionMarkCircledIcon className="ml-2 h-4 w-4 text-muted-foreground" />
               </TooltipTrigger>
-              <TooltipContent>{row.original.description}</TooltipContent>
+              <TooltipContent>
+                <span
+                  dangerouslySetInnerHTML={{ __html: row.original.description }}
+                />
+              </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         )}

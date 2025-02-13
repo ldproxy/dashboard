@@ -1,7 +1,6 @@
 import { type NextRequest } from "next/server";
 import { DevApi } from "@/dev-data/constants";
-import { USE_DEV_DATA } from "@/lib/env";
-import { JobSets } from "@/lib/jobs";
+import { IS_MODE_MULTI, USE_DEV_DATA } from "@/lib/env";
 
 export type MultiResponseItem<T> = {
   url: string;
@@ -10,23 +9,33 @@ export type MultiResponseItem<T> = {
   offline?: boolean;
 };
 
+export type SingleResponse<T> = {
+  response: T | null;
+  errorStatus?: string;
+};
+
 export type MultiResponse<T> = MultiResponseItem<T>[];
+
+export const WRAPPED_HEADER = "x-wrapped";
+export const WRAPPED_SINGLE = "single";
+export const WRAPPED_MULTI = "multi";
 
 export const passThrough = async <T>(
   req: NextRequest,
   endpoint: string,
-  fromDev: () => { url: string; response: JobSets }[],
+  fromDev: (wrap: boolean) => T,
   fallback?: T
 ): Promise<Response> => {
-  if (USE_DEV_DATA) {
-    return Response.json(fromDev());
-  }
-  /*
-  if (endpoint === "/jobs") {
-    return Response.json(fromDev());
-  }
-*/
   const firstOnly = parseBoolean(req, "firstOnly");
+
+  if (USE_DEV_DATA) {
+    return Response.json(fromDev(IS_MODE_MULTI), {
+      headers: IS_MODE_MULTI
+        ? { [WRAPPED_HEADER]: firstOnly ? WRAPPED_SINGLE : WRAPPED_MULTI }
+        : {},
+    });
+  }
+
   const fetchData = firstOnly ? fetchMultiFirst<T> : fetchMulti<T>;
   let apiUrls: string[];
 
@@ -39,7 +48,9 @@ export const passThrough = async <T>(
   try {
     const data = await fetchData(apiUrls, endpoint, fallback);
 
-    return Response.json(data);
+    return Response.json(data, {
+      headers: { [WRAPPED_HEADER]: firstOnly ? WRAPPED_SINGLE : WRAPPED_MULTI },
+    });
   } catch (error) {
     console.error(`Error fetching ${endpoint}:`, error);
     return serverError();
@@ -96,7 +107,7 @@ export const fetchMultiFirst = async <T>(
   apiUrls: string[],
   endpoint: string,
   fallback: T | null = null
-): Promise<{ response: T | null; errorStatus?: string }> => {
+): Promise<SingleResponse<T>> => {
   for (const apiUrl of apiUrls) {
     const url = apiUrl + endpoint;
     try {

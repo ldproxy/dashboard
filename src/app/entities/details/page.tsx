@@ -1,8 +1,9 @@
 "use client";
+
+import React, { useState, useEffect } from "react";
 import { sortCards } from "@/lib/utils";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
-import { useState, useEffect } from "react";
 import { DevEntities } from "@/dev-data/constants";
 import {
   columns,
@@ -46,7 +47,7 @@ function CustomerPage() {
   const autoRefreshInterval = useReloadInterval();
   const router = useRouter();
   const [entities, setEntities] = useState<Entity[]>([]);
-  const [entity, setEntity] = useState<Entity | null>(null); // entities[params.id]);
+  const [entity, setEntity] = useState<Entity | undefined>(undefined); // entities[params.id]);
   const [cfg, setCfg] = useState<{}>({});
   const [isLoading, setIsLoading] = useState(true);
   const [tableData, setTableData] = useState<HealthCheck[]>(
@@ -101,19 +102,12 @@ function CustomerPage() {
             : []
         )
         .map((check) => {
-          if (check && check.name && check.url) {
-            const urlPart = check.url.match(/\/\/([^\/]+)/)?.[1] || "";
-            return {
-              name: check.name,
-              label: check.label || "",
-              description: check.description || "",
-              url: urlPart,
-              state: check.state,
-              message: check.message,
-              checked: dayjs(check.timestamp).format("HH:mm:ss"),
-            };
-          }
-          return null;
+          return {
+            ...check,
+            url: check.url?.match(/\/\/([^\/]+)/)?.[1] || "",
+            description: check.description?.replaceAll("\n", "<br/>"),
+            checked: dayjs(check.timestamp).format("HH:mm:ss"),
+          };
         })
         .filter((c) => c !== null) as UiCheck[];
 
@@ -261,7 +255,7 @@ function CustomerPage() {
                     job.sets &&
                     job.sets.length > 0 &&
                     job.sets.some((jobSet: Job) => {
-                      console.log("blub", jobSet.entity, id);
+                      //console.log("blub", jobSet.entity, id);
                       return (
                         jobSet.entity === id?.split("_").slice(1).join("_")
                       );
@@ -313,7 +307,7 @@ function CustomerPage() {
                           jobSet.entity === id?.split("_").slice(1).join("_")
                       )
                       .map((jobSet: Job) => (
-                        <>
+                        <React.Fragment key={jobSet.id}>
                           <div
                             className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
                             style={{ marginBottom: "10px" }}
@@ -332,7 +326,7 @@ function CustomerPage() {
                             />
                           </div>
                           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>
-                        </>
+                        </React.Fragment>
                       ))
                   )
               : null}

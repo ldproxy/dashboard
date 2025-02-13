@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 
 import { HealthChecksType } from "../app/deployment/page";
 import { Deployment, getDeployments } from "@/lib/deployments";
-import { IS_MODE_SINGLE } from "./env";
+import { IS_DEV, IS_MODE_SINGLE } from "./env";
 import { fetchData } from "./fetchData";
 import { MultiResponse } from "@/app/api/util";
 
@@ -15,6 +15,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export async function getApiUrl(): Promise<string[]> {
+  if (IS_MODE_SINGLE) {
+    if (IS_DEV) {
+      return ["http://localhost:7081/api"];
+    }
+    return ["/api"];
+  }
+
   let apiUrl: string[] = [];
 
   const deployments = await getDeployments();
@@ -181,7 +188,7 @@ export const getLimitedNodes = async (
 
     checks.forEach((check) => {
       if (check.state === "AVAILABLE" || check.state === "LIMITED") {
-        uniqueUrls.add(check.url);
+        uniqueUrls.add(check.url!);
         hasAvailableOrLimited = true;
       }
       if (check.state === "LIMITED" || check.state === "UNAVAILABLE") {
@@ -206,10 +213,10 @@ export const getHealthyNodesCount = (
     const urlStateMap = new Map<string, boolean>();
 
     checks.forEach((check) => {
-      if (!urlStateMap.has(check.url)) {
-        urlStateMap.set(check.url, check.healthy === true);
+      if (!urlStateMap.has(check.url!)) {
+        urlStateMap.set(check.url!, check.healthy === true);
       } else if (check.healthy !== true) {
-        urlStateMap.set(check.url, false);
+        urlStateMap.set(check.url!, false);
       }
     });
 
@@ -230,13 +237,13 @@ export const getOfflineNodesCount = (
     const urlStateMap = new Map<string, boolean>();
 
     checks.forEach((check) => {
-      if (!urlStateMap.has(check.url)) {
+      if (!urlStateMap.has(check.url!)) {
         urlStateMap.set(
-          check.url,
+          check.url!,
           check.state === "UNAVAILABLE" || check.state === "OFFLINE"
         );
       } else if (check.state !== "UNAVAILABLE" && check.state !== "OFFLINE") {
-        urlStateMap.set(check.url, false);
+        urlStateMap.set(check.url!, false);
       }
     });
 

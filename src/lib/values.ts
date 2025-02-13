@@ -19,20 +19,13 @@ export type Value = InputValue & {
 };
 
 export const normalizeValues = (input: InputValues): Value[] => {
-  if (Array.isArray(input)) {
-    input = input[0];
-  }
-  if (input.response) {
-    return Object.keys(input.response).flatMap((type: any) =>
-      Array.isArray(input.response[type])
-        ? input.response[type].map((value: any) => ({
-            type,
-            uid: `${type}_${value.path}`,
-            ...value,
-          }))
-        : []
-    );
-  } else {
-    return [];
-  }
+  return Object.keys(input).flatMap((type: any) =>
+    Array.isArray(input[type])
+      ? input[type].map((value: any) => ({
+          type,
+          uid: `${type}_${value.path}`,
+          ...value,
+        }))
+      : []
+  );
 };

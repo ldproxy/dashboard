@@ -6,7 +6,7 @@ import { Button } from "@/components/shadcn-ui/button";
 import React, { useEffect, useState } from "react";
 import { NavButton } from "./Navbutton";
 import { getIcon } from "@/lib/icons";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { getDeployments, getDeploymentId } from "@/lib/deployments";
 import { IS_MODE_MULTI } from "@/lib/env";
 
@@ -25,6 +25,7 @@ interface EntryProps extends React.HTMLAttributes<HTMLDivElement> {
   selected?: boolean;
   route?: string;
   icon?: string;
+  ignore?: boolean;
 }
 
 export function Section({ title, entries, global }: SectionProps) {
@@ -33,6 +34,7 @@ export function Section({ title, entries, global }: SectionProps) {
   ]);
   const [deploymentName, setDeploymentName] = useState("");
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isHomePage, setIsHomePage] = useState(true);
   const [isCfgPage, setIsCfgPage] = useState(true);
   const [deploymentId, setDeploymentId] = useState("");
@@ -43,9 +45,7 @@ export function Section({ title, entries, global }: SectionProps) {
     return urlObj.toString();
   };
 
-  const hasDidQueryParam = new URLSearchParams(window.location.search).has(
-    "did"
-  );
+  const hasDidQueryParam = searchParams.has("did");
 
   useEffect(() => {
     if (IS_MODE_MULTI) {
@@ -130,23 +130,25 @@ export function Section({ title, entries, global }: SectionProps) {
         {deploymentName}
       </h2>
       <div className="space-y-1">
-        {entries.map(({ title, selected, route, icon }) =>
-          route ? (
-            <NavButton key={title} title={title} route={route} icon={icon} />
-          ) : (
-            <Button
-              key={title}
-              variant={selected ? "secondary" : "ghost"}
-              className="w-full justify-start"
-            >
-              {(() => {
-                const Icon = icon ? getIcon(icon) : null;
-                return Icon ? <Icon className="mr-2 h-4 w-4" /> : null;
-              })()}
-              {title}
-            </Button>
-          )
-        )}
+        {entries
+          .filter((e) => !e.ignore)
+          .map(({ title, selected, route, icon }) =>
+            route ? (
+              <NavButton key={title} title={title} route={route} icon={icon} />
+            ) : (
+              <Button
+                key={title}
+                variant={selected ? "secondary" : "ghost"}
+                className="w-full justify-start"
+              >
+                {(() => {
+                  const Icon = icon ? getIcon(icon) : null;
+                  return Icon ? <Icon className="mr-2 h-4 w-4" /> : null;
+                })()}
+                {title}
+              </Button>
+            )
+          )}
       </div>
       <div className="space-y-1 mt-24">
         {global.map(({ title, selected, route, icon }) =>
