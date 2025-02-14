@@ -37,18 +37,18 @@ export default function EntitiesPage() {
   useEffect(() => {
     loadData({ loadValues: true, checkDifferences: true });
 
-    if (autoRefreshInterval > 0) {
-      const interval = setInterval(() => {
-        loadData({ loadValues: true, checkDifferences: true });
-      }, autoRefreshInterval * 1000);
-      return () => clearInterval(interval);
-    }
-
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
     if (IS_MODE_MULTI) {
       getDeploymentId(setDeploymentId);
+    }
+
+    if (autoRefreshInterval > 0) {
+      const interval = setInterval(() => {
+        loadData({ loadValues: true, checkDifferences: true });
+      }, autoRefreshInterval * 1000);
+      return () => clearInterval(interval);
     }
     // did not include checkDifferences() to avoid infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps

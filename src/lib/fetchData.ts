@@ -33,6 +33,8 @@ export const fetchData = async <T>(
 
   if (IS_DEV && !USE_DEV_DATA && IS_MODE_SINGLE) {
     fullUrl = `http://localhost:7081${fullUrl}`;
+  } else if (USE_DEV_DATA && IS_MODE_SINGLE) {
+    fullUrl = `${fullUrl}?apiUrls=dev`;
   }
 
   const opts: RequestInit =

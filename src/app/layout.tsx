@@ -107,7 +107,7 @@ export default function RootLayout({
             <div className="hidden h-full flex-col md:flex">
               <div className="flex flex-col items-start justify-between space-y-2 py-4 px-4 lg:px-8 sm:flex-row sm:items-center sm:space-y-0 md:h-16">
                 <h2 className="text-lg font-semibold whitespace-nowrap">
-                  <Link href="/">
+                  <Link href="/" className="flex items-center">
                     <DashboardIcon className="mr-2 h-4 w-4 inline" />
                     <span>dashboard</span>
                   </Link>

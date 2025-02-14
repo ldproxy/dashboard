@@ -52,38 +52,39 @@ export function Section({ title, entries, global }: SectionProps) {
     }, [deploymentId]);
   }
 
-  const globals = (
-    <div className="space-y-1">
-      {global.map(({ title, selected, route, icon }) =>
-        route ? (
-          <NavButton key={title} title={title} route={route} icon={icon} />
-        ) : (
-          <Button
-            key={title}
-            variant={selected ? "secondary" : "ghost"}
-            className="w-full justify-start"
-          >
-            {(() => {
-              const Icon = icon ? getIcon(icon) : null;
-              return Icon ? <Icon className="mr-2 h-4 w-4" /> : null;
-            })()}
-            {title}
-          </Button>
-        )
-      )}
-    </div>
-  );
+  const globals =
+    global.length > 0 ? (
+      <div className="space-y-1">
+        {global.map(({ title, selected, route, icon }) =>
+          route ? (
+            <NavButton key={title} title={title} route={route} icon={icon} />
+          ) : (
+            <Button
+              key={title}
+              variant={selected ? "secondary" : "ghost"}
+              className="w-full justify-start"
+            >
+              {(() => {
+                const Icon = icon ? getIcon(icon) : null;
+                return Icon ? <Icon className="mr-2 h-4 w-4" /> : null;
+              })()}
+              {title}
+            </Button>
+          )
+        )}
+      </div>
+    ) : undefined;
 
   return (
     <div className="px-4 py-2">
       {globals}
-      <div className="mt-8 mb-2 px-4">
-        {deploymentName && (
+      {deploymentName && (
+        <div className="mt-8 mb-2 px-4">
           <Badge variant="outline">
             <span className="text-slate-500">{deploymentName}</span>
           </Badge>
-        )}
-      </div>
+        </div>
+      )}
       <div className="space-y-1">
         {entries
           .filter((e) => !e.ignore)
