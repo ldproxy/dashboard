@@ -30,13 +30,12 @@ interface EntryProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function Section({ title, entries, global }: SectionProps) {
+  const searchParams = useSearchParams();
+  const deploymentId = searchParams.get("did");
   const [deploymentName, setDeploymentName] = useState<string>();
 
-  if (IS_MODE_MULTI) {
-    const searchParams = useSearchParams();
-    const deploymentId = searchParams.get("did");
-
-    useEffect(() => {
+  useEffect(() => {
+    if (IS_MODE_MULTI) {
       if (!deploymentId) {
         setDeploymentName(undefined);
       } else {
@@ -49,8 +48,8 @@ export function Section({ title, entries, global }: SectionProps) {
           }
         });
       }
-    }, [deploymentId]);
-  }
+    }
+  }, [deploymentId]);
 
   const globals =
     global.length > 0 ? (
