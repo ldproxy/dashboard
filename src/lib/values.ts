@@ -1,3 +1,5 @@
+import { MultiResponse } from "@/app/api/util";
+
 export interface InputValueWithPath {
   path: string;
   status: string;
@@ -18,7 +20,7 @@ export type Value = InputValue & {
   uid: string;
 };
 
-export const normalizeValues = (input: InputValues): Value[] => {
+export const normalizeValuesSingle = (input: InputValues): Value[] => {
   return Object.keys(input).flatMap((type: any) =>
     Array.isArray(input[type])
       ? input[type].map((value: any) => ({
@@ -28,4 +30,14 @@ export const normalizeValues = (input: InputValues): Value[] => {
         }))
       : []
   );
+};
+
+export const normalizeValues = (
+  input: InputValues | MultiResponse<InputValues>
+): Value[] => {
+  if (Array.isArray(input)) {
+    return normalizeValuesSingle(input[0].response!);
+  }
+
+  return normalizeValuesSingle(input);
 };

@@ -18,7 +18,7 @@ export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   Icon?: React.FunctionComponent<IconProps>;
 }
 
-export default function CustomersPage({
+export default function Summary({
   header,
   main,
   footer,

@@ -25,7 +25,7 @@ export const fromEnv = (): Deployment[] => {
   }
 };
 
-export const getDeployments = async () => {
+export const getDeployments = async (): Promise<Deployment[]> => {
   try {
     const response = await fetch("/api/deployments");
     const data = await response.json();

@@ -1,8 +1,69 @@
-import { InputCheck } from "@/lib/health";
+import { MultiResponse, SingleResponse } from "@/app/api/util";
+import { InputCheck, InputHealth } from "@/lib/health";
 
-export const fromDev = (): { [key: string]: InputCheck } => {
+const health: InputHealth = {
+  "app/crs": {
+    label: "crsLabel",
+    description: "Beschreibung",
+    healthy: true,
+    state: "AVAILABLE",
+    duration: 0,
+    timestamp: "2024-02-15T17:56:36.681+01:00",
+  },
+  "entities/services/testi": {
+    healthy: true,
+    state: "AVAILABLE",
+    duration: 0,
+    timestamp: "2024-02-15T17:56:36.681+01:00",
+    capabilities: {
+      Capability1: {
+        label: "Capability1",
+        description: "Capability1",
+        healthy: true,
+        state: "AVAILABLE",
+        message: "All systems operational",
+      },
+      Capability2: {
+        label: "Capability2",
+        description: "Capability2",
+        healthy: true,
+        state: "AVAILABLE",
+        message: "System maintenance",
+      },
+    },
+    components: {
+      Component1: {
+        healthy: true,
+        state: "AVAILABLE",
+        message: "Component operational",
+        capabilities: ["Capability1"],
+      },
+      Component2: {
+        healthy: true,
+        state: "AVAILABLE",
+        message: "Component failure",
+        capabilities: ["Capability2"],
+      },
+    },
+  },
+};
+export const fromDev = (
+  wrap: boolean,
+  apiUrls?: string[]
+): InputHealth | SingleResponse<InputHealth> | MultiResponse<InputHealth> => {
+  if (wrap && apiUrls) {
+    return apiUrls.map((url) => ({
+      url,
+      response: health,
+    }));
+  }
+
+  return health;
+
   return {
     "app/crs": {
+      label: "crsLabel",
+      description: "Beschreibung",
       healthy: true,
       state: "AVAILABLE",
       duration: 0,
@@ -78,7 +139,7 @@ export const fetchedHealthChecks: { [key: string]: InputCheck } = {
       },
     ], */
     },
-    "db.bergbau.pool.ConnectivityCheck": {
+    /*"db.bergbau.pool.ConnectivityCheck": {
       healthy: true,
       state: "AVAILABLE",
       duration: 0,
@@ -114,6 +175,6 @@ export const fetchedHealthChecks: { [key: string]: InputCheck } = {
           status: "HEALTHY",
         },
       ],
-    },
+    },*/
   };
 };

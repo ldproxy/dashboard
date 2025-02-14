@@ -11,13 +11,7 @@ import { MetricsInfo, normalizeMetrics } from "./metrics";
 import { normalizeValues } from "./values";
 import { Deployment } from "./deployments";
 import { JobSets } from "./jobs";
-import {
-  MultiResponse,
-  SingleResponse,
-  WRAPPED_HEADER,
-  WRAPPED_MULTI,
-  WRAPPED_SINGLE,
-} from "@/app/api/util";
+import { MultiResponse, SingleResponse, WRAPPED_HEADER } from "@/app/api/util";
 
 type InfoType = { name: string; info: Infos }[];
 type MetricsType = { name: string; metrics: MetricsInfo[] };
@@ -139,6 +133,7 @@ export function useDataLoader(
         ...newErrorStatus,
       }));
     }
+
     return Array.isArray(wrapped) ? wrapped : wrapped.response;
   };
 

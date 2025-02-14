@@ -1,7 +1,7 @@
 import { type NextRequest } from "next/server";
 
 import { fromDev } from "@/dev-data/entities";
-import { passThrough, SingleResponse } from "../util";
+import { MultiResponse, passThrough, SingleResponse } from "../util";
 import { InputEntity } from "@/lib/entities";
 
 export type Entities = {
@@ -9,9 +9,7 @@ export type Entities = {
 };
 
 export async function GET(req: NextRequest) {
-  return passThrough<Entities | SingleResponse<Entities>>(
-    req,
-    "/entities",
-    fromDev
-  );
+  return passThrough<
+    Entities | SingleResponse<Entities> | MultiResponse<Entities>
+  >(req, "/entities", fromDev);
 }

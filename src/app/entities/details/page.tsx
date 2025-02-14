@@ -46,7 +46,7 @@ export default SuspenseWrapper;
 function CustomerPage() {
   const autoRefreshInterval = useReloadInterval();
   const router = useRouter();
-  const [entities, setEntities] = useState<Entity[]>([]);
+  //const [entities2, setEntities] = useState<Entity[]>([]);
   const [entity, setEntity] = useState<Entity | undefined>(undefined); // entities[params.id]);
   const [cfg, setCfg] = useState<{}>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -56,7 +56,7 @@ function CustomerPage() {
   const [tab, setTab] = useState("overview");
   const [hasError, setHasError] = useState(false);
   const [tiles, setTiles] = useState(false);
-  const { healthChecksEntities, jobs, loadData } = useDataLoader();
+  const { healthChecksEntities, entities, jobs, loadData } = useDataLoader();
   const healthChecks: Check[] = healthChecksEntities;
 
   let id: string | null = "";
@@ -73,6 +73,18 @@ function CustomerPage() {
       setTiles(isTiles);
     }
   }, [id]);
+
+  useEffect(() => {
+    if (id && entities) {
+      const myEntity = entities.find((e: any) => e.uid === id);
+      setEntity(myEntity);
+
+      if (DevEntities) {
+        console.log("newEntities", entities);
+        console.log("myEntity", myEntity);
+      }
+    }
+  }, [id, entities]);
 
   useEffect(() => {
     if (healthChecks && healthChecks.length > 0 && entity) {
@@ -139,13 +151,14 @@ function CustomerPage() {
     }
   };
 
-  const findEntity = async () => {
+  /*const findEntity = async () => {
     try {
       const newEntities = await fetchData(
         "/api/entities",
         normalizeEntities,
         true
       );
+      console.log("newEntities", newEntities);
       if (!newEntities) {
         return notFound();
       }
@@ -161,15 +174,19 @@ function CustomerPage() {
     } catch (error) {
       console.error("Error loading entities:", error);
     }
-  };
+  };*/
 
   useEffect(() => {
     const loadEntitiesAndCfg = async () => {
-      await findEntity();
+      //await findEntity();
       if (IS_MODE_SAAS) {
         await loadCfg();
       }
-      loadData({ loadHealthChecksEntities: true, loadJobs: true });
+      loadData({
+        loadEntities: true,
+        loadHealthChecksEntities: true,
+        loadJobs: true,
+      });
       setIsLoading(false);
       if (DevEntities) {
         console.log("entities[id]", entities);
@@ -182,7 +199,11 @@ function CustomerPage() {
     if (autoRefreshInterval > 0) {
       const interval = setInterval(() => {
         loadEntitiesAndCfg();
-        loadData({ loadHealthChecksEntities: true, loadJobs: true });
+        loadData({
+          loadEntities: true,
+          loadHealthChecksEntities: true,
+          loadJobs: true,
+        });
       }, autoRefreshInterval * 1000);
       return () => clearInterval(interval);
     }

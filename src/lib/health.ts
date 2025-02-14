@@ -1,6 +1,4 @@
 import dayjs from "dayjs";
-import { fetchData } from "./fetchData";
-import { Deployment } from "./deployments";
 import { MultiResponse } from "@/app/api/util";
 
 export interface InputCheck {
@@ -29,7 +27,7 @@ export interface InputCheck {
       healthy: boolean;
       state: string;
       message?: string;
-      capabilities: [];
+      capabilities: string[];
     }
   >;
 }
@@ -58,14 +56,14 @@ export interface Check {
     healthy: boolean;
     state: string;
     message?: string;
-    capabilities: [];
+    capabilities: string[];
   }[];
 }
 
 export interface UiCheck {
+  name: string;
   label: string;
   description?: string;
-  name?: string;
   url?: string;
   state: string;
   message?: string;
@@ -112,24 +110,26 @@ export const normalizeHealth = (
 };
 
 export function summarizeStoreCheck(storeCheck: UiCheck[]): UiCheck[] {
-  const labelCounts: { [label: string]: number } = {};
-  const summarized: { [label: string]: any } = {};
+  const nameCounts: { [name: string]: number } = {};
+  const summarized: {
+    [name: string]: UiCheck & { status?: string; subRows?: any[] };
+  } = {};
 
   storeCheck.forEach((check) => {
-    if (!labelCounts[check.label]) {
-      labelCounts[check.label] = 0;
+    if (!nameCounts[check.name]) {
+      nameCounts[check.name] = 0;
     }
-    labelCounts[check.label]++;
+    nameCounts[check.name]++;
   });
 
   storeCheck.forEach((check) => {
-    if (labelCounts[check.label] > 1) {
-      if (!summarized[check.label]) {
-        summarized[check.label] = { ...check, subRows: [] };
+    if (nameCounts[check.name] > 1) {
+      if (!summarized[check.name]) {
+        summarized[check.name] = { ...check, subRows: [] };
       }
 
-      const existingCheck = summarized[check.label];
-      existingCheck.subRows.push(check);
+      const existingCheck = summarized[check.name];
+      existingCheck.subRows!.push({ ...check, label: check.url });
 
       if (check.state === "UNAVAILABLE") {
         existingCheck.status = "UNAVAILABLE";
@@ -150,7 +150,7 @@ export function summarizeStoreCheck(storeCheck: UiCheck[]): UiCheck[] {
         existingCheck.checked = check.checked;
       }
     } else {
-      summarized[check.label] = check;
+      summarized[check.name] = check;
     }
   });
 

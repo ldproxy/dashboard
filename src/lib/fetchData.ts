@@ -31,7 +31,7 @@ export const fetchData = async <T>(
 
   let fullUrl = `${url}${suffix}`;
 
-  if (IS_DEV && !USE_DEV_DATA) {
+  if (IS_DEV && !USE_DEV_DATA && IS_MODE_SINGLE) {
     fullUrl = `http://localhost:7081${fullUrl}`;
   }
 

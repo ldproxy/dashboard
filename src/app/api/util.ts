@@ -23,18 +23,10 @@ export const WRAPPED_MULTI = "multi";
 export const passThrough = async <T>(
   req: NextRequest,
   endpoint: string,
-  fromDev: (wrap: boolean) => T,
+  fromDev: (wrap: boolean, apiUrls: string[]) => T,
   fallback?: T
 ): Promise<Response> => {
   const firstOnly = parseBoolean(req, "firstOnly");
-
-  if (USE_DEV_DATA) {
-    return Response.json(fromDev(IS_MODE_MULTI), {
-      headers: IS_MODE_MULTI
-        ? { [WRAPPED_HEADER]: firstOnly ? WRAPPED_SINGLE : WRAPPED_MULTI }
-        : {},
-    });
-  }
 
   const fetchData = firstOnly ? fetchMultiFirst<T> : fetchMulti<T>;
   let apiUrls: string[];
@@ -43,6 +35,14 @@ export const passThrough = async <T>(
     apiUrls = parseStringArray(req, "apiUrls");
   } catch (error: any) {
     return badRequest(error.message);
+  }
+
+  if (USE_DEV_DATA) {
+    return Response.json(fromDev(IS_MODE_MULTI, apiUrls), {
+      headers: IS_MODE_MULTI
+        ? { [WRAPPED_HEADER]: firstOnly ? WRAPPED_SINGLE : WRAPPED_MULTI }
+        : {},
+    });
   }
 
   try {

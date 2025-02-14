@@ -4,17 +4,17 @@ import Link from "next/link";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/shadcn-ui/theme";
-import { Sidebar } from "@/components/dashboard/Sidebar";
+import { SectionProps, Sidebar } from "@/components/dashboard/Sidebar";
 import { DashboardIcon } from "@radix-ui/react-icons";
 import { icons } from "@/lib/icons";
 import { Dev } from "@/dev-data/constants";
 import "./globals.css";
 
-import { useSearchParams } from "next/navigation";
+import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 
 import ReloadSelect from "@/components/dashboard/AutoRefreshSelect";
-import { IS_MODE_MULTI, IS_MODE_SAAS, IS_MODE_SINGLE } from "@/lib/env";
+import { IS_DEV, IS_MODE_MULTI, IS_MODE_SAAS, IS_MODE_SINGLE } from "@/lib/env";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -36,34 +36,58 @@ export const useReloadInterval = () => {
   return context.reloadInterval;
 };
 
+const reloadIntervalDefault = IS_DEV ? 0 : 5;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [deploymentId, setDeploymentId] = useState("");
-  const [reloadInterval, setReloadInterval] = useState<number>(5);
   const searchParams = useSearchParams();
-  const pathname = usePathname();
+  const [reloadInterval, setReloadInterval] = useState<number>(
+    reloadIntervalDefault
+  );
 
-  useEffect(() => {
-    const getDeploymentId = () => {
-      let did;
-      if (searchParams) {
-        if (Dev) {
-          console.log("params", searchParams.get("did"));
-        }
-        did = searchParams.get("did");
-      }
-      if (did && typeof did === "string") {
-        setDeploymentId(did);
-      }
-    };
+  const deploymentId = searchParams.get("did");
 
-    if (IS_MODE_MULTI) {
-      getDeploymentId();
-    }
-  }, [pathname, searchParams]);
+  const sidebar: SectionProps = { title: "", entries: [], global: [] };
+
+  if (!IS_MODE_SINGLE) {
+    sidebar.global.push({
+      title: "Home",
+      icon: icons.Home,
+      route: "/home",
+      ignore: IS_MODE_SINGLE,
+    });
+  }
+  if (IS_MODE_SAAS) {
+    sidebar.entries.push({
+      title: "Configurations",
+      icon: icons.Reader,
+      route: deploymentId
+        ? `/configurations?did=${deploymentId}`
+        : "/configurations",
+    });
+  }
+  if (deploymentId || IS_MODE_SINGLE) {
+    sidebar.entries.push(
+      {
+        title: "Deployment",
+        icon: icons.Play,
+        route: `/deployment?did=${deploymentId}`,
+      },
+      {
+        title: "Entities",
+        icon: icons.Id,
+        route: `/entities?did=${deploymentId}`,
+      },
+      {
+        title: "Values",
+        icon: icons.Code,
+        route: `/values?did=${deploymentId}`,
+      }
+    );
+  }
 
   return (
     <ReloadIntervalContext.Provider value={{ reloadInterval }}>
@@ -106,54 +130,7 @@ export default function RootLayout({
               <div className="border-t">
                 <div className="bg-background">
                   <div className="grid lg:grid-cols-5">
-                    <Sidebar
-                      sections={[
-                        {
-                          title: "",
-                          entries: [
-                            {
-                              title: "Home",
-                              icon: icons.Home,
-                              route: "/home",
-                              ignore: IS_MODE_SINGLE,
-                            },
-                            {
-                              title: "Deployment",
-                              icon: icons.Play,
-                              route: deploymentId
-                                ? `/deployment?did=${deploymentId}`
-                                : "/deployment",
-                            },
-                            {
-                              title: "Entities",
-                              icon: icons.Id,
-                              route: deploymentId
-                                ? `/entities?did=${deploymentId}`
-                                : "/entities",
-                            },
-                            {
-                              title: "Values",
-                              icon: icons.Code,
-                              route: deploymentId
-                                ? `/values?did=${deploymentId}`
-                                : "/values",
-                            },
-                          ],
-                          global: IS_MODE_SAAS
-                            ? [
-                                {
-                                  title: "Configurations",
-                                  icon: icons.Reader,
-                                  route: deploymentId
-                                    ? `/configurations?did=${deploymentId}`
-                                    : "/configurations",
-                                },
-                              ]
-                            : [],
-                        },
-                      ]}
-                      className="hidden lg:block"
-                    />
+                    <Sidebar sections={[sidebar]} className="hidden lg:block" />
                     <div className="col-span-3 lg:col-span-4 lg:border-l">
                       <div className="h-full px-4 py-6 lg:px-8">{children}</div>
                     </div>

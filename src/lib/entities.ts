@@ -1,3 +1,5 @@
+import { MultiResponse } from "@/app/api/util";
+
 export interface InputEntity {
   id: string;
   status: string;
@@ -22,7 +24,7 @@ export type HealthCounts = {
   unavailable: number;
 };
 
-export const normalizeEntities = (
+const normalizeSingleEntities = (
   input: Record<string, InputEntity[]>
 ): Entity[] =>
   Object.keys(input)
@@ -34,6 +36,18 @@ export const normalizeEntities = (
       }))
     )
     .filter((entity: any) => entity.status !== "DISABLED");
+
+export const normalizeEntities = (
+  input:
+    | Record<string, InputEntity[]>
+    | MultiResponse<Record<string, InputEntity[]>>
+): Entity[] => {
+  if (Array.isArray(input)) {
+    return normalizeSingleEntities(input[0].response!);
+  }
+
+  return normalizeSingleEntities(input);
+};
 
 export const getEntityCategory = (entity: Entity) => {
   return entity.type === "services" ? "API" : entity.subType.split(/[/]/)[0];

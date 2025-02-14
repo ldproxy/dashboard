@@ -12,6 +12,7 @@ import prettyMs from "pretty-ms";
 import { columns } from "@/components/dashboard/DataTableComponents/ColumnsInfoBox";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { IS_MODE_SINGLE } from "@/lib/env";
+import { NOT_AVAILABLE } from "@/lib/utils";
 
 export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
@@ -32,7 +33,7 @@ export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-export default function CustomersPage({
+export default function InfoBox({
   name,
   url,
   totalNodes,
@@ -63,10 +64,12 @@ export default function CustomersPage({
 
   if (versions.length > 0 || uptimes.length > 0 || memories.length > 0) {
     const formattedMemories = memories.map((memory) =>
-      filesize(memory.memory, { base: 10 })
+      memory.memory > 0 ? filesize(memory.memory, { base: 10 }) : NOT_AVAILABLE
     );
     const formattedUptimes = uptimes.map((uptime) =>
-      prettyMs(uptime.uptime, { secondsDecimalDigits: 0 })
+      uptime.uptime > 0
+        ? prettyMs(uptime.uptime, { secondsDecimalDigits: 0 })
+        : NOT_AVAILABLE
     );
 
     const combinedData = versions.map((version, index) => ({

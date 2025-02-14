@@ -1,3 +1,5 @@
+import { MultiResponse } from "@/app/api/util";
+
 interface TileSetProgress {
   percent?: number;
   current: number;
@@ -50,11 +52,11 @@ export interface JobsWithUrl {
 }
 
 export const normalizeJobs = (
-  input: JobSets | { url: string; response: JobSets }[]
+  input: JobSets | MultiResponse<JobSets>
 ): JobsWithUrl[] => {
   if (Array.isArray(input)) {
     return input.map(({ url, response }) => {
-      return expandJobs(response.sets, url);
+      return expandJobs(response?.sets, url);
     });
   }
 

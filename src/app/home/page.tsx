@@ -10,7 +10,7 @@ import {
   getHealthyNodesCount,
   getOfflineNodesCount,
 } from "@/lib/utils";
-import Info from "@/components/dashboard/InfoBox";
+import InfoBox from "@/components/dashboard/InfoBox";
 import { ClipLoader } from "react-spinners";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogTrigger } from "@/components/shadcn-ui/dialog";
@@ -28,7 +28,7 @@ import { useDataLoader } from "@/lib/loadDataHook";
 
 export default function HomePage() {
   const autoRefreshInterval = useReloadInterval();
-  const [deployments, setDeployments] = useState([]);
+  const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [limitedNodes, setLimitedNodes] = useState([
     { name: "", availableUrlsCount: 0 },
   ]);
@@ -269,7 +269,7 @@ export default function HomePage() {
               }
 
               const infoComponent = (
-                <Info
+                <InfoBox
                   key={index}
                   name={deployment.name ? ` ${deployment.name}` : ""}
                   url={
@@ -301,9 +301,15 @@ export default function HomePage() {
               return deploymentHealthStatus === "OFFLINE" ? (
                 <div key={index}>{infoComponent}</div>
               ) : (
-                <Link href={`/deployment?did=${deployment.id}`} key={index}>
+                <span
+                  className="cursor-pointer"
+                  onClick={() =>
+                    router.push(`/deployment?did=${deployment.id}`)
+                  }
+                  key={index}
+                >
                   {infoComponent}
-                </Link>
+                </span>
               );
             })()
           )}
