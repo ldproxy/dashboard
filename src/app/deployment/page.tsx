@@ -34,6 +34,7 @@ import { Check, summarizeStoreCheck, UiCheck } from "@/lib/health";
 import { useReloadInterval } from "../layout";
 import { IS_MODE_MULTI, IS_MODE_SINGLE } from "@/lib/env";
 import { Job } from "@/lib/jobs";
+import LogViewer from "@/components/dashboard/LogViewer";
 
 export type HealthChecksType = { [key: string]: Check[] };
 export type NodesDifferent = {
@@ -42,6 +43,32 @@ export type NodesDifferent = {
 };
 
 export default function DeploymentPage() {
+  const [logs, setLogs] = useState<string[]>([
+    "Initializing build...",
+    "Fetching dependencies...",
+    "Building project...",
+    "Running tests...",
+    "Deploying to server...",
+    "Build completed successfully.",
+    "Initializing build...",
+    "Fetching dependencies...",
+    "Building project...",
+    "Running tests...",
+    "Deploying to server...",
+    "Build completed successfully.",
+    "Initializing build...",
+    "Fetching dependencies...",
+    "Building project...",
+    "Running tests...",
+    "Deploying to server...",
+    "Build completed successfully.",
+    "Initializing build...",
+    "Fetching dependencies...",
+    "Building project...",
+    "Running tests...",
+    "Deploying to server...",
+    "Build completed successfully.",
+  ]);
   const autoRefreshInterval = useReloadInterval();
   const [tab, setTab] = useState("overview");
   const [tableData, setTableData] = useState([] as any[]);
@@ -206,6 +233,16 @@ export default function DeploymentPage() {
     console.log("errorStatusDeployment", errorStatus);
   }
 
+  // Beispiel für das Hinzufügen neuer Logs
+  /*
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLogs((prevLogs) => [...prevLogs, "New log entry..."]);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+*/
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
       <div className="flex items-center justify-between space-y-2">
@@ -244,6 +281,9 @@ export default function DeploymentPage() {
             </TabsTrigger>
             <TabsTrigger value="jobs">
               <span>Jobs</span>
+            </TabsTrigger>
+            <TabsTrigger value="log">
+              <span>Log</span>
             </TabsTrigger>
             {/*<TabsTrigger value="cfg">
               <span>Configuration</span>
@@ -508,6 +548,9 @@ export default function DeploymentPage() {
               })
             )}
           </div>
+        </TabsContent>
+        <TabsContent value="log">
+          <LogViewer logs={logs} />
         </TabsContent>
       </Tabs>
     </div>
