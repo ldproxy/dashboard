@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { DoubleArrowDownIcon } from "@radix-ui/react-icons";
 
 interface LogViewerProps {
   logs: string[];
@@ -6,16 +7,22 @@ interface LogViewerProps {
 
 const LogViewer: React.FC<LogViewerProps> = ({ logs }) => {
   const logEndRef = useRef<HTMLDivElement>(null);
+  const [autoScroll, setAutoScroll] = useState(true);
 
   useEffect(() => {
-    if (logEndRef.current) {
+    if (autoScroll && logEndRef.current) {
       logEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [logs]);
+  }, [logs, autoScroll]);
+
+  const toggleAutoScroll = () => {
+    setAutoScroll(!autoScroll);
+  };
 
   return (
     <div
       style={{
+        position: "relative",
         backgroundColor: "#1e1e1e",
         color: "#d4d4d4",
         padding: "10px",
@@ -26,10 +33,37 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs }) => {
         fontFamily: "monospace",
       }}
     >
+      <div
+        style={{
+          position: "sticky",
+          top: "10px",
+          bottom: "10px",
+          right: "10px",
+          marginRight: "15px",
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
+      >
+        <button
+          onClick={toggleAutoScroll}
+          style={{
+            backgroundColor: autoScroll ? "#fff" : "#444",
+            border: "none",
+            color: autoScroll ? "#000" : "#d4d4d4",
+            cursor: "pointer",
+            padding: "5px",
+            borderRadius: "4px",
+          }}
+          title={autoScroll ? "Disable auto-scroll" : "Enable auto-scroll"}
+        >
+          <DoubleArrowDownIcon />
+        </button>
+      </div>
       {logs.map((log, index) => (
         <div key={index}>{log}</div>
       ))}
       <div ref={logEndRef} />
+      <div style={{ height: "20px" }} />
     </div>
   );
 };
