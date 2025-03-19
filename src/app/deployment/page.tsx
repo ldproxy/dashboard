@@ -68,6 +68,30 @@ export default function DeploymentPage() {
     "Running tests...",
     "Deploying to server...",
     "Build completed successfully.",
+    "Initializing build...",
+    "Fetching dependencies...",
+    "Building project...",
+    "Running tests...",
+    "Deploying to server...",
+    "Build completed successfully.",
+    "Initializing build...",
+    "Fetching dependencies...",
+    "Building project...",
+    "Running tests...",
+    "Deploying to server...",
+    "Build completed successfully.",
+    "Initializing build...",
+    "Fetching dependencies...",
+    "Building project...",
+    "Running tests...",
+    "Deploying to server...",
+    "Build completed successfully.",
+    "Initializing build...",
+    "Fetching dependencies...",
+    "Building project...",
+    "Running tests...",
+    "Deploying to server...",
+    "Build completed successfully.",
   ]);
   const autoRefreshInterval = useReloadInterval();
   const [tab, setTab] = useState("overview");
@@ -238,7 +262,7 @@ export default function DeploymentPage() {
   useEffect(() => {
     const interval = setInterval(() => {
       setLogs((prevLogs) => [...prevLogs, "New log entry..."]);
-    }, 5000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
@@ -550,7 +574,9 @@ export default function DeploymentPage() {
           </div>
         </TabsContent>
         <TabsContent value="log">
-          <LogViewer logs={logs} />
+          <div style={{ height: "calc(100vh - 250px)" }}>
+            <LogViewer logs={logs} />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -20,7 +20,8 @@ const LogViewer: React.FC<LogViewerProps> = ({ logs }) => {
         color: "#d4d4d4",
         padding: "10px",
         borderRadius: "8px",
-        height: "400px",
+        height: "100%",
+        width: "100%",
         overflowY: "auto",
         fontFamily: "monospace",
       }}
