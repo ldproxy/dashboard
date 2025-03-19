@@ -1,13 +1,32 @@
 import React, { useEffect, useRef, useState } from "react";
 import { DoubleArrowDownIcon } from "@radix-ui/react-icons";
+import { initialLog } from "@/dev-data/log";
 
 interface LogViewerProps {
   logs: string[];
 }
 
-const LogViewer: React.FC<LogViewerProps> = ({ logs }) => {
+const LogViewer: React.FC = () => {
   const logEndRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
+  const [logs, setLogs] = useState<string[]>(initialLog);
+
+  useEffect(() => {
+    const eventSource = new EventSource("/api/log");
+
+    eventSource.onmessage = (event) => {
+      setLogs((prevLogs) => [...prevLogs, event.data]);
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("EventSource failed:", error);
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
 
   useEffect(() => {
     if (autoScroll && logEndRef.current) {

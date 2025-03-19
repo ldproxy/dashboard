@@ -43,56 +43,6 @@ export type NodesDifferent = {
 };
 
 export default function DeploymentPage() {
-  const [logs, setLogs] = useState<string[]>([
-    "Initializing build...",
-    "Fetching dependencies...",
-    "Building project...",
-    "Running tests...",
-    "Deploying to server...",
-    "Build completed successfully.",
-    "Initializing build...",
-    "Fetching dependencies...",
-    "Building project...",
-    "Running tests...",
-    "Deploying to server...",
-    "Build completed successfully.",
-    "Initializing build...",
-    "Fetching dependencies...",
-    "Building project...",
-    "Running tests...",
-    "Deploying to server...",
-    "Build completed successfully.",
-    "Initializing build...",
-    "Fetching dependencies...",
-    "Building project...",
-    "Running tests...",
-    "Deploying to server...",
-    "Build completed successfully.",
-    "Initializing build...",
-    "Fetching dependencies...",
-    "Building project...",
-    "Running tests...",
-    "Deploying to server...",
-    "Build completed successfully.",
-    "Initializing build...",
-    "Fetching dependencies...",
-    "Building project...",
-    "Running tests...",
-    "Deploying to server...",
-    "Build completed successfully.",
-    "Initializing build...",
-    "Fetching dependencies...",
-    "Building project...",
-    "Running tests...",
-    "Deploying to server...",
-    "Build completed successfully.",
-    "Initializing build...",
-    "Fetching dependencies...",
-    "Building project...",
-    "Running tests...",
-    "Deploying to server...",
-    "Build completed successfully.",
-  ]);
   const autoRefreshInterval = useReloadInterval();
   const [tab, setTab] = useState("overview");
   const [tableData, setTableData] = useState([] as any[]);
@@ -575,7 +525,7 @@ export default function DeploymentPage() {
         </TabsContent>
         <TabsContent value="log">
           <div style={{ height: "calc(100vh - 250px)" }}>
-            <LogViewer logs={logs} />
+            <LogViewer />
           </div>
         </TabsContent>
       </Tabs>
