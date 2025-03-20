@@ -1,11 +1,32 @@
 import { type NextRequest } from "next/server";
+import { IS_DEV, IS_MODE_SINGLE, USE_DEV_DATA } from "../../../lib/env";
 
 export async function GET(req: NextRequest) {
   if (req.headers.get("accept") !== "text/event-stream") {
     return new Response("Expected 'text/event-stream'", { status: 400 });
   }
 
-  const backendUrl = "http://localhost:7081/api/logs/attach";
+  //let backendUrl = "http://localhost:7081/api/logs/attach";
+
+  let backendUrl;
+  const apiUrls =
+    IS_MODE_SINGLE && IS_DEV ? ["http://localhost:7081/api"] : ["/api"];
+
+  if (!apiUrls || apiUrls.length === 0) {
+    let fullUrl = `/api/logs/attach`;
+
+    if (IS_DEV && !USE_DEV_DATA && IS_MODE_SINGLE) {
+      backendUrl = `http://localhost:7081${fullUrl}`;
+    } else if (USE_DEV_DATA && IS_MODE_SINGLE) {
+      backendUrl = `${fullUrl}?apiUrls=dev`;
+    }
+  } else {
+    backendUrl = `${apiUrls[0]}/logs/attach`;
+  }
+
+  if (!backendUrl) {
+    return new Response("Failed to connect to SSE backend", { status: 500 });
+  }
 
   const response = await fetch(backendUrl, {
     headers: {
