@@ -12,19 +12,13 @@ export async function GET(req: NextRequest) {
   const apiUrls =
     IS_MODE_SINGLE && IS_DEV ? ["http://localhost:7081/api"] : ["/api"];
 
-  if (!apiUrls || apiUrls.length === 0) {
-    let fullUrl = `/api/logs/attach`;
-
-    if (IS_DEV && !USE_DEV_DATA && IS_MODE_SINGLE) {
-      backendUrl = `http://localhost:7081${fullUrl}`;
-    } else if (USE_DEV_DATA && IS_MODE_SINGLE) {
-      backendUrl = `${fullUrl}?apiUrls=dev`;
-    }
+  if (USE_DEV_DATA && IS_MODE_SINGLE) {
+    backendUrl = `/api/logs/attach?apiUrls=dev`;
   } else {
     backendUrl = `${apiUrls[0]}/logs/attach`;
   }
 
-  if (!backendUrl) {
+  if (!backendUrl || !IS_MODE_SINGLE) {
     return new Response("Failed to connect to SSE backend", { status: 500 });
   }
 
