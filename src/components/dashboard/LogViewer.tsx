@@ -1,18 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import { DoubleArrowDownIcon } from "@radix-ui/react-icons";
 import { initialLog } from "@/dev-data/log";
-
-interface LogViewerProps {
-  logs: string[];
-}
+import { ClipLoader } from "react-spinners";
 
 const LogViewer: React.FC = () => {
   const logEndRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const [logs, setLogs] = useState<string[]>(initialLog);
+  const [isConnected, setIsConnected] = useState(true); // Zustand für die SSE-Verbindung
 
   useEffect(() => {
     const eventSource = new EventSource("/api/log");
+
+    eventSource.onopen = () => {
+      setIsConnected(true);
+    };
 
     eventSource.onmessage = (event) => {
       setLogs((prevLogs) => [...prevLogs, event.data]);
@@ -24,6 +26,7 @@ const LogViewer: React.FC = () => {
     };
 
     return () => {
+      setIsConnected(false);
       eventSource.close();
     };
   }, []);
@@ -44,7 +47,8 @@ const LogViewer: React.FC = () => {
         position: "relative",
         backgroundColor: "#1e1e1e",
         color: "#d4d4d4",
-        padding: "10px",
+        paddingLeft: "10px",
+        paddingRight: "10px",
         borderRadius: "8px",
         height: "100%",
         width: "100%",
@@ -82,7 +86,13 @@ const LogViewer: React.FC = () => {
         <div key={index}>{log}</div>
       ))}
       <div ref={logEndRef} />
-      <div style={{ height: "20px" }} />
+      <div style={{ height: "25px" }}>
+        {isConnected && (
+          <div style={{ paddingTop: "10px" }}>
+            <ClipLoader color={"#d4d4d4"} loading={true} size={15} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -20,7 +20,6 @@ export async function GET(req: NextRequest) {
   const stream = new ReadableStream({
     start(controller) {
       const reader = response.body?.getReader();
-      const encoder = new TextEncoder();
 
       const push = async () => {
         if (!reader) {
