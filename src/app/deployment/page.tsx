@@ -35,6 +35,7 @@ import { useReloadInterval } from "../layout";
 import { IS_MODE_MULTI, IS_MODE_SINGLE } from "@/lib/env";
 import { Job } from "@/lib/jobs";
 import LogViewer from "@/components/dashboard/LogViewer";
+import LogLevelSelect from "@/components/dashboard/LogLevelSelect";
 
 export type HealthChecksType = { [key: string]: Check[] };
 export type NodesDifferent = {
@@ -45,11 +46,11 @@ export type NodesDifferent = {
 export default function DeploymentPage() {
   const autoRefreshInterval = useReloadInterval();
   const [isDropdownOpenLog, setIsDropdownOpenLog] = useState(false);
+  const [logLevel, setLogLevel] = useState("INFO");
   const [tab, setTab] = useState("overview");
   const [tableData, setTableData] = useState([] as any[]);
   const router = useRouter();
   let pathname = usePathname();
-  const [logLevel, setLogLevel] = useState("INFO");
   const [deployments, setDeployments] = useState([
     { name: "", url: "", apiUrl: [""], id: "" },
   ] as Deployment[]);
@@ -92,6 +93,23 @@ export default function DeploymentPage() {
     wiring: false,
     jobs: false,
   });
+
+  const handleChangeLogLevel = async (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newLogLevel = event.target.value;
+    setLogLevel(newLogLevel);
+
+    const response = await fetch(`/api/log?logLevel=${newLogLevel}`, {
+      method: "POST",
+    });
+
+    if (response.ok) {
+      console.log("successLog", response);
+    } else {
+      alert("Failed to set log level");
+    }
+  };
 
   const handleFlagChangeLog = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = event.target;
@@ -232,23 +250,6 @@ export default function DeploymentPage() {
     console.log("errorStatusDeployment", errorStatus);
   }
 
-  const handleChangeLogLevel = async (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const newLogLevel = event.target.value;
-    setLogLevel(newLogLevel);
-
-    const response = await fetch(`/api/log?logLevel=${newLogLevel}`, {
-      method: "POST",
-    });
-
-    if (response.ok) {
-      console.log("successLog", response);
-    } else {
-      alert("Failed to set log level");
-    }
-  };
-
   // Beispiel für das Hinzufügen neuer Logs
   /*
   useEffect(() => {
@@ -359,31 +360,13 @@ export default function DeploymentPage() {
                   </div>
                 )}
               </div>
-              <div style={{ marginBottom: "10px" }}>
-                <select
-                  id="logLevel"
-                  value={logLevel}
-                  title="Log Level"
-                  onChange={handleChangeLogLevel}
-                  style={{
-                    border: "1px solid #d4d4d4",
-                    borderRadius: "4px",
-                    padding: "3px",
-                    backgroundColor: "white",
-                    color: "black",
-                  }}
-                >
-                  <option value="ERROR">ERROR</option>
-                  <option value="WARN">WARN</option>
-                  <option value="INFO">INFO</option>
-                  <option value="DEBUG">DEBUG</option>
-                  <option value="TRACE">TRACE</option>
-                </select>
-              </div>
+              <LogLevelSelect
+                logLevel={logLevel}
+                handleChangeLogLevel={handleChangeLogLevel}
+              />
             </>
           )}
         </div>
-
         {getWarningMessage() && (
           <div className="flex items-center space-x-2 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
             <ExclamationTriangleIcon className="h-5 w-5" />
