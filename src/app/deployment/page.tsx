@@ -260,7 +260,7 @@ export default function DeploymentPage() {
   }, []);
 */
   return (
-    <div className="flex-1 space-y-4 p-8 pt-0">
+    <div className="flex-1 p-8 pt-0">
       {isDropdownOpenLog && (
         <div
           style={{
@@ -294,6 +294,7 @@ export default function DeploymentPage() {
         value={tab}
         onValueChange={onTabChange}
         className="h-full space-y-6"
+        style={{ marginTop: "16px" }}
       >
         <div className="flex items-center justify-between">
           <TabsList>
@@ -316,11 +317,12 @@ export default function DeploymentPage() {
                 <button
                   onClick={() => setIsDropdownOpenLog(!isDropdownOpenLog)}
                   style={{
-                    backgroundColor: "lightgray",
-                    border: "black",
+                    backgroundColor: "white",
+                    width: "125px",
+                    border: "1px solid lightgray",
                     color: "black",
                     cursor: "pointer",
-                    padding: "5px",
+                    padding: "3px",
                     borderRadius: "4px",
                   }}
                 >
