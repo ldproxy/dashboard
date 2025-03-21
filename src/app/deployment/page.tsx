@@ -101,14 +101,22 @@ export default function DeploymentPage() {
     const newLogLevel = event.target.value;
     setLogLevel(newLogLevel);
 
-    const response = await fetch(`/api/log?logLevel=${newLogLevel}`, {
-      method: "POST",
-    });
+    const filters = Object.keys(flagsLog)
+      .filter((key) => flagsLog[key as keyof typeof flagsLog])
+      .map((key) => `${key}=${flagsLog[key as keyof typeof flagsLog]}`)
+      .join("&");
+
+    const response = await fetch(
+      `/api/log?logLevel=${newLogLevel}&${filters}`,
+      {
+        method: "POST",
+      }
+    );
 
     if (response.ok) {
-      console.log("successLog", response);
+      console.log("Log level and filters set successfully", response);
     } else {
-      alert("Failed to set log level");
+      alert("Failed to set log level and filters");
     }
   };
 
@@ -124,9 +132,13 @@ export default function DeploymentPage() {
 
       const filters = Object.keys(updatedFlagsLog)
         .filter((key) => updatedFlagsLog[key as keyof typeof updatedFlagsLog])
-        .join(",");
+        .map(
+          (key) =>
+            `${key}=${updatedFlagsLog[key as keyof typeof updatedFlagsLog]}`
+        )
+        .join("&");
 
-      fetch(`/api/log?filters=${filters}`, {
+      fetch(`/api/log?logLevel=${logLevel}&${filters}`, {
         method: "POST",
       })
         .then((response) => {
