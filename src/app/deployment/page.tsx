@@ -44,6 +44,7 @@ export type NodesDifferent = {
 
 export default function DeploymentPage() {
   const autoRefreshInterval = useReloadInterval();
+  const [isDropdownOpenLog, setIsDropdownOpenLog] = useState(false);
   const [tab, setTab] = useState("overview");
   const [tableData, setTableData] = useState([] as any[]);
   const router = useRouter();
@@ -76,6 +77,29 @@ export default function DeploymentPage() {
     errorStatus,
     fetchError,
   } = useDataLoader(matchingDeployment);
+
+  const [flagsLog, setFlagsLog] = useState({
+    showThirdPartyLoggers: false,
+    apiRequests: false,
+    apiRequestUsers: false,
+    apiRequestHeaders: false,
+    apiRequestBodies: false,
+    s3: false,
+    sqlQueries: false,
+    sqlResults: false,
+    configDumps: false,
+    stackTraces: false,
+    wiring: false,
+    jobs: false,
+  });
+
+  const handleFlagChangeLog = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+    setFlagsLog((prevFlagsLog) => ({
+      ...prevFlagsLog,
+      [name]: checked,
+    }));
+  };
 
   useEffect(() => {
     if (isInitialLoad && deployments.length > 0) {
@@ -237,6 +261,20 @@ export default function DeploymentPage() {
 */
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">
+      {isDropdownOpenLog && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 10,
+          }}
+          onClick={() => setIsDropdownOpenLog(false)}
+        />
+      )}
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-2xl font-semibold tracking-tight">Deployment</h2>
         {matchingDeployment &&
@@ -273,27 +311,72 @@ export default function DeploymentPage() {
             </TabsTrigger>
           </TabsList>
           {tab === "log" && (
-            <div style={{ marginBottom: "10px" }}>
-              <select
-                id="logLevel"
-                value={logLevel}
-                title="Log Level"
-                onChange={handleChangeLogLevel}
-                style={{
-                  border: "1px solid #d4d4d4",
-                  borderRadius: "4px",
-                  padding: "3px",
-                  backgroundColor: "white",
-                  color: "black",
-                }}
-              >
-                <option value="ERROR">ERROR</option>
-                <option value="WARN">WARN</option>
-                <option value="INFO">INFO</option>
-                <option value="DEBUG">DEBUG</option>
-                <option value="TRACE">TRACE</option>
-              </select>
-            </div>
+            <>
+              <div style={{ marginBottom: "10px", position: "relative" }}>
+                <button
+                  onClick={() => setIsDropdownOpenLog(!isDropdownOpenLog)}
+                  style={{
+                    backgroundColor: "lightgray",
+                    border: "black",
+                    color: "black",
+                    cursor: "pointer",
+                    padding: "5px",
+                    borderRadius: "4px",
+                  }}
+                >
+                  Toggle Filters
+                </button>
+                {isDropdownOpenLog && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "40px",
+                      left: 0,
+                      backgroundColor: "white",
+                      border: "1px solid #d4d4d4",
+                      borderRadius: "4px",
+                      padding: "10px",
+                      zIndex: 20,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    {Object.keys(flagsLog).map((flag) => (
+                      <label key={flag} style={{ marginBottom: "5px" }}>
+                        <input
+                          type="checkbox"
+                          name={flag}
+                          checked={flagsLog[flag as keyof typeof flagsLog]}
+                          onChange={handleFlagChangeLog}
+                        />
+                        {flag}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div style={{ marginBottom: "10px" }}>
+                <select
+                  id="logLevel"
+                  value={logLevel}
+                  title="Log Level"
+                  onChange={handleChangeLogLevel}
+                  style={{
+                    border: "1px solid #d4d4d4",
+                    borderRadius: "4px",
+                    padding: "3px",
+                    backgroundColor: "white",
+                    color: "black",
+                  }}
+                >
+                  <option value="ERROR">ERROR</option>
+                  <option value="WARN">WARN</option>
+                  <option value="INFO">INFO</option>
+                  <option value="DEBUG">DEBUG</option>
+                  <option value="TRACE">TRACE</option>
+                </select>
+              </div>
+            </>
           )}
         </div>
 
