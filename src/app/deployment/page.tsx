@@ -341,6 +341,7 @@ export default function DeploymentPage() {
                       zIndex: 20,
                       display: "flex",
                       flexDirection: "column",
+                      width: "225px",
                     }}
                   >
                     {Object.keys(flagsLog).map((flag) => (
@@ -350,6 +351,7 @@ export default function DeploymentPage() {
                           name={flag}
                           checked={flagsLog[flag as keyof typeof flagsLog]}
                           onChange={handleFlagChangeLog}
+                          style={{ marginRight: "5px" }}
                         />
                         {flag}
                       </label>
