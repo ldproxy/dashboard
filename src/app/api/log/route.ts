@@ -73,3 +73,37 @@ export async function GET(req: NextRequest) {
     },
   });
 }
+
+export async function POST(req: NextRequest) {
+  const logLevel = req.nextUrl.searchParams.get("logLevel");
+
+  if (!IS_MODE_SINGLE) {
+    return new Response("Failed to connect to SSE backend", { status: 500 });
+  }
+
+  if (
+    !logLevel ||
+    !["ERROR", "WARN", "INFO", "DEBUG", "TRACE"].includes(logLevel)
+  ) {
+    return new Response("Invalid log level", { status: 400 });
+  }
+
+  const apiUrls =
+    IS_MODE_SINGLE && IS_DEV ? ["http://localhost:7081/api"] : ["/api"];
+
+  if (apiUrls.length === 0) {
+    return new Response("No API URLs available", { status: 500 });
+  }
+  // /api/logs/setLogLevel?logLevel=DEBUG
+  const backendUrl = `${apiUrls[0]}/logs/setLogLevel?logLevel=${logLevel}`;
+
+  const response = await fetch(backendUrl, {
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    return new Response("Failed to set log level", { status: 500 });
+  }
+
+  return new Response("Log level set successfully", { status: 200 });
+}

@@ -48,6 +48,7 @@ export default function DeploymentPage() {
   const [tableData, setTableData] = useState([] as any[]);
   const router = useRouter();
   let pathname = usePathname();
+  const [logLevel, setLogLevel] = useState("INFO");
   const [deployments, setDeployments] = useState([
     { name: "", url: "", apiUrl: [""], id: "" },
   ] as Deployment[]);
@@ -207,6 +208,23 @@ export default function DeploymentPage() {
     console.log("errorStatusDeployment", errorStatus);
   }
 
+  const handleChangeLogLevel = async (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newLogLevel = event.target.value;
+    setLogLevel(newLogLevel);
+
+    const response = await fetch(`/api/log?logLevel=${newLogLevel}`, {
+      method: "POST",
+    });
+
+    if (response.ok) {
+      console.log("successLog", response);
+    } else {
+      alert("Failed to set log level");
+    }
+  };
+
   // Beispiel für das Hinzufügen neuer Logs
   /*
   useEffect(() => {
@@ -233,19 +251,13 @@ export default function DeploymentPage() {
               <ClipLoader color={"#123abc"} loading={true} size={20} />
             </div>
           )}
-        {/*<div className="flex items-center space-x-2">
-          <Button onClick={loadHealthChecks} className="font-bold">
-            <ReloadIcon className="mr-2 h-4 w-4" />
-            Reload
-          </Button>
-        </div>*/}
       </div>
       <Tabs
         value={tab}
         onValueChange={onTabChange}
         className="h-full space-y-6"
       >
-        <div className="space-between flex items-center">
+        <div className="flex items-center justify-between">
           <TabsList>
             <TabsTrigger value="overview">
               <span>Overview</span>
@@ -259,10 +271,30 @@ export default function DeploymentPage() {
             <TabsTrigger value="log">
               <span>Log</span>
             </TabsTrigger>
-            {/*<TabsTrigger value="cfg">
-              <span>Configuration</span>
-            </TabsTrigger>*/}
           </TabsList>
+          {tab === "log" && (
+            <div style={{ marginBottom: "10px" }}>
+              <select
+                id="logLevel"
+                value={logLevel}
+                title="Log Level"
+                onChange={handleChangeLogLevel}
+                style={{
+                  border: "1px solid #d4d4d4",
+                  borderRadius: "4px",
+                  padding: "3px",
+                  backgroundColor: "white",
+                  color: "black",
+                }}
+              >
+                <option value="ERROR">ERROR</option>
+                <option value="WARN">WARN</option>
+                <option value="INFO">INFO</option>
+                <option value="DEBUG">DEBUG</option>
+                <option value="TRACE">TRACE</option>
+              </select>
+            </div>
+          )}
         </div>
 
         {getWarningMessage() && (
@@ -524,8 +556,8 @@ export default function DeploymentPage() {
           </div>
         </TabsContent>
         <TabsContent value="log">
-          <div style={{ height: "calc(100vh - 250px)" }}>
-            <LogViewer />
+          <div style={{ height: "calc(100vh - 275px)" }}>
+            <LogViewer logLevel={logLevel} />
           </div>
         </TabsContent>
       </Tabs>

@@ -3,11 +3,15 @@ import { DoubleArrowDownIcon } from "@radix-ui/react-icons";
 import { initialLog } from "@/dev-data/log";
 import { ClipLoader } from "react-spinners";
 
-const LogViewer: React.FC = () => {
+interface LogViewerProps {
+  logLevel?: string;
+}
+
+const LogViewer: React.FC<LogViewerProps> = ({ logLevel }) => {
   const logEndRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const [logs, setLogs] = useState<string[]>(initialLog);
-  const [isConnected, setIsConnected] = useState(true); // Zustand für die SSE-Verbindung
+  const [isConnected, setIsConnected] = useState(true);
 
   useEffect(() => {
     const eventSource = new EventSource("/api/log");
@@ -41,59 +45,63 @@ const LogViewer: React.FC = () => {
     setAutoScroll(!autoScroll);
   };
 
+  console.log("Loglevel", logLevel);
+
   return (
-    <div
-      style={{
-        position: "relative",
-        backgroundColor: "#1e1e1e",
-        color: "#d4d4d4",
-        paddingLeft: "10px",
-        paddingRight: "10px",
-        borderRadius: "8px",
-        height: "100%",
-        width: "100%",
-        overflowY: "auto",
-        fontFamily: "monospace",
-      }}
-    >
+    <>
       <div
         style={{
-          position: "sticky",
-          top: "10px",
-          bottom: "10px",
-          right: "10px",
-          marginRight: "15px",
-          display: "flex",
-          justifyContent: "flex-end",
+          position: "relative",
+          backgroundColor: "#1e1e1e",
+          color: "#d4d4d4",
+          paddingLeft: "10px",
+          paddingRight: "10px",
+          borderRadius: "8px",
+          height: "100%",
+          width: "100%",
+          overflowY: "auto",
+          fontFamily: "monospace",
         }}
       >
-        <button
-          onClick={toggleAutoScroll}
+        <div
           style={{
-            backgroundColor: autoScroll ? "#fff" : "#444",
-            border: "none",
-            color: autoScroll ? "#000" : "#d4d4d4",
-            cursor: "pointer",
-            padding: "5px",
-            borderRadius: "4px",
+            position: "sticky",
+            top: "10px",
+            bottom: "10px",
+            right: "10px",
+            marginRight: "15px",
+            display: "flex",
+            justifyContent: "flex-end",
           }}
-          title={autoScroll ? "Disable auto-scroll" : "Enable auto-scroll"}
         >
-          <DoubleArrowDownIcon />
-        </button>
+          <button
+            onClick={toggleAutoScroll}
+            style={{
+              backgroundColor: autoScroll ? "#fff" : "#444",
+              border: "none",
+              color: autoScroll ? "#000" : "#d4d4d4",
+              cursor: "pointer",
+              padding: "5px",
+              borderRadius: "4px",
+            }}
+            title={autoScroll ? "Disable auto-scroll" : "Enable auto-scroll"}
+          >
+            <DoubleArrowDownIcon />
+          </button>
+        </div>
+        {logs.map((log, index) => (
+          <div key={index}>{log}</div>
+        ))}
+        <div ref={logEndRef} />
+        <div style={{ height: "25px" }}>
+          {isConnected && (
+            <div style={{ paddingTop: "10px" }}>
+              <ClipLoader color={"#d4d4d4"} loading={true} size={15} />
+            </div>
+          )}
+        </div>
       </div>
-      {logs.map((log, index) => (
-        <div key={index}>{log}</div>
-      ))}
-      <div ref={logEndRef} />
-      <div style={{ height: "25px" }}>
-        {isConnected && (
-          <div style={{ paddingTop: "10px" }}>
-            <ClipLoader color={"#d4d4d4"} loading={true} size={15} />
-          </div>
-        )}
-      </div>
-    </div>
+    </>
   );
 };
 
