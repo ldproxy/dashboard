@@ -112,12 +112,37 @@ export default function DeploymentPage() {
     }
   };
 
-  const handleFlagChangeLog = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFlagChangeLog = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { name, checked } = event.target;
-    setFlagsLog((prevFlagsLog) => ({
-      ...prevFlagsLog,
-      [name]: checked,
-    }));
+    setFlagsLog((prevFlagsLog) => {
+      const updatedFlagsLog = {
+        ...prevFlagsLog,
+        [name]: checked,
+      };
+
+      const filters = Object.keys(updatedFlagsLog)
+        .filter((key) => updatedFlagsLog[key as keyof typeof updatedFlagsLog])
+        .join(",");
+
+      fetch(`/api/log?filters=${filters}`, {
+        method: "POST",
+      })
+        .then((response) => {
+          if (response.ok) {
+            console.log("Filters set successfully", response);
+          } else {
+            alert("Failed to set filters");
+          }
+        })
+        .catch((error) => {
+          console.error("Error setting filters:", error);
+          alert("Failed to set filters");
+        });
+
+      return updatedFlagsLog;
+    });
   };
 
   useEffect(() => {
