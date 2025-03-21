@@ -36,6 +36,7 @@ import { IS_MODE_MULTI, IS_MODE_SINGLE } from "@/lib/env";
 import { Job } from "@/lib/jobs";
 import LogViewer from "@/components/dashboard/LogViewer";
 import LogLevelSelect from "@/components/dashboard/LogLevelSelect";
+import ToggleFiltersLog from "@/components/dashboard/ToggleFiltersLog";
 
 export type HealthChecksType = { [key: string]: Check[] };
 export type NodesDifferent = {
@@ -260,6 +261,7 @@ export default function DeploymentPage() {
     return () => clearInterval(interval);
   }, []);
 */
+
   return (
     <div className="flex-1 p-8 pt-0">
       {isDropdownOpenLog && (
@@ -314,52 +316,12 @@ export default function DeploymentPage() {
           </TabsList>
           {tab === "log" && (
             <>
-              <div style={{ marginBottom: "10px", position: "relative" }}>
-                <button
-                  onClick={() => setIsDropdownOpenLog(!isDropdownOpenLog)}
-                  style={{
-                    backgroundColor: "white",
-                    width: "125px",
-                    border: "1px solid lightgray",
-                    color: "black",
-                    cursor: "pointer",
-                    padding: "3px",
-                    borderRadius: "4px",
-                  }}
-                >
-                  Toggle Filters
-                </button>
-                {isDropdownOpenLog && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "40px",
-                      left: 0,
-                      backgroundColor: "white",
-                      border: "1px solid #d4d4d4",
-                      borderRadius: "4px",
-                      padding: "10px",
-                      zIndex: 20,
-                      display: "flex",
-                      flexDirection: "column",
-                      width: "225px",
-                    }}
-                  >
-                    {Object.keys(flagsLog).map((flag) => (
-                      <label key={flag} style={{ marginBottom: "5px" }}>
-                        <input
-                          type="checkbox"
-                          name={flag}
-                          checked={flagsLog[flag as keyof typeof flagsLog]}
-                          onChange={handleFlagChangeLog}
-                          style={{ marginRight: "5px" }}
-                        />
-                        {flag}
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <ToggleFiltersLog
+                isDropdownOpenLog={isDropdownOpenLog}
+                setIsDropdownOpenLog={setIsDropdownOpenLog}
+                flagsLog={flagsLog}
+                handleFlagChangeLog={handleFlagChangeLog}
+              />
               <LogLevelSelect
                 logLevel={logLevel}
                 handleChangeLogLevel={handleChangeLogLevel}
