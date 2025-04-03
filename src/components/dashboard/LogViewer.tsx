@@ -24,6 +24,10 @@ const LogViewer: React.FC<LogViewerProps> = ({ logLevel }) => {
       setLogs((prevLogs) => [...prevLogs, event.data]);
     };
 
+    eventSource.addEventListener("log", (event: MessageEvent) => {
+      setLogs((prevLogs) => [...prevLogs, event.data]);
+    });
+
     eventSource.onerror = (error) => {
       console.error("EventSource failed:", error);
       eventSource.close();
