@@ -101,6 +101,8 @@ export default function DeploymentPage() {
     const newLogLevel = event.target.value;
     setLogLevel(newLogLevel);
 
+    // ToDo: leave setting of filters here and move fetching of filters to LogViewer (just like with logLevel)
+    /*
     const filters = Object.keys(flagsLog)
       .filter((key) => flagsLog[key as keyof typeof flagsLog])
       .map((key) => `${key}=${flagsLog[key as keyof typeof flagsLog]}`)
@@ -112,12 +114,7 @@ export default function DeploymentPage() {
         method: "POST",
       }
     );
-
-    if (response.ok) {
-      console.log("Log level and filters set successfully", response);
-    } else {
-      alert("Failed to set log level and filters");
-    }
+*/
   };
 
   const handleFlagChangeLog = async (

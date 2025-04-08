@@ -6,16 +6,22 @@ export async function GET(req: NextRequest) {
     return new Response("Expected 'text/event-stream'", { status: 400 });
   }
 
+  const logLevel = req.nextUrl.searchParams.get("logLevel");
+
   //let backendUrl = "http://localhost:7081/api/logs/attach";
 
   let backendUrl;
   const apiUrls =
     IS_MODE_SINGLE && IS_DEV ? ["http://localhost:7081/api"] : ["/api"];
 
+  if (!logLevel) {
+    return new Response("Log level is required", { status: 400 });
+  }
+
   if (USE_DEV_DATA && IS_MODE_SINGLE) {
-    backendUrl = `/api/logs/attach?apiUrls=dev`;
+    backendUrl = `/api/logs/attach?apiUrls=dev&logLevel=${logLevel}`;
   } else {
-    backendUrl = `${apiUrls[0]}/logs/attach`;
+    backendUrl = `${apiUrls[0]}/logs/attach?logLevel=${logLevel}`;
   }
 
   if (!backendUrl || !IS_MODE_SINGLE) {

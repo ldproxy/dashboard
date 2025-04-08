@@ -4,7 +4,7 @@ import { initialLog } from "@/dev-data/log";
 import { ClipLoader } from "react-spinners";
 
 interface LogViewerProps {
-  logLevel?: string;
+  logLevel: string;
 }
 
 const LogViewer: React.FC<LogViewerProps> = ({ logLevel }) => {
@@ -12,9 +12,37 @@ const LogViewer: React.FC<LogViewerProps> = ({ logLevel }) => {
   const [autoScroll, setAutoScroll] = useState(true);
   const [logs, setLogs] = useState<string[]>(initialLog);
   const [isConnected, setIsConnected] = useState(true);
+  const eventSourceRef = useRef<EventSource | null>(null);
+  console.log("First Log level: ", logLevel);
+  useEffect(() => {
+    const initializeLogs = async () => {
+      await changeLogLevel();
+      await getLogs();
+    };
+
+    initializeLogs();
+
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logLevel]);
 
   useEffect(() => {
-    const eventSource = new EventSource("/api/log");
+    if (autoScroll && logEndRef.current) {
+      logEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [logs, autoScroll]);
+
+  const getLogs = async () => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
+
+    const eventSource = new EventSource(`/api/log?logLevel=${logLevel}`);
+    eventSourceRef.current = eventSource;
 
     eventSource.onopen = () => {
       setIsConnected(true);
@@ -31,25 +59,32 @@ const LogViewer: React.FC<LogViewerProps> = ({ logLevel }) => {
     eventSource.onerror = (error) => {
       console.error("EventSource failed:", error);
       eventSource.close();
-    };
-
-    return () => {
       setIsConnected(false);
-      eventSource.close();
     };
-  }, []);
-
-  useEffect(() => {
-    if (autoScroll && logEndRef.current) {
-      logEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [logs, autoScroll]);
+  };
 
   const toggleAutoScroll = () => {
     setAutoScroll(!autoScroll);
   };
 
-  console.log("Loglevel", logLevel);
+  const changeLogLevel = async () => {
+    try {
+      const response = await fetch(`/api/log?logLevel=${logLevel}`, {
+        method: "GET",
+        headers: {
+          Accept: "text/event-stream",
+        },
+      });
+
+      if (!response.ok) {
+        alert("Failed to set log level and filters");
+      }
+    } catch (error) {
+      alert(
+        "Network error: Unable to set log level. Please check your connection."
+      );
+    }
+  };
 
   return (
     <>
