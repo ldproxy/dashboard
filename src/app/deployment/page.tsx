@@ -81,18 +81,18 @@ export default function DeploymentPage() {
   } = useDataLoader(matchingDeployment);
 
   const [flagsLog, setFlagsLog] = useState({
-    showThirdPartyLoggers: false,
-    apiRequests: false,
-    apiRequestUsers: false,
-    apiRequestHeaders: false,
-    apiRequestBodies: false,
-    s3: false,
-    sqlQueries: false,
-    sqlResults: false,
-    configDumps: false,
-    stackTraces: false,
-    wiring: false,
-    jobs: false,
+    showThirdPartyLoggers: true,
+    apiRequests: true,
+    apiRequestUsers: true,
+    apiRequestHeaders: true,
+    apiRequestBodies: true,
+    s3: true,
+    sqlQueries: true,
+    sqlResults: true,
+    configDumps: true,
+    stackTraces: true,
+    wiring: true,
+    jobs: true,
   });
 
   const handleChangeLogLevel = async (
@@ -100,21 +100,6 @@ export default function DeploymentPage() {
   ) => {
     const newLogLevel = event.target.value;
     setLogLevel(newLogLevel);
-
-    // ToDo: leave setting of filters here and move fetching of filters to LogViewer (just like with logLevel)
-    /*
-    const filters = Object.keys(flagsLog)
-      .filter((key) => flagsLog[key as keyof typeof flagsLog])
-      .map((key) => `${key}=${flagsLog[key as keyof typeof flagsLog]}`)
-      .join("&");
-
-    const response = await fetch(
-      `/api/log?logLevel=${newLogLevel}&${filters}`,
-      {
-        method: "POST",
-      }
-    );
-*/
   };
 
   const handleFlagChangeLog = async (
@@ -126,29 +111,6 @@ export default function DeploymentPage() {
         ...prevFlagsLog,
         [name]: checked,
       };
-
-      const filters = Object.keys(updatedFlagsLog)
-        .filter((key) => updatedFlagsLog[key as keyof typeof updatedFlagsLog])
-        .map(
-          (key) =>
-            `${key}=${updatedFlagsLog[key as keyof typeof updatedFlagsLog]}`
-        )
-        .join("&");
-
-      fetch(`/api/log?logLevel=${logLevel}&${filters}`, {
-        method: "POST",
-      })
-        .then((response) => {
-          if (response.ok) {
-            console.log("Filters set successfully", response);
-          } else {
-            alert("Failed to set filters");
-          }
-        })
-        .catch((error) => {
-          console.error("Error setting filters:", error);
-          alert("Failed to set filters");
-        });
 
       return updatedFlagsLog;
     });
@@ -623,7 +585,7 @@ export default function DeploymentPage() {
         </TabsContent>
         <TabsContent value="log">
           <div style={{ height: "calc(100vh - 275px)" }}>
-            <LogViewer logLevel={logLevel} />
+            <LogViewer logLevel={logLevel} flagsLog={flagsLog} />
           </div>
         </TabsContent>
       </Tabs>

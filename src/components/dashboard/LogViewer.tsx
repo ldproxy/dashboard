@@ -5,19 +5,19 @@ import { ClipLoader } from "react-spinners";
 
 interface LogViewerProps {
   logLevel: string;
+  flagsLog: {};
 }
 
-const LogViewer: React.FC<LogViewerProps> = ({ logLevel }) => {
+const LogViewer: React.FC<LogViewerProps> = ({ logLevel, flagsLog }) => {
   const logEndRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const [logs, setLogs] = useState<string[]>(initialLog);
   const [isConnected, setIsConnected] = useState(true);
   const eventSourceRef = useRef<EventSource | null>(null);
-  console.log("First Log level: ", logLevel);
+  console.log("First Log level: ", logLevel, flagsLog);
   useEffect(() => {
     const initializeLogs = async () => {
-      await changeLogLevel();
-      await getLogs();
+      await changeLogLevelandFilters();
     };
 
     initializeLogs();
@@ -28,7 +28,7 @@ const LogViewer: React.FC<LogViewerProps> = ({ logLevel }) => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [logLevel]);
+  }, [logLevel, flagsLog]);
 
   useEffect(() => {
     if (autoScroll && logEndRef.current) {
@@ -36,12 +36,16 @@ const LogViewer: React.FC<LogViewerProps> = ({ logLevel }) => {
     }
   }, [logs, autoScroll]);
 
-  const getLogs = async () => {
+  const getLogs = async (newFilters: string) => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
     }
 
-    const eventSource = new EventSource(`/api/log?logLevel=${logLevel}`);
+    const eventSource = new EventSource(
+      `/api/log?logLevel=${logLevel}${
+        newFilters ? `&filters=${newFilters}` : ""
+      }`
+    );
     eventSourceRef.current = eventSource;
 
     eventSource.onopen = () => {
@@ -67,15 +71,27 @@ const LogViewer: React.FC<LogViewerProps> = ({ logLevel }) => {
     setAutoScroll(!autoScroll);
   };
 
-  const changeLogLevel = async () => {
+  const changeLogLevelandFilters = async () => {
     try {
-      const response = await fetch(`/api/log?logLevel=${logLevel}`, {
-        method: "GET",
-        headers: {
-          Accept: "text/event-stream",
-        },
-      });
+      const newFilters = Object.keys(flagsLog)
+        .filter((key) => flagsLog[key as keyof typeof flagsLog])
+        .join(",");
 
+      const response = await fetch(
+        `/api/log?logLevel=${logLevel}${
+          newFilters ? `&filters=${newFilters}` : ""
+        }`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "text/event-stream",
+          },
+        }
+      );
+
+      if (response.ok) {
+        await getLogs(newFilters);
+      }
       if (!response.ok) {
         alert("Failed to set log level and filters");
       }

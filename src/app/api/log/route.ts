@@ -7,6 +7,7 @@ export async function GET(req: NextRequest) {
   }
 
   const logLevel = req.nextUrl.searchParams.get("logLevel");
+  const filters = req.nextUrl.searchParams.get("filters");
 
   //let backendUrl = "http://localhost:7081/api/logs/attach";
 
@@ -19,9 +20,13 @@ export async function GET(req: NextRequest) {
   }
 
   if (USE_DEV_DATA && IS_MODE_SINGLE) {
-    backendUrl = `/api/logs/attach?apiUrls=dev&logLevel=${logLevel}`;
+    backendUrl = `/api/logs/attach?apiUrls=dev&logLevel=${logLevel}${
+      filters ? `&filters=${filters}` : ""
+    }`;
   } else {
-    backendUrl = `${apiUrls[0]}/logs/attach?logLevel=${logLevel}`;
+    backendUrl = `${apiUrls[0]}/logs/attach?logLevel=${logLevel}${
+      filters ? `&filters=${filters}` : ""
+    }`;
   }
 
   if (!backendUrl || !IS_MODE_SINGLE) {
@@ -77,35 +82,5 @@ export async function GET(req: NextRequest) {
       "Cache-Control": "no-cache",
       Connection: "keep-alive",
     },
-  });
-}
-
-export async function POST(req: NextRequest) {
-  const logLevel = req.nextUrl.searchParams.get("logLevel");
-  const filters = req.nextUrl.searchParams.get("filters");
-
-  if (!IS_MODE_SINGLE) {
-    return new Response("Failed to connect to SSE backend", { status: 500 });
-  }
-
-  const apiUrls =
-    IS_MODE_SINGLE && IS_DEV ? ["http://localhost:7081/api"] : ["/api"];
-
-  if (apiUrls.length === 0) {
-    return new Response("No API URLs available", { status: 500 });
-  }
-
-  const backendUrl = `${apiUrls[0]}/logs/setLogLevel?logLevel=${logLevel}&filters=${filters}`;
-
-  const response = await fetch(backendUrl, {
-    method: "POST",
-  });
-
-  if (!response.ok) {
-    return new Response("Failed to set log level and filters", { status: 500 });
-  }
-
-  return new Response("Log level and filters set successfully", {
-    status: 200,
   });
 }
