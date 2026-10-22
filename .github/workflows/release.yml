@@ -18,11 +18,6 @@ jobs:
       - run: npm ci
       - run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version --allow-same-version
       - run: npm run package
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          registry-url: https://dl.interactive-instruments.de/repository/npm/
       - run: npm publish ./package
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NEXUS_TOKEN: ${{ secrets.NPM_TOKEN }}
