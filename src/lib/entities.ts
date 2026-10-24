@@ -54,9 +54,10 @@ export const getEntityCategory = (entity: Entity) => {
 };
 
 export const asLabel = (entityCategory: string) => {
-  const formattedCategory =
-    entityCategory[0].toUpperCase() + entityCategory.substring(1);
-  return entityCategory === "API" ? formattedCategory + "s" : formattedCategory;
+  const formattedCategory = entityCategory === "3dtile" 
+    ? "3D Tile"
+    : entityCategory[0].toUpperCase() + entityCategory.substring(1);
+  return formattedCategory + "s";
 };
 
 export const getEntityCounts = (entities: Entity[]): HealthCounts =>

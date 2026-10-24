@@ -6,17 +6,22 @@ const entities: Entities = {
     {
       id: "bergbau",
       status: "AVAILABLE",
-      subType: "features/wfs",
+      subType: "feature/wfs",
     },
     {
       id: "krankenhaus",
       status: "AVAILABLE",
-      subType: "features/sql",
+      subType: "feature/sql",
     },
     {
       id: "krankenhaus-tiles",
       status: "LIMITED",
-      subType: "tiles/mbtiles",
+      subType: "tile/mbtiles",
+    },
+    {
+      id: "cologne-lod2-3dtiles",
+      status: "AVAILABLE",
+      subType: "3dtile/features",
     },
   ],
   services: [
