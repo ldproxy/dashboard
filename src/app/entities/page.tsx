@@ -1,9 +1,6 @@
 "use client";
 
-import Summary from "@/components/dashboard/summary";
-import { Button } from "@/components/shadcn-ui/button";
-import { ReloadIcon } from "@radix-ui/react-icons";
-import Link from "next/link";
+import Summary from "@/components/dashboard/Summary";
 import {
   Tabs,
   TabsList,
@@ -12,10 +9,8 @@ import {
 } from "@/components/shadcn-ui/tabs";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { GetEntities, getHealthChecks } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { Entity } from "@/data/entities";
-import { autoRefreshInterval, DevEntities } from "@/data/constants";
+import { DevEntities } from "@/dev-data/constants";
 import { getIcon } from "@/lib/icons";
 import {
   asLabel,
@@ -23,12 +18,20 @@ import {
   getEntityCategoryCounts,
   getStateSummary,
 } from "@/lib/entities";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import { useDataLoader } from "@/lib/loadDataHook";
+import { useReloadInterval } from "../layout";
+
+import { getDeploymentId } from "@/lib/deployments";
+import { IS_MODE_MULTI } from "@/lib/env";
 
 export default function EntitiesPage() {
-  const [entities, setEntities] = useState<Entity[]>([]);
+  const autoRefreshInterval = useReloadInterval();
   const [tab, setTab] = useState("overview");
   const router = useRouter();
   let pathname = usePathname();
+  const [deploymentId, setDeploymentId] = useState("");
+  const { entities, nodesDifferent, loadData } = useDataLoader();
 
   const entityCategories = entities
     .map(getEntityCategory)
@@ -48,37 +51,44 @@ export default function EntitiesPage() {
     entityCategories
   );
 
-  const loadEntities = async () => {
-    try {
-      const newEntities = await GetEntities();
-      const healthChecks = await getHealthChecks();
+  useEffect(() => {
+    loadData({ loadEntities: true, checkDifferences: true });
 
-      newEntities.forEach((entity) => {
-        const hc = healthChecks.find(
-          (check) => check.name === `entities/${entity.type}/${entity.id}`
-        );
-        entity.status = hc && hc.state ? hc.state : "UNKNOWN";
-      });
-
-      setEntities(newEntities);
-    } catch (error) {
-      console.error("Error loading entities:", error);
+    if (autoRefreshInterval > 0) {
+      const interval = setInterval(() => {
+        loadData({ loadEntities: true, checkDifferences: true });
+      }, autoRefreshInterval * 1000);
+      return () => clearInterval(interval);
     }
-  };
+    // not all dependendies to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRefreshInterval]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      loadEntities();
-    }, autoRefreshInterval);
     if (pathname) {
       setTab(window.location.hash.slice(1) || "overview");
     }
-    return () => clearInterval(interval);
+    if (IS_MODE_MULTI) {
+      getDeploymentId(setDeploymentId);
+    }
+    // did not include function checkDifferences() to avoid infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   const onTabChange = (tab: string) => {
     setTab(tab);
-    router.push(`${pathname}#${tab}`);
+    if (deploymentId !== "") {
+      router.push(`${pathname}?did=${deploymentId}#${tab}`);
+    } else {
+      router.push(`${pathname}#${tab}`);
+    }
+  };
+
+  const getWarningMessage = () => {
+    if (nodesDifferent.entities) {
+      return `Warning: Differences detected in entities across different replicas. This issue is likely temporary.`;
+    }
+    return null;
   };
 
   if (DevEntities) {
@@ -117,6 +127,13 @@ export default function EntitiesPage() {
           </TabsList>
         </div>
 
+        {getWarningMessage() && (
+          <div className="flex items-center space-x-2 p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+            <ExclamationTriangleIcon className="h-5 w-5" />
+            <span>{getWarningMessage()}</span>
+          </div>
+        )}
+
         <TabsContent value="overview">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {entityCategories.map((entityCategory) => (
@@ -126,7 +143,9 @@ export default function EntitiesPage() {
                 footer={getStateSummary(entityTypeStatusCounts[entityCategory])}
                 total={entityTypeCounts[entityCategory]}
                 onClick={() => setTab(entityCategory)}
-                route={`${pathname}#${entityCategory}`}
+                route={`${pathname}${
+                  deploymentId !== "" ? `?did=${deploymentId}` : ""
+                }#${entityCategory}`}
                 Icon={getIcon("Id")}
               />
             ))}
@@ -145,7 +164,9 @@ export default function EntitiesPage() {
                     header={entity.status}
                     main={entity.id}
                     footer={entity.subType.toUpperCase()}
-                    route={`/entities/details?id=${entity.uid}`}
+                    route={`/entities/details${
+                      deploymentId ? `?did=${deploymentId}&` : "?"
+                    }id=${entity.uid}`}
                   />
                 ))}
             </div>

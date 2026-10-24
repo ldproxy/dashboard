@@ -1,0 +1,35 @@
+import React from "react";
+import { Meta, StoryFn } from "@storybook/react";
+import CustomersPage, {
+  SummaryProps,
+} from "../src/components/dashboard/InfoBox";
+import { getIcon } from "../src/lib/icons";
+
+import StoryWrapper from "./StoryWrapper";
+
+export default {
+  title: "Components/HomeInfoBox",
+  component: CustomersPage,
+} as Meta;
+
+const Template: StoryFn<SummaryProps> = (args) => (
+  <StoryWrapper>
+    <CustomersPage {...args} />
+  </StoryWrapper>
+);
+
+export const Healthy = Template.bind({});
+Healthy.args = {
+  name: "ldproxy 3000",
+  url: "http://localhost:3000/",
+  totalNodes: 3,
+  healthyNodes: 1,
+  limitedNodes: 1,
+  offlineNodes: 1,
+  healthStatus: "HEALTHY",
+  IconFooter1: getIcon("InfoCircled"),
+  IconFooter2: getIcon("CheckCircled"),
+  IconFooter3: getIcon("QuestionMark"),
+  IconFooter4: getIcon("Cross"),
+  className: "hover:bg-gray-100 transition-colors duration-200",
+};

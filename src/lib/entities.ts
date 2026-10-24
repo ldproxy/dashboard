@@ -1,4 +1,18 @@
-import { Entity } from "@/data/entities";
+import { MultiResponse } from "@/app/api/util";
+
+export interface InputEntity {
+  id: string;
+  status: string;
+  subType: string;
+}
+
+export interface Entity {
+  id: string;
+  uid: string;
+  type: string;
+  status: string;
+  subType: string;
+}
 
 export type CategoryHealthCounts = {
   [key: string]: HealthCounts;
@@ -10,12 +24,40 @@ export type HealthCounts = {
   unavailable: number;
 };
 
+const normalizeSingleEntities = (
+  input: Record<string, InputEntity[]>
+): Entity[] =>
+  Object.keys(input)
+    .flatMap((type) =>
+      input[type].map((entity: any) => ({
+        type,
+        uid: `${type}_${entity.id}`,
+        ...entity,
+      }))
+    )
+    .filter((entity: any) => entity.status !== "DISABLED");
+
+export const normalizeEntities = (
+  input:
+    | Record<string, InputEntity[]>
+    | MultiResponse<Record<string, InputEntity[]>>
+): Entity[] => {
+  if (Array.isArray(input)) {
+    return normalizeSingleEntities(input[0].response!);
+  }
+
+  return normalizeSingleEntities(input);
+};
+
 export const getEntityCategory = (entity: Entity) => {
   return entity.type === "services" ? "API" : entity.subType.split(/[/]/)[0];
 };
 
-export const asLabel = (entityCategory: string) =>
-  entityCategory[0].toUpperCase() + entityCategory.substring(1) + "s";
+export const asLabel = (entityCategory: string) => {
+  const formattedCategory =
+    entityCategory[0].toUpperCase() + entityCategory.substring(1);
+  return entityCategory === "API" ? formattedCategory + "s" : formattedCategory;
+};
 
 export const getEntityCounts = (entities: Entity[]): HealthCounts =>
   entities.reduce(

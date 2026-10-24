@@ -1,0 +1,201 @@
+"use client";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/shadcn-ui/dialog";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/shadcn-ui/form";
+import { Input } from "@/components/shadcn-ui/input";
+import React, { useEffect, useState } from "react";
+import { Separator } from "@radix-ui/react-separator";
+import { Button } from "@/components/shadcn-ui/button";
+import { updateCfg } from "../../lib/cfg";
+
+interface PopUpDialogProps {
+  name?: string;
+  cfgUrl?: string;
+  handleEdit?: (data: any) => Promise<{ success: boolean }>;
+  onSubmit?: () => Promise<{ success: boolean }>;
+  setPopUp?: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const profileFormSchema = z.object({
+  name: z
+    .string()
+    .min(1, {
+      message: "Name muss min. 1 Zeichen lang sein.",
+    })
+    .max(30, {
+      message: "Name darf max. 30 Zeichen lang sein.",
+    })
+    .refine((value) => !/[äöüÄÖÜ]/.test(value), {
+      message: "Name darf keine Umlaute enthalten.",
+    }),
+  url: z
+    .string()
+    .min(1, {
+      message: "Url muss min. 1 Zeichen lang sein.",
+    })
+    .max(50, {
+      message: "Url darf max. 50 Zeichen lang sein.",
+    })
+    .refine((value) => !/[äöüÄÖÜ]/.test(value), {
+      message: "Url darf keine Umlaute enthalten.",
+    }),
+});
+
+export type ProfileFormValues = z.infer<typeof profileFormSchema>;
+
+export const EditAndDeletePopUpDialog: React.FC<PopUpDialogProps> = ({
+  handleEdit,
+  name,
+  cfgUrl,
+  onSubmit,
+  setPopUp,
+}) => {
+  const [submitResult, setSubmitResult] = useState<{ success: boolean } | null>(
+    null
+  );
+
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileFormSchema),
+    mode: "onChange",
+    defaultValues: {
+      name: name,
+      url: cfgUrl,
+    },
+  });
+
+  const handleSubmit = async (data: ProfileFormValues) => {
+    if (handleEdit) {
+      try {
+        const result = await handleEdit(data);
+        if (result) {
+          setSubmitResult(result);
+          form.reset();
+        }
+      } catch (error) {
+        console.error("Fehler beim Absenden des Formulars", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    form.reset({
+      name: name,
+      url: cfgUrl,
+    });
+  }, [name, cfgUrl, form]);
+
+  if (onSubmit && setPopUp) {
+    return (
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle style={{ margin: "20px" }}>
+            Wollen Sie die Konfiguration wirklich löschen?
+          </DialogTitle>
+        </DialogHeader>
+        <DialogFooter className="flex justify-center">
+          <div className="flex justify-center w-full">
+            <Button
+              onClick={onSubmit}
+              style={{
+                fontWeight: "bold",
+                marginRight: "10px",
+                width: "100px",
+              }}
+            >
+              Ja
+            </Button>
+            <Button
+              onClick={() => {
+                setPopUp(false);
+              }}
+              variant="secondary"
+              style={{ fontWeight: "bold", width: "100px" }}
+            >
+              Nein
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    );
+  }
+
+  return (
+    <DialogContent>
+      <DialogHeader>
+        <div style={{ marginBottom: "15px" }}>
+          <DialogTitle>Konfiguration umbennen</DialogTitle>
+        </div>
+        <Separator />
+      </DialogHeader>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-8"
+          style={{ marginBottom: "25px" }}
+        >
+          <FormField
+            control={form.control}
+            name="url"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>URL</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            style={{ fontWeight: "bold" }}
+            type="submit"
+            disabled={!form.formState.isValid ? true : false}
+          >
+            Change
+          </Button>
+        </form>
+      </Form>
+      {submitResult && !submitResult.success ? (
+        <div style={{ color: "red" }}>Ein Fehler ist aufgetreten.</div>
+      ) : submitResult && submitResult.success ? (
+        <div style={{ color: "green" }}>
+          Konfiguration wurde erfolgreich umbenannt.
+        </div>
+      ) : (
+        ""
+      )}
+    </DialogContent>
+  );
+};

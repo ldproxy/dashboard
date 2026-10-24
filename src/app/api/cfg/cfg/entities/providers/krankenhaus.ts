@@ -1,0 +1,9 @@
+import { providers_krankenhaus } from "../../../../../../dev-data/cfg";
+
+export default function handler(req: any, res: any) {
+  if (req.method === "GET") {
+    res.status(200).json(providers_krankenhaus);
+  } else {
+    res.status(405).json({ message: "Method not allowed" });
+  }
+}

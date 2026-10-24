@@ -4,14 +4,27 @@ import { ColumnDef, Row } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/shadcn-ui/button";
 import { Badge } from "@/components/shadcn-ui/badge";
-import { ChevronRightIcon, ChevronDownIcon } from "@radix-ui/react-icons";
+import {
+  ChevronRightIcon,
+  ChevronDownIcon,
+  QuestionMarkCircledIcon,
+} from "@radix-ui/react-icons";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/shadcn-ui/tooltip";
 
 export type HealthCheck = {
-  label: string;
-  status: string;
+  name: string;
+  label?: string;
+  description?: string;
+  state: string;
   checked: string;
   message: string;
   subRows: HealthCheck[];
+  url: string;
 };
 
 export const columns: ColumnDef<HealthCheck>[] = [
@@ -28,9 +41,23 @@ export const columns: ColumnDef<HealthCheck>[] = [
         </Button>
       );
     },
-    cell: ({ row, getValue }) => (
+    cell: ({ row }) => (
       <div className={`${row.depth === 0 ? "ml-4 flex items-center" : "ml-8"}`}>
-        {getValue<string>()}{" "}
+        {row.original.label || row.original.name || row.original.url}
+        {row.depth === 0 && row.original.description && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <QuestionMarkCircledIcon className="ml-2 h-4 w-4 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <span
+                  dangerouslySetInnerHTML={{ __html: row.original.description }}
+                />
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
         {row.getCanExpand() ? (
           <button
             {...{
@@ -62,16 +89,32 @@ export const columns: ColumnDef<HealthCheck>[] = [
     },
     cell: ({ row }: { row: Row<HealthCheck> }) => {
       if (row.original) {
-        const badgeColor =
-          row.original.status === "HEALTHY" ||
-          row.original.status === "AVAILABLE"
-            ? "success"
-            : row.original.status === "LIMITED"
-            ? "warning"
-            : "destructive";
+        let badgeColor = "";
+        let textColor = "white";
+
+        switch (row.original.state) {
+          case "HEALTHY":
+          case "AVAILABLE":
+            badgeColor = "#4CAF50";
+            break;
+          case "LIMITED":
+            badgeColor = "#FFDD44";
+            break;
+          default:
+            badgeColor = "#F44336";
+            break;
+        }
+
         return (
-          <Badge className="ml-4" variant={badgeColor}>
-            {row.original.status}
+          <Badge
+            className="ml-4"
+            style={{
+              backgroundColor: badgeColor,
+              color: textColor,
+              cursor: "default",
+            }}
+          >
+            {row.original.state}
           </Badge>
         );
       }

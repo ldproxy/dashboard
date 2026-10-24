@@ -1,0 +1,180 @@
+import { MultiResponse, SingleResponse } from "@/app/api/util";
+import { InputCheck, InputHealth } from "@/lib/health";
+
+const health: InputHealth = {
+  "app/crs": {
+    label: "crsLabel",
+    description: "Beschreibung",
+    healthy: true,
+    state: "AVAILABLE",
+    duration: 0,
+    timestamp: "2024-02-15T17:56:36.681+01:00",
+  },
+  "entities/services/testi": {
+    healthy: true,
+    state: "AVAILABLE",
+    duration: 0,
+    timestamp: "2024-02-15T17:56:36.681+01:00",
+    capabilities: {
+      Capability1: {
+        label: "Capability1",
+        description: "Capability1",
+        healthy: true,
+        state: "AVAILABLE",
+        message: "All systems operational",
+      },
+      Capability2: {
+        label: "Capability2",
+        description: "Capability2",
+        healthy: true,
+        state: "AVAILABLE",
+        message: "System maintenance",
+      },
+    },
+    components: {
+      Component1: {
+        healthy: true,
+        state: "AVAILABLE",
+        message: "Component operational",
+        capabilities: ["Capability1"],
+      },
+      Component2: {
+        healthy: true,
+        state: "AVAILABLE",
+        message: "Component failure",
+        capabilities: ["Capability2"],
+      },
+    },
+  },
+};
+export const fromDev = (
+  wrap: boolean,
+  apiUrls?: string[]
+): InputHealth | SingleResponse<InputHealth> | MultiResponse<InputHealth> => {
+  if (wrap && apiUrls) {
+    return apiUrls.map((url) => ({
+      url,
+      response: health,
+    }));
+  }
+
+  return health;
+
+  return {
+    "app/crs": {
+      label: "crsLabel",
+      description: "Beschreibung",
+      healthy: true,
+      state: "AVAILABLE",
+      duration: 0,
+      timestamp: "2024-02-15T17:56:36.681+01:00",
+    },
+    "entities/services/testi": {
+      healthy: true,
+      state: "AVAILABLE",
+      duration: 0,
+      timestamp: "2024-02-15T17:56:36.681+01:00",
+      /*capabilities: [
+        {
+          label: "COLLECTIONS",
+          description: "COLLECTIONS",
+          name: "collections",
+          healthy: false,
+          state: "UNAVAILABLE",
+        },
+      ]*/
+      /*
+export const fetchedHealthChecks: { [key: string]: InputCheck } = {
+  "app/crs": {
+    label: "crsLabel",
+    description: "Beschreibung",
+    healthy: true,
+    state: "AVAILABLE",
+    duration: 0,
+    timestamp: "2024-02-15T17:56:36.681+01:00",
+  },
+  "entities/services/testi": {
+    healthy: true,
+    state: "AVAILABLE",
+    duration: 0,
+    timestamp: "2024-02-15T17:56:36.681+01:00",
+    capabilities: [
+      {
+        label: "Label",
+        description: "Beschreibung",
+        name: "collectionss",
+        healthy: false,
+        state: "UNAVAILABLE",
+      },
+    ],
+    /*
+    capabilities: [
+      {
+        name: "Capability1",
+        healthy: true,
+        state: "AVAILABLE",
+        message: "All systems operational",
+      },
+      {
+        name: "Capability2",
+        healthy: true,
+        state: "AVAILABLE",
+        message: "System maintenance",
+      },
+    ],
+    components: [
+      {
+        name: "Component1",
+        healthy: true,
+        state: "AVAILABLE",
+        message: "Component operational",
+        capabilities: ["Capability1"],
+      },
+      {
+        name: "Component2",
+        healthy: true,
+        state: "AVAILABLE",
+        message: "Component failure",
+        capabilities: ["Capability2"],
+      },
+    ], */
+    },
+    /*"db.bergbau.pool.ConnectivityCheck": {
+      healthy: true,
+      state: "AVAILABLE",
+      duration: 0,
+      timestamp: "2024-02-15T17:56:36.681+01:00",
+    },
+    "db.krankenhaus.pool.ConnectivityCheck": {
+      healthy: true,
+      state: "AVAILABLE",
+
+      duration: 5,
+      timestamp: "2024-02-15T17:56:36.687+01:00",
+    },
+    deadlocks: {
+      healthy: true,
+      state: "AVAILABLE",
+
+      duration: 0,
+      timestamp: "2024-02-15T17:56:36.687+01:00",
+    },
+    store: {
+      healthy: true,
+      duration: 0,
+      state: "AVAILABLE",
+
+      timestamp: "2024-02-15T17:56:36.687+01:00",
+      sources: [
+        {
+          label: "FS[.]",
+          status: "HEALTHY",
+        },
+        {
+          label: "S3[s3.ldproxy.net/bplan]",
+          status: "HEALTHY",
+        },
+      ],
+    },*/
+  };
+};

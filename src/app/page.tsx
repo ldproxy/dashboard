@@ -2,20 +2,18 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/shadcn-ui/button";
-import { ReloadIcon } from "@radix-ui/react-icons";
+import { IS_MODE_MULTI } from "@/lib/env";
 
 export default function ValuesPage() {
   const router = useRouter();
-  const multipleDeployments = process.env.NEXT_PUBLIC_MULTIPLE_DEPLOYMENTS;
 
   useEffect(() => {
-    if (multipleDeployments === "false") {
-      router.push("/deployment");
-    } else if (multipleDeployments === "true") {
+    if (IS_MODE_MULTI) {
       router.push("/home");
+    } else {
+      router.push("/deployment");
     }
-  }, [router, multipleDeployments]);
+  }, [router]);
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-0">

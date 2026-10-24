@@ -1,24 +1,23 @@
 "use client";
-import { Button } from "@/components/shadcn-ui/button";
-import {
-  GetEntities,
-  getCfg,
-  getHealthChecks,
-  getJobs,
-  sortCards,
-} from "@/lib/utils";
-import { ReloadIcon, ChevronLeftIcon } from "@radix-ui/react-icons";
+
+import React, { useState, useEffect } from "react";
+import { sortCards } from "@/lib/utils";
+import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
-import { useState, useEffect } from "react";
-import { Entity } from "@/data/entities";
-import { Check } from "@/data/health";
-import { autoRefreshInterval, DevEntities } from "@/data/constants";
-import { columns } from "@/components/dashboard/DataTableComponents/DataTableColumns";
+import { DevEntities } from "@/dev-data/constants";
+import {
+  columns,
+  HealthCheck,
+} from "@/components/dashboard/DataTableComponents/DataTableColumns";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ClipLoader } from "react-spinners";
-import JobInfo from "@/components/dashboard/job-info";
-import { Jobs, Job } from "@/data/jobs";
+import JobInfo from "@/components/dashboard/Jobinfo";
+import { Check, summarizeStoreCheck, UiCheck } from "@/lib/health";
+import { useDataLoader } from "@/lib/loadDataHook";
+import { useReloadInterval } from "../../layout";
+
+import { getCfg } from "@/lib/cfg";
 
 import {
   Tabs,
@@ -31,6 +30,10 @@ import "prismjs/components/prism-json";
 import "prismjs/themes/prism.css";
 import { Suspense } from "react";
 import dayjs from "dayjs";
+import { fetchData } from "@/lib/fetchData";
+import { Entity, normalizeEntities } from "@/lib/entities";
+import { Job } from "@/lib/jobs";
+import { IS_MODE_MULTI, IS_MODE_SAAS } from "@/lib/env";
 
 const SuspenseWrapper = () => (
   <Suspense fallback={<div>Loading...</div>}>
@@ -41,17 +44,20 @@ const SuspenseWrapper = () => (
 export default SuspenseWrapper;
 
 function CustomerPage() {
+  const autoRefreshInterval = useReloadInterval();
   const router = useRouter();
-  const [entities, setEntities] = useState<Entity[]>([]);
-  const [entity, setEntity] = useState<Entity | null>(null); // entities[params.id]);
-  const [healthChecks, setHealthChecks] = useState<Check[]>([]);
+  //const [entities2, setEntities] = useState<Entity[]>([]);
+  const [entity, setEntity] = useState<Entity | undefined>(undefined); // entities[params.id]);
   const [cfg, setCfg] = useState<{}>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [tableData, setTableData] = useState([] as any[]);
+  const [tableData, setTableData] = useState<HealthCheck[]>(
+    [] as HealthCheck[]
+  );
   const [tab, setTab] = useState("overview");
   const [hasError, setHasError] = useState(false);
   const [tiles, setTiles] = useState(false);
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const { healthChecksEntities, entities, jobs, loadData } = useDataLoader();
+  const healthChecks: Check[] = healthChecksEntities;
 
   let id: string | null = "";
   let searchParams = useSearchParams();
@@ -69,19 +75,35 @@ function CustomerPage() {
   }, [id]);
 
   useEffect(() => {
-    if (healthChecks && entity) {
-      const myCheck = healthChecks
+    if (id && entities) {
+      const myEntity = entities.find((e: any) => e.uid === id);
+      setEntity(myEntity);
+
+      if (DevEntities) {
+        console.log("newEntities", entities);
+        console.log("myEntity", myEntity);
+      }
+    }
+  }, [id, entities]);
+
+  useEffect(() => {
+    if (healthChecks && healthChecks.length > 0 && entity) {
+      const myCheck: UiCheck[] = healthChecks
         .filter(
-          (check) => check.name === `entities/${entity.type}/${entity.id}`
+          (check: Check) =>
+            check.name === `entities/${entity.type}/${entity.id}`
         )
         .flatMap((check) =>
           check.capabilities
             ? check.capabilities.map((cap) => ({
                 ...cap,
                 timestamp: check.timestamp,
+                url: check.url,
                 components: check.components
                   ? check.components
-                      .filter((comp) => comp.capabilities.includes(cap.name))
+                      .filter((comp) =>
+                        (comp.capabilities as string[]).includes(cap.name)
+                      )
                       .map((comp) => ({
                         ...comp,
                         capability: cap.name,
@@ -91,42 +113,27 @@ function CustomerPage() {
               }))
             : []
         )
-        .map((check) => ({
-          label: check.name,
-          status: check.state,
-          message: check.message,
-          checked: dayjs(check.timestamp).format("HH:mm:ss"),
-          subRows: check.components.map((comp) => ({
-            label: comp.name,
-            status: comp.state,
-            message: comp.message,
-            checked: "", //dayjs(check.timestamp).format("HH:mm:ss"),
-          })),
-        }));
-      setTableData(myCheck);
+        .map((check) => {
+          return {
+            ...check,
+            url: check.url?.match(/\/\/([^\/]+)/)?.[1] || "",
+            description: check.description?.replaceAll("\n", "<br/>"),
+            checked: dayjs(check.timestamp).format("HH:mm:ss"),
+          };
+        })
+        .filter((c) => c !== null) as UiCheck[];
+
+      const summarizedStoreCheck = IS_MODE_MULTI
+        ? summarizeStoreCheck(myCheck)
+        : myCheck;
+
+      setTableData(summarizedStoreCheck as HealthCheck[]);
+
       if (DevEntities) {
-        console.log("myCheck:", myCheck);
+        console.log("myCheck:", myCheck, summarizedStoreCheck);
       }
     }
   }, [healthChecks, entity]);
-
-  const loadHealthChecks = async () => {
-    try {
-      const newHealthChecks = await getHealthChecks();
-      setHealthChecks(newHealthChecks);
-    } catch (error) {
-      console.error("Error loading health checks:", error);
-    }
-  };
-
-  const loadJobs = async () => {
-    try {
-      const newJobs = await getJobs();
-      setJobs(newJobs);
-    } catch (error) {
-      console.error("Error loading jobs:", error);
-    }
-  };
 
   const loadCfg = async () => {
     try {
@@ -144,15 +151,20 @@ function CustomerPage() {
     }
   };
 
-  const loadEntities = async () => {
+  /*const findEntity = async () => {
     try {
-      const newEntities = await GetEntities();
+      const newEntities = await fetchData(
+        "/api/entities",
+        normalizeEntities,
+        true
+      );
+      console.log("newEntities", newEntities);
       if (!newEntities) {
         return notFound();
       }
       setEntities(newEntities);
 
-      const myEntity = newEntities.find((e) => e.uid === id);
+      const myEntity = newEntities.find((e: any) => e.uid === id);
       setEntity(myEntity);
 
       if (DevEntities) {
@@ -162,14 +174,19 @@ function CustomerPage() {
     } catch (error) {
       console.error("Error loading entities:", error);
     }
-  };
+  };*/
 
   useEffect(() => {
-    const loadData = async () => {
-      await loadEntities();
-      await loadHealthChecks();
-      await loadJobs();
-      //await loadCfg();
+    const loadEntitiesAndCfg = async () => {
+      //await findEntity();
+      if (IS_MODE_SAAS) {
+        await loadCfg();
+      }
+      loadData({
+        loadEntities: true,
+        loadHealthChecksEntities: true,
+        loadJobs: true,
+      });
       setIsLoading(false);
       if (DevEntities) {
         console.log("entities[id]", entities);
@@ -177,13 +194,22 @@ function CustomerPage() {
         console.log("cfg", cfg);
       }
     };
-    const interval = setInterval(() => {
-      loadData();
-    }, autoRefreshInterval);
-    return () => clearInterval(interval);
+    loadEntitiesAndCfg();
+
+    if (autoRefreshInterval > 0) {
+      const interval = setInterval(() => {
+        loadEntitiesAndCfg();
+        loadData({
+          loadEntities: true,
+          loadHealthChecksEntities: true,
+          loadJobs: true,
+        });
+      }, autoRefreshInterval * 1000);
+      return () => clearInterval(interval);
+    }
     // some dependencies ignored to avoid indefinite loop
     // eslint-disable-next-line
-  }, [tiles]);
+  }, [tiles, autoRefreshInterval]);
 
   const onTabChange = (tab: string) => {
     setTab(tab);
@@ -244,8 +270,17 @@ function CustomerPage() {
               {id &&
                 tiles &&
                 jobs &&
+                jobs.length > 0 &&
                 jobs.some(
-                  (job: Job) => job.entity === id?.split("_").slice(1).join("_")
+                  (job) =>
+                    job.sets &&
+                    job.sets.length > 0 &&
+                    job.sets.some((jobSet: Job) => {
+                      //console.log("blub", jobSet.entity, id);
+                      return (
+                        jobSet.entity === id?.split("_").slice(1).join("_")
+                      );
+                    })
                 ) && (
                   <TabsTrigger value="jobs">
                     <span>Jobs</span>
@@ -268,35 +303,53 @@ function CustomerPage() {
           <TabsContent value="jobs">
             {id &&
             sortedJobs.length > 0 &&
-            sortedJobs.filter(
-              (job: Job) => job.entity === id?.split("_").slice(1).join("_")
-            ).length > 0
+            sortedJobs.some(
+              (job) =>
+                job &&
+                job.sets.length > 0 &&
+                job.sets.some(
+                  (jobSet: Job) =>
+                    jobSet.entity === id?.split("_").slice(1).join("_")
+                )
+            )
               ? sortedJobs
                   .filter(
-                    (job: Job) =>
-                      job.entity === id?.split("_").slice(1).join("_")
+                    (job) =>
+                      job &&
+                      job.sets.some(
+                        (jobSet: Job) =>
+                          jobSet.entity === id?.split("_").slice(1).join("_")
+                      )
                   )
-                  .map((job: Job) => (
-                    <>
-                      <div
-                        className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
-                        style={{ marginBottom: "10px" }}
-                      >
-                        <JobInfo
-                          key={job.id}
-                          entity={job.entity}
-                          label={job.label}
-                          tilesets={job.details.tileSets}
-                          percent={job.percent}
-                          startedAt={job.startedAt}
-                          updatedAt={job.updatedAt}
-                          info={`${job.current}/${job.total}`}
-                          id={job.id}
-                        />
-                      </div>
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>
-                    </>
-                  ))
+                  .map((job) =>
+                    job.sets
+                      .filter(
+                        (jobSet: Job) =>
+                          jobSet.entity === id?.split("_").slice(1).join("_")
+                      )
+                      .map((jobSet: Job) => (
+                        <React.Fragment key={jobSet.id}>
+                          <div
+                            className="grid gap-4 md:grid-cols-1 lg:grid-cols-1"
+                            style={{ marginBottom: "10px" }}
+                          >
+                            <JobInfo
+                              key={jobSet.id}
+                              entity={jobSet.entity}
+                              label={jobSet.label}
+                              tilesets={jobSet.details.tileSets}
+                              percent={jobSet.percent}
+                              startedAt={jobSet.startedAt}
+                              updatedAt={jobSet.updatedAt}
+                              info={`${jobSet.current}/${jobSet.total}`}
+                              id={jobSet.id}
+                              url={job.url}
+                            />
+                          </div>
+                          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>
+                        </React.Fragment>
+                      ))
+                  )
               : null}
           </TabsContent>
           <TabsContent value="cfg">
