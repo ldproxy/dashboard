@@ -32,7 +32,7 @@ import {
 import { useDataLoader } from "@/lib/loadDataHook";
 import { Check, summarizeStoreCheck, UiCheck } from "@/lib/health";
 import { useReloadInterval } from "../layout";
-import { IS_MODE_MULTI, IS_MODE_SINGLE } from "@/lib/env";
+import { FEATURE_LOG_VIEWER, IS_MODE_MULTI, IS_MODE_SINGLE } from "@/lib/env";
 import { Job } from "@/lib/jobs";
 import LogViewer from "@/components/dashboard/LogViewer";
 import LogLevelSelect from "@/components/dashboard/LogLevelSelect";
@@ -176,7 +176,12 @@ export default function DeploymentPage() {
 
   useEffect(() => {
     if (pathname) {
-      setTab(window.location.hash.slice(1) || "overview");
+      const hashTab = window.location.hash.slice(1);
+      setTab(
+        !hashTab || (hashTab === "log" && !FEATURE_LOG_VIEWER)
+          ? "overview"
+          : hashTab
+      );
     }
   }, [pathname]);
 
@@ -306,11 +311,13 @@ export default function DeploymentPage() {
             <TabsTrigger value="jobs">
               <span>Jobs</span>
             </TabsTrigger>
-            <TabsTrigger value="log">
-              <span>Log</span>
-            </TabsTrigger>
+            {FEATURE_LOG_VIEWER && (
+              <TabsTrigger value="log">
+                <span>Log</span>
+              </TabsTrigger>
+            )}
           </TabsList>
-          {tab === "log" && (
+          {FEATURE_LOG_VIEWER && tab === "log" && (
             <>
               <ToggleFiltersLog
                 isDropdownOpenLog={isDropdownOpenLog}
@@ -583,11 +590,13 @@ export default function DeploymentPage() {
             )}
           </div>
         </TabsContent>
-        <TabsContent value="log">
-          <div style={{ height: "calc(100vh - 275px)" }}>
-            <LogViewer logLevel={logLevel} flagsLog={flagsLog} />
-          </div>
-        </TabsContent>
+        {FEATURE_LOG_VIEWER && (
+          <TabsContent value="log">
+            <div style={{ height: "calc(100vh - 275px)" }}>
+              <LogViewer logLevel={logLevel} flagsLog={flagsLog} />
+            </div>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

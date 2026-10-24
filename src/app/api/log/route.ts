@@ -1,7 +1,16 @@
 import { type NextRequest } from "next/server";
-import { IS_DEV, IS_MODE_SINGLE, USE_DEV_DATA } from "../../../lib/env";
+import {
+  FEATURE_LOG_VIEWER,
+  IS_DEV,
+  IS_MODE_SINGLE,
+  USE_DEV_DATA,
+} from "../../../lib/env";
 
 export async function GET(req: NextRequest) {
+  if (!FEATURE_LOG_VIEWER) {
+    return new Response("Not found", { status: 404 });
+  }
+
   if (req.headers.get("accept") !== "text/event-stream") {
     return new Response("Expected 'text/event-stream'", { status: 400 });
   }
