@@ -70,19 +70,6 @@ function calculateDaysBetweenDates(begin: number, end: number): number {
   return Math.floor(diff / oneDay);
 }
 
-export const sortCards = (cards: any[]) => {
-  if (cards.length === 0) return [];
-  return cards.sort((a: any, b: any) => {
-    if (a.percent === 100 && b.percent !== 100) return 1;
-    if (b.percent === 100 && a.percent !== 100) return -1;
-    if (a.startedAt === -1 && b.startedAt > -1) return 1;
-    if (b.startedAt === -1 && a.startedAt > -1) return -1;
-    if (a.updatedAt <= 0 && b.updatedAt > 0) return 1;
-    if (b.updatedAt <= 0 && a.updatedAt > 0) return -1;
-    return b.startedAt - a.startedAt;
-  });
-};
-
 export const compareDataAcrossUrls = async () => {
   try {
     const entitiesData: MultiResponse<any> = await fetchData(

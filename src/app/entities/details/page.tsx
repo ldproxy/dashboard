@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { sortCards } from "@/lib/utils";
 import { ChevronLeftIcon } from "@radix-ui/react-icons";
 import { notFound } from "next/navigation";
 import { DevEntities } from "@/dev-data/constants";
@@ -32,7 +31,7 @@ import { Suspense } from "react";
 import dayjs from "dayjs";
 import { fetchData } from "@/lib/fetchData";
 import { Entity, normalizeEntities } from "@/lib/entities";
-import { Job } from "@/lib/jobs";
+import { Job, sortJobs } from "@/lib/jobs";
 import { IS_MODE_MULTI, IS_MODE_SAAS } from "@/lib/env";
 
 const SuspenseWrapper = () => (
@@ -215,10 +214,7 @@ function CustomerPage() {
     setTab(tab);
   };
 
-  let sortedJobs = [];
-  if (jobs.length > 0) {
-    sortedJobs = sortCards(jobs);
-  }
+  const sortedJobs = sortJobs(jobs);
   //const entity = entities ? entities.find((e) => (e.uid = params.id)) : null; Diese Funktion hat UIDs in entities verändert.
 
   if (isLoading) {
@@ -276,9 +272,10 @@ function CustomerPage() {
                     job.sets &&
                     job.sets.length > 0 &&
                     job.sets.some((jobSet: Job) => {
-                      //console.log("blub", jobSet.entity, id);
+                      //console.log("blub", jobSet.context?.entity, id);
                       return (
-                        jobSet.entity === id?.split("_").slice(1).join("_")
+                        jobSet.context?.entity ===
+                        id?.split("_").slice(1).join("_")
                       );
                     })
                 ) && (
@@ -309,7 +306,7 @@ function CustomerPage() {
                 job.sets.length > 0 &&
                 job.sets.some(
                   (jobSet: Job) =>
-                    jobSet.entity === id?.split("_").slice(1).join("_")
+                    jobSet.context?.entity === id?.split("_").slice(1).join("_")
                 )
             )
               ? sortedJobs
@@ -318,14 +315,16 @@ function CustomerPage() {
                       job &&
                       job.sets.some(
                         (jobSet: Job) =>
-                          jobSet.entity === id?.split("_").slice(1).join("_")
+                          jobSet.context?.entity ===
+                          id?.split("_").slice(1).join("_")
                       )
                   )
                   .map((job) =>
                     job.sets
                       .filter(
                         (jobSet: Job) =>
-                          jobSet.entity === id?.split("_").slice(1).join("_")
+                          jobSet.context?.entity ===
+                          id?.split("_").slice(1).join("_")
                       )
                       .map((jobSet: Job) => (
                         <React.Fragment key={jobSet.id}>
@@ -335,15 +334,16 @@ function CustomerPage() {
                           >
                             <JobInfo
                               key={jobSet.id}
-                              entity={jobSet.entity}
+                              entity={jobSet.context?.entity}
                               label={jobSet.label}
-                              tilesets={jobSet.details.tileSets}
-                              percent={jobSet.percent}
+                              tilesets={jobSet.progress.details}
+                              percent={jobSet.progress.percent}
+                              status={jobSet.status}
                               startedAt={jobSet.startedAt}
                               updatedAt={jobSet.updatedAt}
-                              info={`${jobSet.current}/${jobSet.total}`}
+                              info={`${jobSet.progress.current}/${jobSet.progress.total}`}
                               id={jobSet.id}
-                              url={job.url}
+                              url={job.url ?? ""}
                             />
                           </div>
                           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"></div>

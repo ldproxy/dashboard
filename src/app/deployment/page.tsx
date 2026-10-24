@@ -11,7 +11,6 @@ import {
   TabsTrigger,
   TabsContent,
 } from "@/components/shadcn-ui/tabs";
-import { sortCards } from "@/lib/utils";
 import React, { useState, useEffect } from "react";
 import { getIcon } from "@/lib/icons";
 import { DataTable } from "@/components/dashboard/DataTableComponents/DataTable";
@@ -33,7 +32,7 @@ import { useDataLoader } from "@/lib/loadDataHook";
 import { Check, summarizeStoreCheck, UiCheck } from "@/lib/health";
 import { useReloadInterval } from "../layout";
 import { FEATURE_LOG_VIEWER, IS_MODE_MULTI, IS_MODE_SINGLE } from "@/lib/env";
-import { Job } from "@/lib/jobs";
+import { Job, sortJobs } from "@/lib/jobs";
 import LogViewer from "@/components/dashboard/LogViewer";
 import LogLevelSelect from "@/components/dashboard/LogLevelSelect";
 import ToggleFiltersLog from "@/components/dashboard/ToggleFiltersLog";
@@ -239,10 +238,7 @@ export default function DeploymentPage() {
   const totalEntities = entities.length;
   const entityCounts = getEntityCounts(entities);
   const footer = getStateSummary(entityCounts);
-  let sortedJobs: { url: string; sets: Job[] }[] = [];
-  if (jobs && jobs.length > 0) {
-    sortedJobs = sortCards(jobs);
-  }
+  const sortedJobs = sortJobs(jobs ?? []);
 
   if (DevDeployment) {
     console.log("Values:", totalValues);
@@ -521,7 +517,7 @@ export default function DeploymentPage() {
         <TabsContent value="jobs">
           {sortedJobs.length > 0 ? (
             sortedJobs.map(
-              (job: { url: string; sets: Job[] }) =>
+              (job) =>
                 job.sets &&
                 job.sets.length > 0 &&
                 job.sets.map((jobSet: Job) => (
@@ -532,13 +528,14 @@ export default function DeploymentPage() {
                     >
                       <JobInfo
                         key={jobSet.id}
-                        entity={jobSet.entity}
+                        entity={jobSet.context?.entity}
                         label={jobSet.label}
-                        tilesets={jobSet.details.tileSets}
-                        percent={jobSet.percent}
+                        tilesets={jobSet.progress.details}
+                        percent={jobSet.progress.percent}
+                        status={jobSet.status}
                         startedAt={jobSet.startedAt}
                         updatedAt={jobSet.updatedAt}
-                        info={`${jobSet.current}/${jobSet.total}`}
+                        info={`${jobSet.progress.current}/${jobSet.progress.total}`}
                         id={jobSet.id}
                         url={job.url?.match(/\/\/([^\/]+)/)?.[1] || ""}
                       />

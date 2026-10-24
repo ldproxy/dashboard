@@ -2,7 +2,7 @@ import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import JobInfo, { SummaryProps } from "../src/components/dashboard/Jobinfo";
 import StoryWrapper from "./StoryWrapper";
-import { fromDev } from "../src/dev-data/jobs";
+import { jobSets } from "../src/dev-data/jobs";
 
 export default {
   title: "Components/JobInfo",
@@ -15,32 +15,33 @@ const Template: StoryFn<SummaryProps> = (args) => (
   </StoryWrapper>
 );
 
-// Extrahieren der Daten aus fromDev
-const devData = fromDev();
-const exampleJob = devData[0].response.sets[0];
+const exampleJob = jobSets.sets[0];
+const exampleUrl = "localhost:7080";
 
 export const Default = Template.bind({});
 Default.args = {
-  entity: exampleJob.entity,
-  tilesets: exampleJob.details.tileSets,
+  entity: exampleJob.context.entity,
+  tilesets: exampleJob.progress.details,
   label: exampleJob.label,
-  percent: exampleJob.percent,
+  percent: exampleJob.progress.percent,
+  status: exampleJob.status,
   startedAt: exampleJob.startedAt,
   updatedAt: exampleJob.updatedAt,
   id: exampleJob.id,
   info: "Processing tiles",
-  url: devData[0].url,
+  url: exampleUrl,
 };
 
 export const Ready = Template.bind({});
 Ready.args = {
-  entity: exampleJob.entity,
-  tilesets: exampleJob.details.tileSets,
+  entity: exampleJob.context.entity,
+  tilesets: exampleJob.progress.details,
   label: exampleJob.label,
   percent: 100,
+  status: "SUCCESSFUL",
   startedAt: exampleJob.startedAt,
   updatedAt: exampleJob.updatedAt,
   id: exampleJob.id,
   info: "Processing tiles",
-  url: devData[0].url,
+  url: exampleUrl,
 };

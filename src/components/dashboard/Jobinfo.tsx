@@ -7,13 +7,14 @@ import {
 import React, { useState } from "react";
 import prettyMs from "pretty-ms";
 import { Progress } from "@/components/dashboard/Progress";
-import { TileSets } from "@/lib/jobs";
+import { JobStatus, TileSetProgress, TileSets } from "@/lib/jobs";
 
 export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   entity: string;
   tilesets: TileSets;
   label: string;
   percent: number;
+  status: JobStatus;
   startedAt: number;
   updatedAt: number;
   id: string;
@@ -21,24 +22,29 @@ export interface SummaryProps extends React.HTMLAttributes<HTMLDivElement> {
   url: string;
 }
 
+const tileSetPercent = ({ percent, current, total }: TileSetProgress) =>
+  percent ?? (total > 0 ? Math.round((100 * current) / total) : 0);
+
 export default function JobInfo({
   entity,
   tilesets,
   label,
   percent,
+  status,
   startedAt,
   updatedAt,
   id,
   info,
   url,
 }: SummaryProps) {
-  const durationInMs = (updatedAt - startedAt) * 1000;
+  const completed = status === "SUCCESSFUL";
+  const durationInMs = updatedAt - startedAt;
   const readableDuration =
     startedAt <= 0
       ? "waiting"
       : updatedAt <= 0
-      ? "starting"
-      : prettyMs(durationInMs);
+        ? "starting"
+        : prettyMs(durationInMs);
 
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
 
@@ -67,7 +73,7 @@ export default function JobInfo({
           >
             <div
               className={`flex-none ${
-                percent === 100 ? "text-green-500" : "text-blue-500"
+                completed ? "text-green-500" : "text-blue-500"
               }`}
               style={{
                 width: "360px",
@@ -94,7 +100,7 @@ export default function JobInfo({
           <div>
             <div
               className={`flex flex-col justify-center items-center w-5/6 ${
-                percent === 100 ? "" : "animate-pulse"
+                completed ? "" : "animate-pulse"
               } mt-1`}
             >
               <div
@@ -108,16 +114,14 @@ export default function JobInfo({
               </div>
               <Progress
                 value={percent}
-                indicatorColor={`${
-                  percent === 100 ? "bg-green-400" : "bg-blue-400"
-                }`}
+                indicatorColor={`${completed ? "bg-green-400" : "bg-blue-400"}`}
               />
               <span className="w-1/6 text-right mt-3">{percent}%</span>
             </div>
             <div className={`flex flex-col justify-center items-center w-5/6`}>
               <span
                 className={`w-5/6 text-right mt-3 ${
-                  percent === 100 ? "text-green-500" : "text-blue-500"
+                  completed ? "text-green-500" : "text-blue-500"
                 }`}
                 style={{
                   textAlign: "center",
@@ -143,88 +147,87 @@ export default function JobInfo({
                 width: "100%",
               }}
             >
-              {Object.entries(tilesets).map(([key, value]) => (
-                <div key={key}>
-                  <div
-                    key={key}
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      color: "dimgray",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                      marginBottom: "10px",
-                    }}
-                  >
-                    <button
-                      onClick={() => toggleSection(`${id} + ${key}`)}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        marginRight: "5px",
-                        width: "20px",
-                        display: "flex",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {expandedSections.includes(`${id} + ${key}`) ? "▼" : "▶"}
-                    </button>
+              {Object.entries(tilesets).map(([key, value]) => {
+                const tilesetPercent = tileSetPercent(value);
+                return (
+                  <div key={key}>
                     <div
+                      key={key}
                       style={{
-                        width: "300px",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
+                        display: "flex",
+                        flexDirection: "row",
                         color: "dimgray",
                         fontSize: "14px",
                         fontWeight: "bold",
-                        marginRight: "20px",
+                        marginBottom: "10px",
                       }}
-                      title={key}
                     >
-                      {key}
-                    </div>
-                    {value.progress && value.progress.percent !== undefined && (
+                      <button
+                        onClick={() => toggleSection(`${id} + ${key}`)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          marginRight: "5px",
+                          width: "20px",
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {expandedSections.includes(`${id} + ${key}`)
+                          ? "▼"
+                          : "▶"}
+                      </button>
+                      <div
+                        style={{
+                          width: "300px",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          color: "dimgray",
+                          fontSize: "14px",
+                          fontWeight: "bold",
+                          marginRight: "20px",
+                        }}
+                        title={key}
+                      >
+                        {key}
+                      </div>
                       <div
                         className={`flex flex-col justify-center items-center w-1/6 ${
-                          value.progress.percent === 100 ? "" : "animate-pulse"
+                          tilesetPercent === 100 ? "" : "animate-pulse"
                         } mt-1`}
                       >
                         <Progress
-                          value={value.progress.percent}
+                          value={tilesetPercent}
                           indicatorColor={`${
-                            value.progress.percent === 100
+                            tilesetPercent === 100
                               ? "bg-green-400"
                               : "bg-blue-400"
                           }`}
                         />
                       </div>
-                    )}
-                  </div>
+                    </div>
 
-                  {expandedSections.includes(`${id} + ${key}`) &&
-                    value.progress &&
-                    value.progress.levels &&
-                    Object.keys(value.progress.levels).map((tms) => (
-                      <div
-                        key={tms}
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          marginLeft: "35px",
-                          marginBottom: "5px",
-                          color: "#808080",
-                          fontSize: "12px",
-                          fontWeight: "bold",
-                          marginRight: "20px",
-                        }}
-                      >
-                        <div>{tms}:&nbsp;&nbsp;</div>
-                        {value.progress &&
-                          value.progress.levels &&
-                          value.progress.levels[tms].map(
-                            (levelProgress, level) =>
+                    {expandedSections.includes(`${id} + ${key}`) &&
+                      value.levels &&
+                      Object.keys(value.levels).map((tms) => (
+                        <div
+                          key={tms}
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            marginLeft: "35px",
+                            marginBottom: "5px",
+                            color: "#808080",
+                            fontSize: "12px",
+                            fontWeight: "bold",
+                            marginRight: "20px",
+                          }}
+                        >
+                          <div>{tms}:&nbsp;&nbsp;</div>
+                          {value.levels &&
+                            value.levels[tms].map((levelProgress, level) =>
                               levelProgress > -1 ? (
                                 <span
                                   key={level}
@@ -238,11 +241,12 @@ export default function JobInfo({
                                   {level}&nbsp;
                                 </span>
                               ) : null
-                          )}
-                      </div>
-                    ))}
-                </div>
-              ))}
+                            )}
+                        </div>
+                      ))}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

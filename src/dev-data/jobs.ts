@@ -1,77 +1,74 @@
 import { MultiResponse, SingleResponse } from "@/app/api/util";
-import { JobSets, JobsWithUrl } from "@/lib/jobs";
+import { JobSets, PartialJob } from "@/lib/jobs";
 
-const jobSets: JobSets = {
+const partialJob = (id: string, kind: string, partOf: string): PartialJob => ({
+  id,
+  kind,
+  createdAt: 1738323460000,
+  startedAt: 0,
+  updatedAt: 0,
+  finishedAt: 0,
+  priority: 0,
+  progress: { current: 0, total: 0, percent: 0, details: {} },
+  status: "SUCCESSFUL",
+  errors: [],
+  context: { entity: "testOpenApi" },
+  partOf,
+  executor: "",
+  onHold: false,
+  progressUpdates: 0,
+});
+
+export const jobSets: JobSets = {
   sets: [
     {
       id: "c88b1ac0-dfc7-11ef-917f-d2a0be19b136",
-      type: "tile-seeding",
-      followUps: [],
-      errors: [],
-      startedAt: 1738323463,
-      updatedAt: 1738323566,
-      finishedAt: -1,
-      total: 68405,
-      current: 33000,
-      details: {
-        tileProvider: "strassen-tiles",
-        tileSets: {
+      kind: "tile-seeding",
+      createdAt: 1738323460000,
+      startedAt: 1738323463000,
+      updatedAt: 1738323566000,
+      finishedAt: 0,
+      priority: 0,
+      progress: {
+        current: 33000,
+        total: 68405,
+        percent: 48,
+        details: {
           netzknoten: {
-            progress: {
-              total: 17234,
-              current: 10000,
-              done: false,
-              percent: 73,
-              levels: {
-                WebMercatorQuad: [
-                  -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 2279, 9116, -1,
-                  -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                ],
-                AdV_25832: [
-                  -1, -1, -1, -1, 0, 0, 0, 0, 3696, -1, -1, -1, -1, -1, -1, -1,
-                  -1, -1, -1, -1, -1, -1, -1, -1,
-                ],
-              },
+            total: 17234,
+            current: 10000,
+            percent: 73,
+            levels: {
+              WebMercatorQuad: [
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 2279, 9116, -1, -1,
+                -1, -1, -1, -1, -1, -1, -1, -1,
+              ],
+              AdV_25832: [
+                -1, -1, -1, -1, 0, 0, 0, 0, 3696, -1, -1, -1, -1, -1, -1, -1,
+                -1, -1, -1, -1, -1, -1, -1, -1,
+              ],
             },
           },
         },
-        reseed: false,
       },
+      status: "RUNNING",
+      errors: [],
+      context: { entity: "testOpenApi" },
       label: "Tile cache seeding",
       description: " (Tilesets: [netzknoten])",
-      entity: "testOpenApi",
-      setup: {
-        id: "c88b1ac1-dfc7-11ef-917f-d2a0be19b136",
-        type: "tile-seeding:setup",
-        details: false,
-        followUps: [],
-        errors: [],
-        startedAt: -1,
-        updatedAt: -1,
-        finishedAt: -1,
-        total: 0,
-        current: 0,
-        partOf: "c88b1ac0-dfc7-11ef-917f-d2a0be19b136",
-        done: true,
-        percent: 0,
-      },
-      cleanup: {
-        id: "c88b1ac2-dfc7-11ef-917f-d2a0be19b136",
-        type: "tile-seeding:setup",
-        details: true,
-        followUps: [],
-        errors: [],
-        startedAt: -1,
-        updatedAt: -1,
-        finishedAt: -1,
-        total: 0,
-        current: 0,
-        partOf: "c88b1ac0-dfc7-11ef-917f-d2a0be19b136",
-        done: true,
-        percent: 0,
-      },
-      done: false,
-      percent: 48,
+      inputs: { tileProvider: "strassen-tiles", reseed: false },
+      outputs: {},
+      setup: partialJob(
+        "c88b1ac1-dfc7-11ef-917f-d2a0be19b136",
+        "tile-seeding:setup",
+        "c88b1ac0-dfc7-11ef-917f-d2a0be19b136"
+      ),
+      cleanup: partialJob(
+        "c88b1ac2-dfc7-11ef-917f-d2a0be19b136",
+        "tile-seeding:cleanup",
+        "c88b1ac0-dfc7-11ef-917f-d2a0be19b136"
+      ),
+      followUps: [],
     },
   ],
 };

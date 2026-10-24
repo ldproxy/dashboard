@@ -1,46 +1,58 @@
 import { MultiResponse } from "@/app/api/util";
 
-interface TileSetProgress {
+export interface TileSetProgress {
   percent?: number;
   current: number;
-  done: boolean;
   total: number;
-  WebMercatorQuad?: { [level: number]: number };
   levels?: { [tms: string]: number[] };
-  [key: string]: any;
 }
 
 export interface TileSets {
-  [key: string]: {
-    progress?: TileSetProgress;
-    parameters?: any;
-  };
+  [key: string]: TileSetProgress;
 }
 
-interface JobDetails {
-  tileProvider: string;
-  tileSets: TileSets;
-  reseed: boolean;
-}
+export type JobStatus =
+  "ACCEPTED" | "RUNNING" | "SUCCESSFUL" | "FAILED" | "DISMISSED";
 
-export interface Job {
-  id: string;
-  finishedAt: number;
-  type: string;
-  entity: string;
-  label: string;
-  description?: string;
-  details: JobDetails;
-  percent: number;
-  startedAt: number;
-  updatedAt: number;
+export interface Progress {
   current: number;
   total: number;
-  followUps: Job[];
+  percent: number;
+  details: { [key: string]: any };
+}
+
+export interface BaseJob {
+  id: string;
+  kind: string;
+  createdAt: number;
+  startedAt: number;
+  updatedAt: number;
+  finishedAt: number;
+  priority: number;
+  progress: Progress;
+  status: JobStatus;
   errors: string[];
-  setup?: any;
-  cleanup?: any;
-  done: boolean;
+  context: { [key: string]: any };
+}
+
+export interface PartialJob extends BaseJob {
+  partOf: string;
+  executor: string;
+  onHold: boolean;
+  progressUpdates: number;
+  sequence?: number;
+}
+
+export interface Job extends BaseJob {
+  label: string;
+  description?: string;
+  inputs: { [key: string]: any };
+  outputs: { [key: string]: any };
+  setup?: PartialJob;
+  cleanup?: PartialJob;
+  followUps: Job[];
+  sequence?: number;
+  ttlSeconds?: number;
 }
 export interface JobSets {
   sets: Job[];
@@ -82,3 +94,21 @@ const expandJob = (job: Job): Job[] => {
 
   return [job];
 };
+
+const statusRank: Record<JobStatus, number> = {
+  RUNNING: 0,
+  ACCEPTED: 1,
+  FAILED: 2,
+  DISMISSED: 2,
+  SUCCESSFUL: 2,
+};
+
+const byActivityThenNewest = (a: Job, b: Job): number =>
+  statusRank[a.status] - statusRank[b.status] ||
+  (b.startedAt || b.createdAt) - (a.startedAt || a.createdAt);
+
+export const sortJobs = (jobs: JobsWithUrl[]): JobsWithUrl[] =>
+  jobs.map(({ sets, url }) => ({
+    sets: [...sets].sort(byActivityThenNewest),
+    url,
+  }));
