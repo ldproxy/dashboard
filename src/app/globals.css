@@ -77,3 +77,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+/*
+ * Styling ::-webkit-scrollbar makes Chrome and Safari render a classic,
+ * always-visible scrollbar instead of the macOS overlay one that only shows
+ * while scrolling. Setting scrollbar-width/-color would disable this in Chrome.
+ */
+@layer utilities {
+  .visible-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .visible-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+}

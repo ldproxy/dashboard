@@ -60,8 +60,8 @@ export default function JobInfo({
 
   return (
     <Card
-      className="shadow-lg"
-      style={{ height: "250px", overflow: "auto", boxSizing: "border-box" }}
+      className="shadow-lg flex flex-col overflow-hidden"
+      style={{ height: "250px", boxSizing: "border-box" }}
     >
       <CardHeader>
         <CardTitle className="text-2xl font-bold break-normal mb-5">
@@ -89,7 +89,7 @@ export default function JobInfo({
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex items-start">
+      <CardContent className="flex items-start flex-1 min-h-0">
         <div
           className="text-xl font-bold break-normal"
           style={{
@@ -137,16 +137,9 @@ export default function JobInfo({
           </div>
         </div>
 
-        <div className="flex flex-col w-[360px] mt-[-10px]">
+        <div className="flex flex-col flex-1 self-stretch min-w-0 mt-[-28px] overflow-y-auto visible-scrollbar">
           {Object.keys(tilesets).length > 0 && (
-            <div
-              style={{
-                marginRight: "225px",
-                marginTop: "-18px",
-                height: "50px",
-                width: "100%",
-              }}
-            >
+            <div>
               {Object.entries(tilesets).map(([key, value]) => {
                 const tilesetPercent = tileSetPercent(value);
                 return (
@@ -240,7 +233,7 @@ export default function JobInfo({
                                 >
                                   {level}&nbsp;
                                 </span>
-                              ) : null
+                              ) : null,
                             )}
                         </div>
                       ))}

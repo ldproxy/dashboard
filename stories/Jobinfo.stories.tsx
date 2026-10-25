@@ -45,3 +45,17 @@ Ready.args = {
   info: "Processing tiles",
   url: exampleUrl,
 };
+
+const [exampleTileSet] = Object.values(exampleJob.progress.details);
+const manyTileSets = Object.fromEntries(
+  Array.from({ length: 12 }, (_, i) => [
+    `tileset_${i + 1}`,
+    { ...exampleTileSet, percent: Math.min(100, (i + 1) * 9) },
+  ]),
+);
+
+export const ManyTileSets = Template.bind({});
+ManyTileSets.args = {
+  ...Default.args,
+  tilesets: manyTileSets,
+};
